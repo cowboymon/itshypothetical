@@ -70,7 +70,7 @@ function Nav() {
       <div className="max-w-5xl mx-auto px-6 h-14 flex items-center justify-between">
         <Link
           to="/"
-          className="font-[Gambarino] italic text-lg text-foreground hover:text-accent transition-colors duration-200"
+          className="font-[Gambarino] text-lg text-foreground hover:text-accent transition-colors duration-200"
         >
           It's Hypothetical
         </Link>
@@ -159,7 +159,7 @@ function Footer({ nextProject }: { nextProject?: Project }) {
           <div>
             <Link
               to="/"
-              className="font-[Gambarino] italic text-base text-foreground hover:text-accent transition-colors"
+              className="font-[Gambarino] text-base text-foreground hover:text-accent transition-colors"
             >
               It's Hypothetical
             </Link>
@@ -219,7 +219,7 @@ function Homepage() {
 
       {/* Project grid */}
       <section id="projects" className="max-w-5xl mx-auto px-6 py-24">
-        <h2 className="font-[Gambarino] italic text-4xl sm:text-5xl text-foreground mb-16">
+        <h2 className="font-[Gambarino] text-4xl sm:text-5xl text-foreground mb-16">
           The family
         </h2>
 
@@ -234,7 +234,7 @@ function Homepage() {
       <section id="about" className="bg-card border-y border-border py-24">
         <div className="max-w-5xl mx-auto px-6 grid grid-cols-1 lg:grid-cols-[1fr_2fr] gap-12 items-start">
           <div>
-            <h2 className="font-[Gambarino] italic text-4xl sm:text-5xl text-foreground leading-tight">
+            <h2 className="font-[Gambarino] text-4xl sm:text-5xl text-foreground leading-tight">
               What this actually is
             </h2>
           </div>
@@ -245,7 +245,7 @@ function Homepage() {
             <p>
               I'm not a studio in the twelve-people-and-a-Slack-status sense. It's mostly me, a notes app full of half-formed things, and an unreasonable interest in whether an idea is actually good or I just like the name I came up with for it.
             </p>
-            <p className="text-muted-foreground text-sm italic font-[Gambarino]">
+            <p className="text-muted-foreground text-sm font-[Gambarino]">
               "Some ideas here started as a real problem I kept hitting. One started because I liked the name more than the concept. I'll let you guess which."
             </p>
           </div>
@@ -268,7 +268,7 @@ function ProjectCard({ project }: { project: Project }) {
           <h3 className="font-[Gambarino] text-2xl sm:text-3xl text-foreground group-hover:text-accent transition-colors duration-200">
             {project.name}
           </h3>
-          <p className="font-[Gambarino] italic text-muted-foreground text-base mt-0.5">
+          <p className="font-[Gambarino] text-muted-foreground text-base mt-0.5">
             {project.tagline}
           </p>
         </div>
@@ -327,7 +327,7 @@ function HowItWorksItem({ text, index }: { text: string; index: number }) {
 function QuoteBlock({ children }: { children: React.ReactNode }) {
   return (
     <blockquote className="border-l-2 border-accent pl-6 my-2">
-      <p className="font-[Gambarino] italic text-xl sm:text-2xl text-foreground leading-snug">
+      <p className="font-[Gambarino] text-xl sm:text-2xl text-foreground leading-snug">
         {children}
       </p>
     </blockquote>
@@ -361,7 +361,7 @@ function LoudAndFine() {
           <h1 className="font-[Gambarino] text-5xl sm:text-7xl lg:text-8xl text-foreground leading-[1.02] mt-3">
             Loud & Fine
           </h1>
-          <p className="font-[Gambarino] italic text-2xl sm:text-3xl text-muted-foreground mt-3">
+          <p className="font-[Gambarino] text-2xl sm:text-3xl text-muted-foreground mt-3">
             Loud world. Fine dog.
           </p>
           <p className="font-[General_Sans] font-light text-lg text-muted-foreground mt-6 max-w-xl leading-relaxed">
@@ -438,7 +438,7 @@ function QuirksAndAll() {
           <h1 className="font-[Gambarino] text-5xl sm:text-7xl lg:text-8xl text-foreground leading-[1.02] mt-3">
             Quirks & All
           </h1>
-          <p className="font-[Gambarino] italic text-2xl sm:text-3xl text-muted-foreground mt-3">
+          <p className="font-[Gambarino] text-2xl sm:text-3xl text-muted-foreground mt-3">
             Away, but known.
           </p>
           <p className="font-[General_Sans] font-light text-lg text-muted-foreground mt-6 max-w-xl leading-relaxed">
@@ -511,7 +511,7 @@ function Reach() {
           <h1 className="font-[Gambarino] text-5xl sm:text-7xl lg:text-8xl text-foreground leading-[1.02] mt-3">
             Reach
           </h1>
-          <p className="font-[Gambarino] italic text-2xl sm:text-3xl text-muted-foreground mt-3">
+          <p className="font-[Gambarino] text-2xl sm:text-3xl text-muted-foreground mt-3">
             Alone, not lost.
           </p>
           <p className="font-[General_Sans] font-light text-lg text-muted-foreground mt-6 max-w-xl leading-relaxed">
@@ -533,7 +533,7 @@ function Reach() {
 
             <section>
               <h2 className="font-[DM_Mono] text-xs tracking-[0.18em] text-muted-foreground uppercase mb-2">How it works</h2>
-              <p className="font-[General_Sans] font-light text-sm text-muted-foreground italic py-6 border-b border-border">
+              <p className="font-[General_Sans] font-light text-sm text-muted-foreground py-6 border-b border-border">
                 Feature set is being validated. More soon.
               </p>
             </section>
@@ -571,7 +571,7 @@ function StraightforwardReview() {
           <h1 className="font-[Gambarino] text-5xl sm:text-7xl lg:text-8xl text-foreground leading-[1.02] mt-3">
             Straightforward<br className="hidden sm:block" /> Review
           </h1>
-          <p className="font-[Gambarino] italic text-2xl sm:text-3xl text-muted-foreground mt-3">
+          <p className="font-[Gambarino] text-2xl sm:text-3xl text-muted-foreground mt-3">
             Thumbs up or don't bother.
           </p>
           <p className="font-[General_Sans] font-light text-lg text-muted-foreground mt-6 max-w-xl leading-relaxed">
