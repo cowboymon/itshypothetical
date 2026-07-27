@@ -1,5 +1,6 @@
 import { HashRouter, Routes, Route, Link, useNavigate, useLocation } from "react-router";
 import React, { useEffect, useState } from "react";
+import { ImageWithFallback } from "./components/figma/ImageWithFallback";
 
 // ─── Types ──────────────────────────────────────────────────────────────────
 
@@ -345,7 +346,51 @@ function ProjectCTA({ label, href = "#" }: { label: string; href?: string }) {
   );
 }
 
+// Screenshots for a project's "In the app" section.
+// Leave `images` empty to turn this off — nothing renders until screenshots exist.
+function Screenshots({ images }: { images?: { src: string; alt: string }[] }) {
+  if (!images || images.length === 0) return null;
+  return (
+    <div className="flex gap-4 overflow-x-auto pb-2 -mx-1 px-1 mt-6">
+      {images.map((img, i) => (
+        <div
+          key={i}
+          className="shrink-0 w-40 sm:w-48 aspect-[9/19.5] bg-card border border-border overflow-hidden"
+        >
+          <ImageWithFallback src={img.src} alt={img.alt} className="w-full h-full object-cover" />
+        </div>
+      ))}
+    </div>
+  );
+}
+
+// User/press reviews for a project. Leave `items` empty to turn this section off per page —
+// the whole section (heading included) disappears until reviews are added.
+function Reviews({ items }: { items?: { quote: string; author?: string }[] }) {
+  if (!items || items.length === 0) return null;
+  return (
+    <section>
+      <h2 className="font-[DM_Mono] text-xs tracking-[0.18em] text-muted-foreground uppercase mb-6">Reviews</h2>
+      <div className="space-y-6">
+        {items.map((r, i) => (
+          <div key={i} className="border-b border-border pb-6 last:border-0">
+            <p className="font-[General_Sans] font-light text-base text-foreground leading-relaxed">"{r.quote}"</p>
+            {r.author && (
+              <p className="font-[DM_Mono] text-xs text-muted-foreground uppercase tracking-[0.12em] mt-3">{r.author}</p>
+            )}
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+}
+
 // ─── Loud & Fine ─────────────────────────────────────────────────────────────
+
+// Add screenshots here once they exist — e.g. { src: "/screenshots/loud-and-fine-1.png", alt: "..." }
+const loudAndFineScreenshots: { src: string; alt: string }[] = [];
+// Add reviews here once they exist — the section stays hidden until then
+const loudAndFineReviews: { quote: string; author?: string }[] = [];
 
 function LoudAndFine() {
   const nextProject = projects[1];
@@ -399,7 +444,10 @@ function LoudAndFine() {
               <QuoteBlock>
                 "[Name] has heard Thunderstorm 5 times and has not once lost their mind. That's growth."
               </QuoteBlock>
+              <Screenshots images={loudAndFineScreenshots} />
             </section>
+
+            <Reviews items={loudAndFineReviews} />
           </div>
 
           {/* Details */}
@@ -423,6 +471,9 @@ function LoudAndFine() {
 }
 
 // ─── Quirks & All ────────────────────────────────────────────────────────────
+
+const quirksAndAllScreenshots: { src: string; alt: string }[] = [];
+const quirksAndAllReviews: { quote: string; author?: string }[] = [];
 
 function QuirksAndAll() {
   const nextProject = projects[2];
@@ -474,7 +525,10 @@ function QuirksAndAll() {
                 <QuoteBlock>Still using "settle" with Biscuit? Still accurate?</QuoteBlock>
                 <QuoteBlock>One tap. Print-ready poster and social tile. Just in case.</QuoteBlock>
               </div>
+              <Screenshots images={quirksAndAllScreenshots} />
             </section>
+
+            <Reviews items={quirksAndAllReviews} />
           </div>
 
           <aside>
@@ -496,6 +550,8 @@ function QuirksAndAll() {
 }
 
 // ─── Reach ───────────────────────────────────────────────────────────────────
+
+const reachReviews: { quote: string; author?: string }[] = [];
 
 function Reach() {
   const nextProject = projects[3];
@@ -537,6 +593,8 @@ function Reach() {
                 Feature set is being validated. More soon.
               </p>
             </section>
+
+            <Reviews items={reachReviews} />
           </div>
 
           <aside>
@@ -557,6 +615,8 @@ function Reach() {
 }
 
 // ─── Straightforward Review ───────────────────────────────────────────────────
+
+const straightforwardReviewReviews: { quote: string; author?: string }[] = [];
 
 function StraightforwardReview() {
   return (
@@ -605,6 +665,8 @@ function StraightforwardReview() {
                 <QuoteBlock>Wouldn't go back. Kitchen closed at 8:45 when the sign says 9.</QuoteBlock>
               </div>
             </section>
+
+            <Reviews items={straightforwardReviewReviews} />
           </div>
 
           <aside>
