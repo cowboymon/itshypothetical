@@ -158,12 +158,12 @@ function Footer({ nextProject }: { nextProject?: Project }) {
       <div className="max-w-5xl mx-auto px-6 py-12">
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
           <div>
-            <Link
-              to="/"
+            <a
+              href="https://itshypothetical.com"
               className="font-[Gambarino] text-base text-foreground hover:text-accent transition-colors"
             >
               It's Hypothetical
-            </Link>
+            </a>
             <p className="text-xs font-[General_Sans] text-muted-foreground mt-1">
               Built in Sydney. Mostly at hours I'm not proud of.
             </p>
