@@ -387,10 +387,17 @@ function Reviews({ items }: { items?: { quote: string; author?: string }[] }) {
 
 // ─── Loud & Fine ─────────────────────────────────────────────────────────────
 
-// Add screenshots here once they exist — e.g. { src: "/screenshots/loud-and-fine-1.png", alt: "..." }
-const loudAndFineScreenshots: { src: string; alt: string }[] = [];
-// Add reviews here once they exist — the section stays hidden until then
-const loudAndFineReviews: { quote: string; author?: string }[] = [];
+// Placeholder screenshots/reviews — swap for the real ones before shipping
+const loudAndFineScreenshots: { src: string; alt: string }[] = [
+  { src: "https://picsum.photos/seed/loud-and-fine-1/300/650", alt: "Loud & Fine app screenshot — sound picker" },
+  { src: "https://picsum.photos/seed/loud-and-fine-2/300/650", alt: "Loud & Fine app screenshot — session in progress" },
+  { src: "https://picsum.photos/seed/loud-and-fine-3/300/650", alt: "Loud & Fine app screenshot — progress tracking" },
+];
+const loudAndFineReviews: { quote: string; author?: string }[] = [
+  { quote: "My dog used to hide in the bathtub every time it thundered. Now he just glances at the window.", author: "Sarah, and a much calmer beagle" },
+  { quote: "Wish this existed before the fireworks incident of 2023. We're rebuilding trust, slowly.", author: "Marcus" },
+  { quote: "$2.99 and no subscription almost made me suspicious. It just works.", author: "Priya" },
+];
 
 function LoudAndFine() {
   const nextProject = projects[1];
@@ -472,8 +479,17 @@ function LoudAndFine() {
 
 // ─── Quirks & All ────────────────────────────────────────────────────────────
 
-const quirksAndAllScreenshots: { src: string; alt: string }[] = [];
-const quirksAndAllReviews: { quote: string; author?: string }[] = [];
+// Placeholder screenshots/reviews — swap for the real ones before shipping
+const quirksAndAllScreenshots: { src: string; alt: string }[] = [
+  { src: "https://picsum.photos/seed/quirks-and-all-1/300/650", alt: "Quirks & All app screenshot — dog profile" },
+  { src: "https://picsum.photos/seed/quirks-and-all-2/300/650", alt: "Quirks & All app screenshot — share link presets" },
+  { src: "https://picsum.photos/seed/quirks-and-all-3/300/650", alt: "Quirks & All app screenshot — missing poster generator" },
+];
+const quirksAndAllReviews: { quote: string; author?: string }[] = [
+  { quote: "My sitter texted back 'this is the best handoff doc I've ever gotten.' Weirdly proud of that.", author: "Jamie" },
+  { quote: "Finally a way to explain that 'off' means off the couch, not off the bed.", author: "Theo" },
+  { quote: "Haven't needed the missing poster generator. Comforting that it's there.", author: "Dana" },
+];
 
 function QuirksAndAll() {
   const nextProject = projects[2];
