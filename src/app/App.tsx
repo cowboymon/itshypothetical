@@ -10,6 +10,7 @@ interface Project {
   tagline: string;
   description: string;
   status: "Live" | "In beta" | "In validation" | "In concept";
+  hasPage?: boolean;
 }
 
 // ─── Data ────────────────────────────────────────────────────────────────────
@@ -35,6 +36,7 @@ const projects: Project[] = [
     tagline: "Alone, not lost.",
     description: "A loneliness app — because knowing you're not alone shouldn't take this much effort.",
     status: "In validation",
+    hasPage: false,
   },
   {
     slug: "straightforward-review",
@@ -260,11 +262,10 @@ function Homepage() {
 }
 
 function ProjectCard({ project }: { project: Project }) {
-  return (
-    <Link
-      to={`/${project.slug}`}
-      className="group bg-background p-8 sm:p-10 flex flex-col gap-5 hover:bg-card transition-colors duration-200 min-h-[240px]"
-    >
+  const hasPage = project.hasPage !== false;
+
+  const content = (
+    <>
       <div className="flex items-start justify-between gap-4">
         <div>
           <h3 className="font-[Gambarino] text-2xl sm:text-3xl text-foreground group-hover:text-accent transition-colors duration-200">
@@ -285,9 +286,28 @@ function ProjectCard({ project }: { project: Project }) {
         {project.description}
       </p>
 
-      <span className="text-xs font-[General_Sans] text-muted-foreground group-hover:text-foreground transition-colors flex items-center gap-1.5">
-        See project <span className="transition-transform duration-200 group-hover:translate-x-0.5 inline-block">→</span>
-      </span>
+      {hasPage && (
+        <span className="text-xs font-[General_Sans] text-muted-foreground group-hover:text-foreground transition-colors flex items-center gap-1.5">
+          See project <span className="transition-transform duration-200 group-hover:translate-x-0.5 inline-block">→</span>
+        </span>
+      )}
+    </>
+  );
+
+  if (!hasPage) {
+    return (
+      <div className="bg-background p-8 sm:p-10 flex flex-col gap-5 min-h-[240px]">
+        {content}
+      </div>
+    );
+  }
+
+  return (
+    <Link
+      to={`/${project.slug}`}
+      className="group bg-background p-8 sm:p-10 flex flex-col gap-5 hover:bg-card transition-colors duration-200 min-h-[240px]"
+    >
+      {content}
     </Link>
   );
 }
@@ -337,9 +357,12 @@ function QuoteBlock({ children }: { children: React.ReactNode }) {
 }
 
 function ProjectCTA({ label, href = "#" }: { label: string; href?: string }) {
+  const isExternal = /^https?:\/\//.test(href);
   return (
     <a
       href={href}
+      target={isExternal ? "_blank" : undefined}
+      rel={isExternal ? "noopener noreferrer" : undefined}
       className="inline-flex items-center gap-2 bg-foreground text-primary-foreground font-[General_Sans] text-sm px-6 py-3 hover:bg-accent transition-colors duration-200"
     >
       {label}
@@ -490,7 +513,7 @@ const quirksAndAllReviews: { quote: string; author?: string }[] = [
 ];
 
 function QuirksAndAll() {
-  const nextProject = projects[2];
+  const nextProject = projects[3];
   return (
     <main>
       <div className="max-w-5xl mx-auto px-6 pt-32 pb-0">
@@ -510,7 +533,7 @@ function QuirksAndAll() {
             The pet-care handoff doc your sitter actually reads — quirks, commands, and the one thing to know if things go sideways.
           </p>
           <div className="mt-8">
-            <ProjectCTA label="Get it on the App Store" />
+            <ProjectCTA label="Visit the website" href="https://quirksandall.itshypothetical.com" />
           </div>
         </div>
 
@@ -535,10 +558,6 @@ function QuirksAndAll() {
 
             <section>
               <h2 className="font-[DM_Mono] text-xs tracking-[0.18em] text-muted-foreground uppercase mb-6">In the app</h2>
-              <div className="space-y-4">
-                <QuoteBlock>Still using "settle" with Biscuit? Still accurate?</QuoteBlock>
-                <QuoteBlock>One tap. Print-ready poster and social tile. Just in case.</QuoteBlock>
-              </div>
               <Screenshots images={quirksAndAllScreenshots} />
             </section>
 
@@ -548,77 +567,12 @@ function QuirksAndAll() {
           <aside>
             <h2 className="font-[DM_Mono] text-xs tracking-[0.18em] text-muted-foreground uppercase mb-4">Details</h2>
             <div className="bg-card p-6 border border-border">
-              <DetailRow label="Platform" value="iOS" />
+              <DetailRow label="Platform" value="Website" />
               <DetailRow label="Model" value="Free to start" />
               <DetailRow label="Tone" value="Quirks are charming, not problems" />
             </div>
             <div className="mt-8">
-              <ProjectCTA label="Get it on the App Store" />
-            </div>
-          </aside>
-        </div>
-      </div>
-      <Footer nextProject={nextProject} />
-    </main>
-  );
-}
-
-// ─── Reach ───────────────────────────────────────────────────────────────────
-
-const reachReviews: { quote: string; author?: string }[] = [];
-
-function Reach() {
-  const nextProject = projects[3];
-  return (
-    <main>
-      <div className="max-w-5xl mx-auto px-6 pt-32 pb-0">
-        <BackLink />
-
-        <div className="mt-12 pb-16 border-b border-border">
-          <span className={`font-[DM_Mono] text-[10px] tracking-[0.12em] uppercase px-2.5 py-1 ${statusStyle["In validation"]} mb-6 inline-block`}>
-            In validation
-          </span>
-          <h1 className="font-[Gambarino] text-5xl sm:text-7xl lg:text-8xl text-foreground leading-[1.02] mt-3">
-            Reach
-          </h1>
-          <p className="font-[Gambarino] text-2xl sm:text-3xl text-muted-foreground mt-3">
-            Alone, not lost.
-          </p>
-          <p className="font-[General_Sans] font-light text-lg text-muted-foreground mt-6 max-w-xl leading-relaxed">
-            A loneliness app. In validation right now — not yet built. Get notified when it's ready.
-          </p>
-          <div className="mt-8">
-            <ProjectCTA label="Get notified when it's ready" />
-          </div>
-        </div>
-
-        <div className="grid grid-cols-1 lg:grid-cols-[2fr_1fr] gap-16 py-20">
-          <div className="space-y-16">
-            <section>
-              <h2 className="font-[DM_Mono] text-xs tracking-[0.18em] text-muted-foreground uppercase mb-6">The problem</h2>
-              <p className="font-[General_Sans] font-light text-base sm:text-lg text-foreground leading-relaxed">
-                Loneliness isn't usually about being alone — it's about the gap between wanting to reach out and actually doing it. Knowing you're not alone shouldn't take this much effort.
-              </p>
-            </section>
-
-            <section>
-              <h2 className="font-[DM_Mono] text-xs tracking-[0.18em] text-muted-foreground uppercase mb-2">How it works</h2>
-              <p className="font-[General_Sans] font-light text-sm text-muted-foreground py-6 border-b border-border">
-                Feature set is being validated. More soon.
-              </p>
-            </section>
-
-            <Reviews items={reachReviews} />
-          </div>
-
-          <aside>
-            <h2 className="font-[DM_Mono] text-xs tracking-[0.18em] text-muted-foreground uppercase mb-4">Details</h2>
-            <div className="bg-card p-6 border border-border">
-              <DetailRow label="Platform" value="TBD" />
-              <DetailRow label="Status" value="In validation — not yet built" />
-            </div>
-            <div className="mt-8">
-              <ProjectCTA label="Get notified when it's ready" />
+              <ProjectCTA label="Visit the website" href="https://quirksandall.itshypothetical.com" />
             </div>
           </aside>
         </div>
@@ -687,7 +641,7 @@ function StraightforwardReview() {
             <h2 className="font-[DM_Mono] text-xs tracking-[0.18em] text-muted-foreground uppercase mb-4">Details</h2>
             <div className="bg-card p-6 border border-border">
               <DetailRow label="Format" value="Thumbs up/down + 2 sentences" />
-              <DetailRow label="Platform" value="TBD" />
+              <DetailRow label="Platform" value="Website" />
               <DetailRow label="Status" value="Live" />
               <DetailRow label="Tone" value="Utility over charm" />
             </div>
@@ -710,7 +664,6 @@ export default function App() {
         <Route path="/" element={<Homepage />} />
         <Route path="/loud-and-fine" element={<LoudAndFine />} />
         <Route path="/quirks-and-all" element={<QuirksAndAll />} />
-        <Route path="/reach" element={<Reach />} />
         <Route path="/straightforward-review" element={<StraightforwardReview />} />
       </Routes>
     </HashRouter>
