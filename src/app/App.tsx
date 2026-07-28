@@ -9,7 +9,7 @@ interface Project {
   name: string;
   tagline: string;
   description: string;
-  status: "Live" | "In validation" | "In concept";
+  status: "Live" | "In beta" | "In validation" | "In concept";
 }
 
 // ─── Data ────────────────────────────────────────────────────────────────────
@@ -20,14 +20,14 @@ const projects: Project[] = [
     name: "Loud & Fine",
     tagline: "Loud world. Fine dog.",
     description: "Sound desensitization for anxious dogs — no trainer required, several treats required.",
-    status: "Live",
+    status: "In beta",
   },
   {
     slug: "quirks-and-all",
     name: "Quirks & All",
     tagline: "Away, but known.",
     description: "Every weird habit your dog has, written down and handed off on purpose.",
-    status: "Live",
+    status: "In beta",
   },
   {
     slug: "reach",
@@ -41,12 +41,13 @@ const projects: Project[] = [
     name: "Straightforward Review",
     tagline: "Thumbs up or don't bother.",
     description: "Reviews in two sentences or less. You already know what you want — this just confirms it.",
-    status: "In concept",
+    status: "Live",
   },
 ];
 
 const statusStyle: Record<string, string> = {
   "Live": "bg-[#1C1A17] text-[#F8F5F0]",
+  "In beta": "bg-[#6E7F6B] text-[#F8F5F0]",
   "In validation": "bg-[#C4845A] text-[#F8F5F0]",
   "In concept": "bg-[#E4E0DA] text-[#7A7368]",
 };
@@ -407,8 +408,8 @@ function LoudAndFine() {
         <BackLink />
 
         <div className="mt-12 pb-16 border-b border-border">
-          <span className={`font-[DM_Mono] text-[10px] tracking-[0.12em] uppercase px-2.5 py-1 ${statusStyle["Live"]} mb-6 inline-block`}>
-            Live
+          <span className={`font-[DM_Mono] text-[10px] tracking-[0.12em] uppercase px-2.5 py-1 ${statusStyle["In beta"]} mb-6 inline-block`}>
+            In beta
           </span>
           <h1 className="font-[Gambarino] text-5xl sm:text-7xl lg:text-8xl text-foreground leading-[1.02] mt-3">
             Loud & Fine
@@ -420,7 +421,7 @@ function LoudAndFine() {
             Systematic sound desensitization for dogs who lose it at vacuums, thunder, fireworks, and the doorbell. $2.99 once. No subscription. No ads.
           </p>
           <div className="mt-8">
-            <ProjectCTA label="Get it on the App Store" />
+            <ProjectCTA label="Join the waitlist" />
           </div>
         </div>
 
@@ -448,9 +449,6 @@ function LoudAndFine() {
             {/* Voice sample */}
             <section>
               <h2 className="font-[DM_Mono] text-xs tracking-[0.18em] text-muted-foreground uppercase mb-6">In the app</h2>
-              <QuoteBlock>
-                "[Name] has heard Thunderstorm 5 times and has not once lost their mind. That's growth."
-              </QuoteBlock>
               <Screenshots images={loudAndFineScreenshots} />
             </section>
 
@@ -467,7 +465,7 @@ function LoudAndFine() {
               <DetailRow label="Tone" value="Cool vet nurse — warm, deadpan" />
             </div>
             <div className="mt-8">
-              <ProjectCTA label="Get it on the App Store" />
+              <ProjectCTA label="Join the waitlist" />
             </div>
           </aside>
         </div>
@@ -499,8 +497,8 @@ function QuirksAndAll() {
         <BackLink />
 
         <div className="mt-12 pb-16 border-b border-border">
-          <span className={`font-[DM_Mono] text-[10px] tracking-[0.12em] uppercase px-2.5 py-1 ${statusStyle["Live"]} mb-6 inline-block`}>
-            Live
+          <span className={`font-[DM_Mono] text-[10px] tracking-[0.12em] uppercase px-2.5 py-1 ${statusStyle["In beta"]} mb-6 inline-block`}>
+            In beta
           </span>
           <h1 className="font-[Gambarino] text-5xl sm:text-7xl lg:text-8xl text-foreground leading-[1.02] mt-3">
             Quirks & All
@@ -641,8 +639,8 @@ function StraightforwardReview() {
         <BackLink />
 
         <div className="mt-12 pb-16 border-b border-border">
-          <span className={`font-[DM_Mono] text-[10px] tracking-[0.12em] uppercase px-2.5 py-1 ${statusStyle["In concept"]} mb-6 inline-block`}>
-            In concept
+          <span className={`font-[DM_Mono] text-[10px] tracking-[0.12em] uppercase px-2.5 py-1 ${statusStyle["Live"]} mb-6 inline-block`}>
+            Live
           </span>
           <h1 className="font-[Gambarino] text-5xl sm:text-7xl lg:text-8xl text-foreground leading-[1.02] mt-3">
             Straightforward<br className="hidden sm:block" /> Review
@@ -690,7 +688,7 @@ function StraightforwardReview() {
             <div className="bg-card p-6 border border-border">
               <DetailRow label="Format" value="Thumbs up/down + 2 sentences" />
               <DetailRow label="Platform" value="TBD" />
-              <DetailRow label="Status" value="In concept" />
+              <DetailRow label="Status" value="Live" />
               <DetailRow label="Tone" value="Utility over charm" />
             </div>
           </aside>
