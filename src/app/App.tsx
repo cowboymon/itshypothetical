@@ -41,7 +41,7 @@ const projects: Project[] = [
   {
     slug: "straightforward-review",
     name: "Straightforward Review",
-    tagline: "Thumbs up or don't bother.",
+    tagline: "Reviews without the bullshit.",
     description: "Reviews in two sentences or less. You already know what you want — this just confirms it.",
     status: "Live",
   },
@@ -600,7 +600,7 @@ function StraightforwardReview() {
             Straightforward<br className="hidden sm:block" /> Review
           </h1>
           <p className="font-[Gambarino] text-2xl sm:text-3xl text-muted-foreground mt-3">
-            Thumbs up or don't bother.
+            Reviews without the bullshit.
           </p>
           <p className="font-[General_Sans] font-light text-lg text-muted-foreground mt-6 max-w-xl leading-relaxed">
             Reviews in two sentences or less. One thumb, up or down. You already know if the place was good — this just makes it quick to say so, and quick to check.
@@ -612,14 +612,14 @@ function StraightforwardReview() {
             <section>
               <h2 className="font-[DM_Mono] text-xs tracking-[0.18em] text-muted-foreground uppercase mb-6">The problem</h2>
               <p className="font-[General_Sans] font-light text-base sm:text-lg text-foreground leading-relaxed">
-                Most reviews are 300 words of someone re-litigating their evening. Nobody reads them, and nobody who writes them enjoys it either. You don't need a novel to know if a place is worth going — you need one honest signal from someone who's already been.
+                Most reviews are 300 words of someone re-litigating their week. Nobody reads them, and nobody who writes them enjoys it either. Book, blender, ice cream, whatever — you don't need a novel to know if it's worth it. You need one honest signal from someone who's already been through it.
               </p>
             </section>
 
             <section>
               <h2 className="font-[DM_Mono] text-xs tracking-[0.18em] text-muted-foreground uppercase mb-2">How it works</h2>
               {[
-                "See a place. Give it a thumb — up or down. No stars, no 1–10, no ambiguity.",
+                "See a thing. Give it a thumb — up or down. No stars, no 1–10, no ambiguity.",
                 "Add up to two sentences if you want to. Not required.",
                 "Browsing: see the thumb split first, read the two-liners after — no scrolling through essays to find the one useful line.",
                 "No profiles to build, no reviewer level, no badges. That's the whole product.",
@@ -629,8 +629,9 @@ function StraightforwardReview() {
             <section>
               <h2 className="font-[DM_Mono] text-xs tracking-[0.18em] text-muted-foreground uppercase mb-6">What a review looks like</h2>
               <div className="space-y-4">
-                <QuoteBlock>Good. Loud on weekends though.</QuoteBlock>
-                <QuoteBlock>Wouldn't go back. Kitchen closed at 8:45 when the sign says 9.</QuoteBlock>
+                <QuoteBlock>Bloody good read. Finished in two weeks. Felt all the feels and then some.</QuoteBlock>
+                <QuoteBlock>Would endure the aftermaths of lactose intolerance again.</QuoteBlock>
+                <QuoteBlock>Clackity clack tap tap clack clop. Rough translation: I do be enjoying this.</QuoteBlock>
               </div>
             </section>
 
