@@ -9,7 +9,7 @@ interface Project {
   name: string;
   tagline: string;
   description: string;
-  status: "Live" | "In beta" | "In validation" | "In concept";
+  status: "Live" | "In beta" | "In validation" | "In concept" | "Wrapped";
   hasPage?: boolean;
 }
 
@@ -43,7 +43,7 @@ const projects: Project[] = [
     name: "Straightforward Review",
     tagline: "Reviews without the bullshit.",
     description: "Reviews in two sentences or less. You already know what you want — this just confirms it.",
-    status: "Live",
+    status: "Wrapped",
   },
 ];
 
@@ -52,6 +52,7 @@ const statusStyle: Record<string, string> = {
   "In beta": "bg-[#6E7F6B] text-[#F8F5F0]",
   "In validation": "bg-[#C4845A] text-[#F8F5F0]",
   "In concept": "bg-[#E4E0DA] text-[#7A7368]",
+  "Wrapped": "bg-[#7C8798] text-[#F8F5F0]",
 };
 
 // ─── Scroll to top on route change ───────────────────────────────────────────
@@ -593,8 +594,8 @@ function StraightforwardReview() {
         <BackLink />
 
         <div className="mt-12 pb-16 border-b border-border">
-          <span className={`font-[DM_Mono] text-[10px] tracking-[0.12em] uppercase px-2.5 py-1 ${statusStyle["Live"]} mb-6 inline-block`}>
-            Live
+          <span className={`font-[DM_Mono] text-[10px] tracking-[0.12em] uppercase px-2.5 py-1 ${statusStyle["Wrapped"]} mb-6 inline-block`}>
+            Wrapped
           </span>
           <h1 className="font-[Gambarino] text-5xl sm:text-7xl lg:text-8xl text-foreground leading-[1.02] mt-3">
             Straightforward<br className="hidden sm:block" /> Review
@@ -643,7 +644,7 @@ function StraightforwardReview() {
             <div className="bg-card p-6 border border-border">
               <DetailRow label="Format" value="Thumbs up/down + 2 sentences" />
               <DetailRow label="Platform" value="Website" />
-              <DetailRow label="Status" value="Live" />
+              <DetailRow label="Status" value="Wrapped" />
               <DetailRow label="Tone" value="Utility over charm" />
             </div>
           </aside>
