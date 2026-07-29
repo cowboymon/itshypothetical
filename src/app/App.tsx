@@ -503,9 +503,11 @@ function LoudAndFine() {
 
 // Placeholder screenshots/reviews — swap for the real ones before shipping
 const quirksAndAllScreenshots: { src: string; alt: string }[] = [
-  { src: "https://picsum.photos/seed/quirks-and-all-1/300/650", alt: "Quirks & All app screenshot — dog profile" },
-  { src: "https://picsum.photos/seed/quirks-and-all-2/300/650", alt: "Quirks & All app screenshot — share link presets" },
-  { src: "https://picsum.photos/seed/quirks-and-all-3/300/650", alt: "Quirks & All app screenshot — missing poster generator" },
+  { src: "/screenshots/quirks-and-all/1-share-links.png", alt: "Quirks & All app screenshot — dashboard with share links" },
+  { src: "/screenshots/quirks-and-all/2-commands.png", alt: "Quirks & All app screenshot — commands & quirks editor" },
+  { src: "/screenshots/quirks-and-all/3-daily-routine.png", alt: "Quirks & All app screenshot — daily routine" },
+  { src: "/screenshots/quirks-and-all/4-emergency.png", alt: "Quirks & All app screenshot — emergency cheat sheet" },
+  { src: "/screenshots/quirks-and-all/5-missing-poster.png", alt: "Quirks & All app screenshot — missing poster generator" },
 ];
 const quirksAndAllReviews: { quote: string; author?: string }[] = [
   { quote: "My sitter texted back 'this is the best handoff doc I've ever gotten.' Weirdly proud of that.", author: "Jamie" },
