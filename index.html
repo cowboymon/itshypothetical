@@ -9,28 +9,16 @@
       <meta name="description" content="Capture and organize your thoughts effortlessly with a user-friendly platform designed for individuals seeking clarity and inspiration in their daily lives." />
       <style>html, body { height: 100%; margin: 0; } #root { height: 100%; }</style>
 
-      <!-- Analytics by Swetrix -->
-      <script src="https://swetrix.org/swetrix.js" defer></script>
-      <script>
-        document.addEventListener('DOMContentLoaded', function() {
-          swetrix.init('%VITE_SWETRIX_PID%')
-          swetrix.trackViews()
-        })
-      </script>
+      <!-- Analytics by Pirsch -->
+      <script defer src="https://api.pirsch.io/pa.js"
+        id="pianjs"
+        data-code="%VITE_PIRSCH_CODE%"></script>
     </head>
 
     <body>
 
       <div id="root"></div>
       <script type="module" src="/src/main.tsx"></script>
-
-      <noscript>
-        <img
-          src="https://api.swetrix.com/log/noscript?pid=%VITE_SWETRIX_PID%"
-          alt=""
-          referrerpolicy="no-referrer-when-downgrade"
-        />
-      </noscript>
     </body>
   </html>
   
