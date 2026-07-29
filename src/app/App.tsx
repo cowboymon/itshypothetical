@@ -380,7 +380,7 @@ function Screenshots({ images }: { images?: { src: string; alt: string }[] }) {
       {images.map((img, i) => (
         <div
           key={i}
-          className="shrink-0 w-40 sm:w-48 aspect-[9/19.5] bg-card border border-border overflow-hidden"
+          className="shrink-0 w-64 sm:w-80 aspect-[9/19.5] bg-card border border-border overflow-hidden"
         >
           <ImageWithFallback src={img.src} alt={img.alt} className="w-full h-full object-cover" />
         </div>
