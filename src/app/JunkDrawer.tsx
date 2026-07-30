@@ -902,18 +902,22 @@ export default function JunkDrawer() {
                     <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
                       <div
                         style={{
-                          border: "3px solid #a4231b",
-                          color: "#a4231b",
-                          padding: "8px 26px",
+                          border: `2px solid ${RUST}`,
+                          outline: `1px solid ${RUST}`,
+                          outlineOffset: "3px",
+                          color: RUST,
+                          padding: "10px 24px 8px",
                           fontFamily: LABEL_FONT,
-                          fontSize: 20,
-                          letterSpacing: "0.3em",
-                          transform: "rotate(-8deg)",
-                          background: "rgba(244,236,218,.6)",
-                          textTransform: "uppercase",
+                          letterSpacing: "0.2em",
+                          transform: "rotate(-7deg)",
+                          background: "rgba(244,236,218,.72)",
+                          textAlign: "center",
                         }}
                       >
-                        Confidential
+                        <div style={{ fontSize: 19, textTransform: "uppercase" }}>Confidential</div>
+                        <div style={{ fontSize: 10, letterSpacing: "0.16em", marginTop: 3, textTransform: "uppercase" }}>
+                          Specimen {open.no} · access restricted
+                        </div>
                       </div>
                     </div>
                   </div>
