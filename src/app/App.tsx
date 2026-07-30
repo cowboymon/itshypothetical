@@ -187,7 +187,7 @@ function Footer({ nextProject }: { nextProject?: Project }) {
               <Link to="/" className="text-xs font-[General_Sans] text-muted-foreground hover:text-foreground transition-colors">Projects</Link>
               <Link to="/" className="text-xs font-[General_Sans] text-muted-foreground hover:text-foreground transition-colors">About</Link>
               <a href="mailto:hello@itshypothetical.com" className="text-xs font-[General_Sans] text-muted-foreground hover:text-foreground transition-colors">Contact</a>
-              <Link to="/junk-drawer" className="text-xs font-[General_Sans] text-muted-foreground hover:text-foreground transition-colors">Junk drawer</Link>
+              <Link to="/junk-drawer" className="text-xs text-muted-foreground hover:text-foreground transition-colors" style={{ fontFamily: "Comico, sans-serif" }}>The Idea Bed</Link>
               <a href="https://www.linkedin.com/in/monica-rattanong/" target="_blank" rel="noopener noreferrer" className="text-xs font-[General_Sans] text-muted-foreground hover:text-foreground transition-colors">LinkedIn</a>
             </div>
           )}

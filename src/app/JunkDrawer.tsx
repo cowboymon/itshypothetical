@@ -100,9 +100,9 @@ const SPECIMENS: Specimen[] = [
 ];
 
 const SHAPES = [
-  { w: 150, h: 120, r: "14% 5% 18% 7%/9% 16% 6% 19%", c: 3 },
-  { w: 118, h: 104, r: "38% 19% 33% 24%/23% 37% 20% 35%", c: 3 },
-  { w: 88, h: 84, r: "57% 41% 49% 53%/43% 62% 38% 57%", c: 2 },
+  { w: 150, h: 120, r: "14% 5% 18% 7%/9% 16% 6% 19%" },
+  { w: 118, h: 104, r: "38% 19% 33% 24%/23% 37% 20% 35%" },
+  { w: 88, h: 84, r: "57% 41% 49% 53%/43% 62% 38% 57%" },
 ];
 const BONE = ["#e9dfc7", "#efe6d2", "#e3d8bd", "#eae0c9"];
 const DIRT = "#a8946b";
@@ -130,7 +130,6 @@ interface LaidOutSpecimen extends Specimen {
   tone: string;
   rot: number;
   icon: number;
-  creases: { top: number; left: number; len: number; rot: number; light: boolean }[];
 }
 
 // ─── Fossil imprints — what's actually etched into each rock ─────────────────
@@ -207,14 +206,7 @@ export default function JunkDrawer() {
       const row = Math.floor(i / cols);
       const x = Math.round(Math.max(16, Math.min(w - s.w - 16, col * cw + (cw - s.w) / 2 + (rnd() - 0.5) * cw * 0.3)));
       const y = Math.round(Math.max(14, Math.min(h - s.h - 14, row * ch + (ch - s.h) / 2 + (rnd() - 0.5) * ch * 0.3)));
-      const creases = Array.from({ length: s.c }, (_, k) => ({
-        top: Math.round(-6 + rnd() * (s.h + 10)),
-        left: Math.round(-12 + rnd() * (s.w * 0.4)),
-        len: Math.round(s.w * (0.5 + rnd() * 0.8)),
-        rot: (rnd() - 0.5) * (i % 3 === 0 ? 30 : 150),
-        light: k % 3 === 1,
-      }));
-      return { ...sp, i, x, y, w: s.w, h: s.h, r: s.r, tone: BONE[i % BONE.length], rot: (rnd() - 0.5) * 26, icon: i % FOSSIL_ICONS.length, creases };
+      return { ...sp, i, x, y, w: s.w, h: s.h, r: s.r, tone: BONE[i % BONE.length], rot: (rnd() - 0.5) * 26, icon: i % FOSSIL_ICONS.length };
     });
     cleared.current = new Set();
     setLayout(next);
@@ -406,7 +398,6 @@ export default function JunkDrawer() {
       <style>{`
         @font-face { font-family: 'Sentient'; src: url('/fonts/sentient/Sentient-Variable.woff2') format('woff2'); font-weight: 200 700; font-style: normal; font-display: swap; }
         @font-face { font-family: 'Sentient'; src: url('/fonts/sentient/Sentient-VariableItalic.woff2') format('woff2'); font-weight: 200 700; font-style: italic; font-display: swap; }
-        @font-face { font-family: 'Comico'; src: url('/fonts/comico/Comico-Regular.woff2') format('woff2'); font-weight: 400; font-style: normal; font-display: swap; }
       `}</style>
 
       {!started ? (
@@ -506,26 +497,8 @@ export default function JunkDrawer() {
                     position: "relative",
                     borderRadius: sp.r,
                     backgroundColor: sp.tone,
-                    backgroundImage: "repeating-linear-gradient(102deg, rgba(255,255,255,.42) 0 2px, transparent 2px 5px)",
-                    border: "1.5px solid #6f5c3c",
-                    overflow: "hidden",
-                    boxShadow: "inset -12px -14px 20px rgba(110,92,60,.3), inset 9px 10px 14px rgba(255,252,240,.55)",
                   }}
                 >
-                  {sp.creases.map((c, k) => (
-                    <div
-                      key={k}
-                      style={{
-                        position: "absolute",
-                        top: c.top,
-                        left: c.left,
-                        width: c.len,
-                        borderTop: c.light ? "1.5px solid rgba(255,252,240,.8)" : "1px solid rgba(112,93,61,.55)",
-                        transform: `rotate(${c.rot}deg)`,
-                        transformOrigin: "left center",
-                      }}
-                    />
-                  ))}
                   <svg
                     viewBox="0 0 100 100"
                     fill="none"
