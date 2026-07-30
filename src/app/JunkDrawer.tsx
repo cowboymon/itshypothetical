@@ -769,8 +769,7 @@ export default function JunkDrawer() {
                         pointerEvents: "none",
                       }}
                     >
-                      {sp.confidential ? "🔒 " : ""}
-                      {sp.name.length > MAX_LABEL_LEN ? "??" : sp.name}
+                      {sp.confidential ? "🔒 REDACTED" : sp.name.length > MAX_LABEL_LEN ? "??" : sp.name}
                     </div>
                   </div>
                 );
