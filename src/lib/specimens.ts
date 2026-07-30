@@ -18,7 +18,7 @@ export interface SpecimenRow {
   image_url: string | null;
   sort_order: number;
   confidential: boolean;
-  icon: string | null;
+  icon_url: string | null;
 }
 
 export type SpecimenDraft = Omit<SpecimenRow, "id"> & { id?: string };
@@ -46,7 +46,7 @@ export async function deleteSpecimen(id: string): Promise<void> {
   if (error) throw error;
 }
 
-export async function uploadPlateImage(file: File): Promise<string> {
+async function uploadToSpecimenPlates(file: File): Promise<string> {
   assertConfigured();
   const ext = file.name.split(".").pop() || "jpg";
   const path = `${crypto.randomUUID()}.${ext}`;
@@ -55,3 +55,6 @@ export async function uploadPlateImage(file: File): Promise<string> {
   const { data } = supabase.storage.from("specimen-plates").getPublicUrl(path);
   return data.publicUrl;
 }
+
+export const uploadPlateImage = uploadToSpecimenPlates;
+export const uploadIconImage = uploadToSpecimenPlates;

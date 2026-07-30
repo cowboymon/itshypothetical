@@ -30,7 +30,7 @@ interface Specimen {
   cause: string;
   imageUrl?: string;
   confidential?: boolean;
-  icon?: string;
+  iconUrl?: string;
 }
 
 interface Stratum {
@@ -56,7 +56,7 @@ function rowToSpecimen(row: SpecimenRow): Specimen {
     cause: row.cause,
     imageUrl: row.image_url ?? undefined,
     confidential: row.confidential,
-    icon: row.icon ?? undefined,
+    iconUrl: row.icon_url ?? undefined,
   };
 }
 
@@ -127,82 +127,11 @@ interface LaidOutSpecimen extends Specimen {
 }
 
 // ─── Fossil imprints — what's actually etched into each rock ─────────────────
-// Flat single-stroke line art. Keyed by concept where a specimen picks one
-// deliberately (a phone for "Still Reachable", a gavel for "Group Chat
-// Court"); GENERIC_ICON_KEYS is the fallback cycle for specimens without one.
+// Flat single-stroke line art, cycled across specimens. A specimen with its
+// own uploaded icon (set in the editor) renders that image instead — see
+// FossilGlyph below.
 
 const FOSSIL_ICONS: Record<string, ReactNode> = {
-  // a phone handset — Still Reachable
-  phone: (
-    <path d="M28 30 C28 25 33 21 37 23 L46 28 C49 30 49 34 46 37 L41 41 C46 54 56 64 60 60 L64 55 C67 52 71 52 74 55 L79 64 C81 68 77 73 72 73 C52 73 28 50 28 30 Z" />
-  ),
-  // a sealed envelope — Sent Anyway
-  envelope: (
-    <>
-      <path d="M18 28 L82 28 L82 72 L18 72 Z" />
-      <path d="M18 28 L50 54 L82 28" />
-    </>
-  ),
-  // an hourglass — The Alibi
-  timer: (
-    <>
-      <path d="M28 18 L72 18 M28 82 L72 82" />
-      <path d="M30 18 L30 30 C30 42 44 46 50 50 C56 54 70 58 70 70 L70 82 L30 82 L30 70 C30 58 44 54 50 50 C56 46 70 42 70 30 L70 18 Z" />
-    </>
-  ),
-  // a gavel — Group Chat Court
-  gavel: (
-    <>
-      <rect x="16" y="18" width="36" height="18" rx="4" transform="rotate(-35 34 27)" />
-      <path d="M38 34 L64 60" />
-      <path d="M18 80 L64 80" />
-    </>
-  ),
-  // a paddle-pop stick — Paddle Pop Enterprise
-  popsicle: (
-    <>
-      <path d="M32 14 L68 14 C72 14 74 18 74 22 L74 52 C74 60 68 66 60 66 L40 66 C32 66 26 60 26 52 L26 22 C26 18 28 14 32 14 Z" />
-      <path d="M50 66 L50 88" />
-    </>
-  ),
-  // a potted plant — At Least Your Plants Answer
-  plant: (
-    <>
-      <path d="M36 58 L64 58 L60 84 L40 84 Z" />
-      <path d="M50 58 C50 44 40 40 32 30 M50 58 C50 42 60 36 70 26 M50 58 C50 46 50 34 50 16" />
-    </>
-  ),
-  // a bin — Sorted
-  bin: (
-    <>
-      <path d="M28 30 L72 30 L66 84 L34 84 Z" />
-      <path d="M22 30 L78 30 M40 20 L60 20" />
-      <path d="M42 40 L45 74 M58 40 L55 74" />
-    </>
-  ),
-  // a raffle ticket — Critically Endangered
-  ticket: (
-    <>
-      <path d="M14 36 L86 36 L86 64 L14 64 Z" />
-      <path d="M56 36 L56 64" strokeDasharray="4 5" />
-      <circle cx="70" cy="50" r="7" />
-    </>
-  ),
-  // an open book/comic — Holly the Horse & Pumpkin Pea Patch
-  book: (
-    <>
-      <path d="M18 28 L50 33 L82 28 L82 76 L50 71 L18 76 Z" />
-      <path d="M50 33 L50 71" />
-    </>
-  ),
-  // fork & spoon — Actually Tasty
-  cutlery: (
-    <>
-      <path d="M28 14 L28 36 M22 14 L22 32 C22 36 26 38 28 38 M34 14 L34 32 C34 36 30 38 28 38 L28 88" />
-      <path d="M70 14 C60 14 58 26 64 34 C67 38 68 40 68 44 L68 88" />
-    </>
-  ),
-  // generic fallback pool, cycled for specimens without a chosen icon
   spiral: (
     <path d="M50 50 C50 38 40 34 32 40 C22 47 24 62 36 66 C50 70 62 58 58 44 C54 30 36 24 24 34 C10 46 14 68 32 76" />
   ),
@@ -238,10 +167,50 @@ const FOSSIL_ICONS: Record<string, ReactNode> = {
   ),
 };
 
-// Curated icons a specimen can be assigned on purpose, in the editor.
-const NAMED_ICON_KEYS = ["phone", "envelope", "timer", "gavel", "popsicle", "plant", "bin", "ticket", "book", "cutlery"];
-// Fallback cycle for specimens with no icon chosen.
+// Fallback cycle for specimens with no uploaded icon.
 const GENERIC_ICON_KEYS = ["spiral", "footprint", "dragonfly", "trilobite", "fern"];
+
+// Renders a specimen's uploaded icon image if it has one, otherwise its
+// cycled generic fossil glyph.
+function FossilGlyph({ sp }: { sp: LaidOutSpecimen }) {
+  if (sp.iconUrl) {
+    return (
+      <img
+        src={sp.iconUrl}
+        alt=""
+        style={{
+          position: "absolute",
+          left: "50%",
+          top: "50%",
+          width: "62%",
+          height: "62%",
+          transform: "translate(-50%, -50%)",
+          objectFit: "contain",
+        }}
+      />
+    );
+  }
+  return (
+    <svg
+      viewBox="0 0 100 100"
+      fill="none"
+      stroke="rgba(75,60,38,.62)"
+      strokeWidth="3"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      style={{
+        position: "absolute",
+        left: "50%",
+        top: "50%",
+        width: "72%",
+        height: "72%",
+        transform: "translate(-50%, -50%)",
+      }}
+    >
+      {FOSSIL_ICONS[sp.icon]}
+    </svg>
+  );
+}
 
 export default function JunkDrawer() {
   const [specimens, setSpecimens] = useState<Specimen[] | null>(null);
@@ -313,7 +282,7 @@ export default function JunkDrawer() {
       const row = Math.floor(slot / cols);
       const x = Math.round(Math.max(margin, Math.min(w - sw - margin, col * cw + (cw - sw) / 2 + (rnd() - 0.5) * cw * jitter)));
       const y = Math.round(Math.max(margin, Math.min(h - sh - margin, row * ch + (ch - sh) / 2 + (rnd() - 0.5) * ch * jitter)));
-      const icon = sp.icon && FOSSIL_ICONS[sp.icon] ? sp.icon : GENERIC_ICON_KEYS[i % GENERIC_ICON_KEYS.length];
+      const icon = GENERIC_ICON_KEYS[i % GENERIC_ICON_KEYS.length];
       return { ...sp, i, x, y, w: sw, h: sh, r: base.r, tone: BONE[i % BONE.length], rot: (rnd() - 0.5) * 26, icon };
     });
     cleared.current = new Set();
@@ -756,24 +725,7 @@ export default function JunkDrawer() {
                     backgroundColor: sp.tone,
                   }}
                 >
-                  <svg
-                    viewBox="0 0 100 100"
-                    fill="none"
-                    stroke="rgba(75,60,38,.62)"
-                    strokeWidth="3"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    style={{
-                      position: "absolute",
-                      left: "50%",
-                      top: "50%",
-                      width: "72%",
-                      height: "72%",
-                      transform: "translate(-50%, -50%)",
-                    }}
-                  >
-                    {FOSSIL_ICONS[sp.icon]}
-                  </svg>
+                  <FossilGlyph sp={sp} />
                 </div>
               </div>
             ))}
@@ -818,24 +770,7 @@ export default function JunkDrawer() {
                         transition: "box-shadow .15s",
                       }}
                     >
-                      <svg
-                        viewBox="0 0 100 100"
-                        fill="none"
-                        stroke="rgba(75,60,38,.62)"
-                        strokeWidth="3"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        style={{
-                          position: "absolute",
-                          left: "50%",
-                          top: "50%",
-                          width: "72%",
-                          height: "72%",
-                          transform: "translate(-50%, -50%)",
-                        }}
-                      >
-                        {FOSSIL_ICONS[sp.icon]}
-                      </svg>
+                      <FossilGlyph sp={sp} />
                     </div>
                     <div
                       style={{

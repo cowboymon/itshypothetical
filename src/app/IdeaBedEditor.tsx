@@ -6,6 +6,7 @@ import {
   deleteSpecimen,
   fetchSpecimens,
   saveSpecimen,
+  uploadIconImage,
   uploadPlateImage,
   type SpecimenRow,
 } from "../lib/specimens";
@@ -38,24 +39,9 @@ function blankRow(sortOrder: number, existingRows: SpecimenRow[]): SpecimenRow {
     image_url: null,
     sort_order: sortOrder,
     confidential: false,
-    icon: null,
+    icon_url: null,
   };
 }
-
-// Keep in sync with FOSSIL_ICONS' named keys in JunkDrawer.tsx.
-const ICON_OPTIONS = [
-  { value: "", label: "Auto (generic fossil)" },
-  { value: "phone", label: "Phone" },
-  { value: "envelope", label: "Envelope" },
-  { value: "timer", label: "Hourglass" },
-  { value: "gavel", label: "Gavel" },
-  { value: "popsicle", label: "Paddle pop stick" },
-  { value: "plant", label: "Potted plant" },
-  { value: "bin", label: "Bin" },
-  { value: "ticket", label: "Ticket" },
-  { value: "book", label: "Open book" },
-  { value: "cutlery", label: "Fork & spoon" },
-];
 
 function Field({
   label,
@@ -93,6 +79,8 @@ function SpecimenEditor({
   const [draft, setDraft] = useState(row);
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [uploadingIcon, setUploadingIcon] = useState(false);
+  const [iconMode, setIconMode] = useState<"random" | "custom">(row.icon_url ? "custom" : "random");
   const [error, setError] = useState<string | null>(null);
   const isNew = !row.id;
 
@@ -143,6 +131,22 @@ function SpecimenEditor({
     }
   }
 
+  async function handleIconImage(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploadingIcon(true);
+    setError(null);
+    try {
+      const url = await uploadIconImage(file);
+      set("icon_url", url);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to upload icon.");
+    } finally {
+      setUploadingIcon(false);
+      e.target.value = "";
+    }
+  }
+
   return (
     <div className="flex flex-col gap-3 p-5" style={{ border: `1px solid ${BORDER}`, background: "#faf6ea" }}>
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
@@ -182,17 +186,53 @@ function SpecimenEditor({
         />
       </Field>
       <Field label="Fossil icon">
-        <select
-          style={inputStyle}
-          value={draft.icon ?? ""}
-          onChange={(e) => set("icon", e.target.value || null)}
-        >
-          {ICON_OPTIONS.map((opt) => (
-            <option key={opt.value} value={opt.value}>
-              {opt.label}
-            </option>
-          ))}
-        </select>
+        <div className="flex flex-col gap-2">
+          <div className="flex items-center gap-4">
+            <label className="flex items-center gap-2 cursor-pointer">
+              <input
+                type="radio"
+                name={`icon-mode-${row.id || "new"}`}
+                checked={iconMode === "random"}
+                onChange={() => {
+                  setIconMode("random");
+                  set("icon_url", null);
+                }}
+              />
+              <span style={{ fontSize: 13, color: INK }}>Random fossil</span>
+            </label>
+            <label className="flex items-center gap-2 cursor-pointer">
+              <input
+                type="radio"
+                name={`icon-mode-${row.id || "new"}`}
+                checked={iconMode === "custom"}
+                onChange={() => setIconMode("custom")}
+              />
+              <span style={{ fontSize: 13, color: INK }}>Custom icon</span>
+            </label>
+          </div>
+          {iconMode === "custom" && (
+            <div className="flex items-center gap-3 flex-wrap">
+              {draft.icon_url && (
+                <img
+                  src={draft.icon_url}
+                  alt=""
+                  style={{ width: 44, height: 44, objectFit: "contain", border: `1px solid ${BORDER}`, background: "#fff", padding: 4 }}
+                />
+              )}
+              <input type="file" accept="image/*" onChange={handleIconImage} disabled={uploadingIcon} />
+              {draft.icon_url && (
+                <button
+                  type="button"
+                  onClick={() => set("icon_url", null)}
+                  className="cursor-pointer"
+                  style={{ fontSize: 12, color: MUTED, textDecoration: "underline" }}
+                >
+                  remove
+                </button>
+              )}
+            </div>
+          )}
+        </div>
       </Field>
       <Field label="Plate image">
         <div className="flex items-center gap-3 flex-wrap">
@@ -229,7 +269,7 @@ function SpecimenEditor({
         <button
           type="button"
           onClick={handleSave}
-          disabled={saving || uploading}
+          disabled={saving || uploading || uploadingIcon}
           className="cursor-pointer"
           style={{ background: INK, color: PAPER, padding: "9px 20px", fontSize: 13, letterSpacing: "0.08em" }}
         >
