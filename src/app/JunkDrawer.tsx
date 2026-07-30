@@ -220,21 +220,20 @@ export default function JunkDrawer() {
         </div>
       </div>
 
-      {/* The drawer itself */}
-      <div className="max-w-5xl mx-auto px-6 py-16">
-        <motion.div
-          ref={drawerRef}
-          className="relative w-full min-w-[880px] h-[760px] rounded-2xl overflow-hidden"
-          style={{
-            background: "#E7DCC1",
-            backgroundImage: NOISE_BG,
-            boxShadow: "inset 0 0 50px rgba(58,50,38,0.12)",
-            border: "2px solid #D8C9A3",
-          }}
-          initial={{ scale: 0.98, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          transition={{ duration: 0.4 }}
-        >
+      {/* The drawer itself — full bleed, edge to edge */}
+      <motion.div
+        ref={drawerRef}
+        className="relative w-full h-[85vh] min-h-[600px] overflow-hidden mt-16"
+        style={{
+          background: "#E7DCC1",
+          backgroundImage: NOISE_BG,
+          boxShadow: "inset 0 0 60px rgba(58,50,38,0.14)",
+          borderTop: "2px solid #D8C9A3",
+        }}
+        initial={{ scale: 0.98, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        transition={{ duration: 0.4 }}
+      >
           {/* Drawer front sliding open on load */}
           <motion.div
             className="absolute inset-0 z-50 flex items-end justify-center pb-8"
@@ -279,8 +278,7 @@ export default function JunkDrawer() {
           <DraggableItem top="42%" left="88%" rotate={-14} delay={1.34} constraintsRef={drawerRef}>
             <HighlighterIcon color="#D9738F" seedBase={51} />
           </DraggableItem>
-        </motion.div>
-      </div>
+      </motion.div>
     </main>
   );
 }
