@@ -28,41 +28,58 @@ const SPECIMENS: Specimen[] = [
   {
     no: "FD-01",
     name: "Critically Endangered",
-    tagline: "a zoo where the rarest animals cost the most",
-    blurb: "Every species is capped at exactly how many are left in the real world — if there are 30 vaquita left in the wild, only 30 people on the planet will ever be able to have one in their zoo, ever, full stop. No restock. Buying one sends real money to actual conservation, so the rarer and more expensive the animal, the more it's actually doing.",
-    reason: "I don't know how to world build like that.",
-    cause: "SCOPE",
+    tagline: "a zoo where the rarest thing in it is basically a lottery ticket",
+    blurb: "Every animal capped at exactly how many are left in the wild. 30 polar bears left on Earth? Then exactly 30 people, ever, get to own one in-game. No restock, no \"come back next season.\" Real money goes to real conservation, so the rarer (read: more expensive) the animal, the more good it's actually doing.",
+    reason: "Got as far as a Figma mockup before I killed it, because I already know myself, and I would commit several ethically grey acts to get a saber-toothed tiger into MY zoo.",
+    cause: "TRASHED FOR MY OWN PROTECTION",
   },
   {
     no: "FD-02",
     name: "Sorted",
-    tagline: "scan it. we'll tell you where it actually goes",
-    blurb: "Point your phone at a barcode and get told exactly what's recyclable in your home bin, and where the rest needs to go instead. Built on the idea that shame is a terrible motivator — nobody's cheering you on in your kitchen at 11pm with no one watching.",
-    reason: "\"Tells you where your rubbish goes\" is a feature, not a product.",
-    cause: "TOO SMALL TO BE A PRODUCT",
+    tagline: "point, scan, get told where your trash actually belongs",
+    blurb: "Scan a barcode, get told what's recyclable in your bin and where the rest needs to go. Built on the very reasonable idea that shame doesn't work on anyone standing alone in their kitchen at 11pm sorting yoghurt tubs.",
+    reason: "Never left the napkin sketch stage, because other people already built this, better, first.",
+    cause: "NOT SPECIAL",
   },
   {
     no: "FD-03",
-    name: "Best in Show",
-    tagline: "one category. dog poop. public vote",
-    blurb: "You photograph the day's offering. So does everyone else. Funniest one wins. There is no further explanation, because there isn't one.",
-    reason: "I couldn't find a version of this pitch that didn't end with someone asking me why.",
-    cause: "COULDN'T DEFEND IT",
+    name: "Still Reachable",
+    tagline: "a number that's always theirs, no matter what",
+    blurb: "Upload a voice message from someone you've lost — touch with, or just lost — and get a number that's permanently theirs. Call it, hear them. Text it, it just sits there. No stranger eventually inheriting the number and going \"sorry, wrong number\" into the void where their voice used to live.",
+    reason: "Currently sitting at \"idea in a doc,\" untouched.",
+    cause: "UNTOUCHED, STILL POSSIBLE",
   },
   {
     no: "FD-04",
-    name: "Still Reachable",
-    tagline: "a number that's always theirs",
-    blurb: "Upload a voice message from someone you've lost touch with — or lost — and get a number where it's always waiting: call it to hear them, text it and it just sits there, without some stranger's \"sorry, wrong number\" eventually landing in its place.",
-    cause: "STILL VIABLE, HONESTLY",
+    name: "Sent Anyway",
+    tagline: "say the thing. it just never lands",
+    blurb: "Text your ex, or anyone gone, into an inbox that never reaches them. Same dumb little rush as hitting send, none of the aftermath. If it was bad enough, order the whole thread printed as a book, delivered with a single match, so the last thing you ever do with it is set it on fire.",
+    reason: "Got a working prototype together. The instinct's dead right — grief wants an inbox, closure sometimes wants a bonfire, not a Notes app. But \"$34, ships in 5–7 business days, comes with complimentary matches\" turns something tender into a checkout page, and I couldn't say that out loud with a straight face in a pitch meeting.",
+    cause: "TENDER TURNED INTO A CHECKOUT PAGE",
   },
   {
     no: "FD-05",
-    name: "Sent Anyway",
-    tagline: "say it. it just never lands",
-    blurb: "Text your ex — or anyone you've lost — into an inbox that never reaches them. Same rush as hitting send, none of the reply, none of the reopening a door you closed for a reason. If it was bad enough, you can order a printed book of the whole thread when you're done, delivered with a single match and a little kindling, so the last thing you do with it is burn it.",
-    reason: "The emotional insight is real — grief wants somewhere to send words, and closure sometimes wants a fire, not a notes file on your phone — but we don't want to be liable for creating arsonists.",
-    cause: "LIABILITY",
+    name: "At Least Your Plants Answer",
+    tagline: "a houseplant that texts you back. rudely",
+    blurb: "Soil sensor, hooked to a chatbot that only communicates in plant grievances: \"kind of thirsty,\" \"you're doing too much,\" \"I am not a fern, Kevin, stop misting me.\" Prototyped it on my own windowsill, actually — it's a $40 Bluetooth moisture sensor cosplaying as a personality.",
+    reason: "Eventually somebody notices the man behind the curtain.",
+    cause: "THE CURTAIN SLIPS EVENTUALLY",
+  },
+  {
+    no: "FD-06",
+    name: "The Alibi",
+    tagline: "a believable excuse to leave, on a countdown",
+    blurb: "Set a timer before any dinner, date, or work drinks you already regret agreeing to. At zero, it fires off a fake emergency text — one you wrote while sober, so future-you always has a getaway car.",
+    reason: "Made it to a clickable prototype. An app whose entire personality is \"helps you lie to people you love\" is a hard pitch at the best of times, and an impossible one at the family dinner you're currently trying to escape. Also: turns out you can just schedule texts now.",
+    cause: "TECH ALREADY DID THE CRIME",
+  },
+  {
+    no: "FD-07",
+    name: "Group Chat Court",
+    tagline: "screenshots in. verdict out",
+    blurb: "Submit your side of the dispute — who said they'd bring the speaker, who ghosted the group booking — and total strangers vote guilty or not guilty.",
+    reason: "Stayed a thought experiment. Handing the internet a gavel and pointing it at your actual friendships is exactly as bad an idea as it sounds on paper, and we knew that going in. Also Reddit exists. For a reason.",
+    cause: "REDDIT ALREADY EXISTS",
   },
 ];
 
@@ -342,7 +359,7 @@ export default function JunkDrawer() {
               The Idea Bed
             </h1>
             <p className="mt-4 max-w-md text-lg italic" style={{ fontFamily: DISPLAY_FONT, color: "#6b5c40" }}>
-              Five ideas I abandoned, buried where they fell. Nothing here is labelled. You'll have to brush it off yourself.
+              Seven ideas I abandoned, buried where they fell. Nothing here is labelled. You'll have to brush it off yourself.
             </p>
             <button
               onClick={() => setStarted(true)}
