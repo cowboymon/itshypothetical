@@ -90,15 +90,10 @@ insert into public.specimens (no, name, year, tagline, blurb, reason, cause, sor
 insert into public.specimens (no, name, year, tagline, blurb, reason, cause, sort_order) values ('FD-09', 'Holly the Horse & Pumpkin Pea Patch', 2004, 'my first published universe. circulation: one photocopier, tops', 'A comic. Read way too much Captain Underpants, but was quietly into zines before zines were a thing anyone under 40 had heard of, so really I was just ahead of my time and nobody knew it yet.', 'Plot, characters, and overall coherence: none of your business.', 'AHEAD OF ITS TIME, ALLEGEDLY', 8);
 insert into public.specimens (no, name, year, tagline, blurb, reason, cause, sort_order) values ('FD-10', 'Actually Tasty', 2023, 'turns out 4.5 stars just means it offended nobody', 'Got sick of walking into 4.5+ star restaurants, cafes, and bakeries and having a genuinely bad time, then spiraling about what was wrong with me. Eventual realisation: taste is subjective, and a 5-star average usually just means the food is generic enough to never upset anyone. Congratulations to that muffin, it has no personality and neither does your rating system. The idea: 10 menu items, one per vendor, you actually try. You rate how you felt eating each one, and that builds your taste profile — not "is this objectively good" but "will YOU, specifically, enjoy this." Then you follow people with matching taste buds, so you stop taking recommendations from people whose mouths clearly work differently to yours.', NULL, 'STILL COOKING', 9);
 
--- Give the existing 10 specimens icons matching their concept instead of the
--- random generic fallback (safe to re-run — no-ops once already set).
-update public.specimens set icon = 'ticket' where no = 'FD-01' and icon is null;
-update public.specimens set icon = 'bin' where no = 'FD-02' and icon is null;
-update public.specimens set icon = 'phone' where no = 'FD-03' and icon is null;
-update public.specimens set icon = 'envelope' where no = 'FD-04' and icon is null;
-update public.specimens set icon = 'plant' where no = 'FD-05' and icon is null;
-update public.specimens set icon = 'timer' where no = 'FD-06' and icon is null;
-update public.specimens set icon = 'gavel' where no = 'FD-07' and icon is null;
-update public.specimens set icon = 'popsicle' where no = 'FD-08' and icon is null;
-update public.specimens set icon = 'book' where no = 'FD-09' and icon is null;
-update public.specimens set icon = 'cutlery' where no = 'FD-10' and icon is null;
+-- Icons are left null by default, so every specimen falls back to the
+-- generic fossil glyph cycle (see GENERIC_ICON_KEYS in JunkDrawer.tsx) —
+-- the look was preferred over per-specimen contextual icons. The mapping
+-- below is kept for reference in case that's ever reactivated from the
+-- editor's "Fossil icon" dropdown, on a per-specimen basis:
+--   FD-01 ticket · FD-02 bin · FD-03 phone · FD-04 envelope · FD-05 plant
+--   FD-06 timer · FD-07 gavel · FD-08 popsicle · FD-09 book · FD-10 cutlery
