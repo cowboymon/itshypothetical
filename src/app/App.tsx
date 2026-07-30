@@ -1,4 +1,4 @@
-import { HashRouter, Routes, Route, Link, useNavigate, useLocation, useParams } from "react-router";
+import { HashRouter, Routes, Route, Link, Navigate, useNavigate, useLocation, useParams } from "react-router";
 import React, { useEffect, useState } from "react";
 import { ImageWithFallback } from "./components/figma/ImageWithFallback";
 import JunkDrawer from "./JunkDrawer";
@@ -122,7 +122,7 @@ function NavLink({ section, label }: { section: string; label: string }) {
 
 function Footer({ nextProject }: { nextProject?: ProjectRow }) {
   return (
-    <footer className="border-t border-border mt-16">
+    <footer className="border-t border-border">
       <div className="max-w-5xl mx-auto px-6 py-12">
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
           <div>
@@ -165,6 +165,13 @@ function Footer({ nextProject }: { nextProject?: ProjectRow }) {
 function Homepage() {
   const [projects, setProjects] = useState<ProjectRow[] | null>(null);
   const [loadError, setLoadError] = useState<string | null>(null);
+  const location = useLocation();
+
+  useEffect(() => {
+    const scrollTo = (location.state as { scrollTo?: string } | null)?.scrollTo;
+    if (scrollTo) document.getElementById(scrollTo)?.scrollIntoView({ behavior: "smooth" });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     let cancelled = false;
@@ -441,12 +448,9 @@ function ProjectPage() {
 
   const project = projects.find((p) => p.slug === slug && p.has_page);
   if (!project) {
-    return (
-      <main className="max-w-5xl mx-auto px-6 pt-32">
-        <BackLink />
-        <p className="font-[General_Sans] text-sm text-muted-foreground mt-8">That project doesn't exist (yet).</p>
-      </main>
-    );
+    // "/projects" isn't a real page — jump to the grid on the homepage instead
+    // of showing a dead end. Any other unknown slug just goes home.
+    return <Navigate to="/" replace state={slug === "projects" ? { scrollTo: "projects" } : undefined} />;
   }
 
   const pageProjects = projects.filter((p) => p.has_page).sort((a, b) => a.sort_order - b.sort_order);
