@@ -12,7 +12,7 @@ const BORDER = "#c3b291";
 const MUTED = "#8a7a5c";
 const RUST = "#a4522c";
 
-const DISPLAY_FONT = "'Zodiak', Georgia, serif";
+const DISPLAY_FONT = "'Sentient', Georgia, serif";
 const LABEL_FONT = "'Comico', sans-serif";
 
 interface Specimen {
@@ -81,12 +81,28 @@ const SPECIMENS: Specimen[] = [
     reason: "Stayed a thought experiment. Handing the internet a gavel and pointing it at your actual friendships is exactly as bad an idea as it sounds on paper, and we knew that going in. Also Reddit exists. For a reason.",
     cause: "REDDIT ALREADY EXISTS",
   },
+  {
+    no: "FD-08",
+    name: "Paddle Pop Enterprise",
+    tagline: "a multi-level conspiracy to corner the frozen stick market, aged 8",
+    blurb: "Tried to hack the Paddle Pop prize system by cahoots-ing with a small ring of co-conspirators to artificially inflate demand — get enough kids buying, then swoop in and collect everyone's sticks once the hype had done its job.",
+    reason: "Basically ran a demand-side cartel out of a primary school tuckshop.",
+    cause: "NO REGRETS, MILD CONCERN",
+  },
+  {
+    no: "FD-09",
+    name: "Hollu the Horse and the Pumpkin Pea Patch",
+    tagline: "my first published universe. circulation: one photocopier, tops",
+    blurb: "A comic. Read way too much Captain Underpants, but was quietly into zines before zines were a thing anyone under 40 had heard of, so really I was just ahead of my time and nobody knew it yet.",
+    reason: "Plot, characters, and overall coherence: none of your business.",
+    cause: "AHEAD OF ITS TIME, ALLEGEDLY",
+  },
 ];
 
 const SHAPES = [
-  { w: 150, h: 120, r: "14% 5% 18% 7%/9% 16% 6% 19%", c: 7 },
-  { w: 118, h: 104, r: "38% 19% 33% 24%/23% 37% 20% 35%", c: 10 },
-  { w: 88, h: 84, r: "57% 41% 49% 53%/43% 62% 38% 57%", c: 12 },
+  { w: 150, h: 120, r: "14% 5% 18% 7%/9% 16% 6% 19%", c: 3 },
+  { w: 118, h: 104, r: "38% 19% 33% 24%/23% 37% 20% 35%", c: 3 },
+  { w: 88, h: 84, r: "57% 41% 49% 53%/43% 62% 38% 57%", c: 2 },
 ];
 const BONE = ["#e9dfc7", "#efe6d2", "#e3d8bd", "#eae0c9"];
 const DIRT = "#a8946b";
@@ -113,8 +129,56 @@ interface LaidOutSpecimen extends Specimen {
   r: string;
   tone: string;
   rot: number;
+  icon: number;
   creases: { top: number; left: number; len: number; rot: number; light: boolean }[];
 }
+
+// ─── Fossil imprints — what's actually etched into each rock ─────────────────
+// Flat single-stroke line art, cycled across specimens. Not literal to the
+// idea's content — just varied, so the bed doesn't read as one repeated shape.
+
+const FOSSIL_ICONS = [
+  // ammonite spiral
+  <path d="M50 50 C50 38 40 34 32 40 C22 47 24 62 36 66 C50 70 62 58 58 44 C54 30 36 24 24 34 C10 46 14 68 32 76" />,
+  // fish skeleton
+  <>
+    <path d="M12 50 Q50 34 88 50" />
+    <path d="M20 50 L28 38 M28 50 L36 36 M36 50 L44 36 M44 50 L52 36 M52 50 L60 37 M60 50 L68 38" />
+    <path d="M20 50 L28 62 M28 50 L36 64 M36 50 L44 64 M44 50 L52 64 M52 50 L60 63 M60 50 L68 62" />
+    <path d="M88 50 L98 40 M88 50 L98 60 M88 50 L94 50" />
+  </>,
+  // skull / jaw
+  <>
+    <path d="M20 40 Q20 22 42 20 Q70 18 84 34 Q90 42 82 48 L78 46 Q76 56 64 58 L60 66 L54 58 L46 66 L42 58 Q28 56 24 46 Z" />
+    <circle cx="36" cy="34" r="4" />
+  </>,
+  // three-toed footprint
+  <>
+    <path d="M50 30 C46 30 44 40 46 50 C48 60 44 68 50 70 C56 68 52 60 54 50 C56 40 54 30 50 30 Z" />
+    <path d="M30 42 C26 42 25 50 28 58 C30 64 27 70 32 72 C37 70 34 64 36 58 C38 50 34 42 30 42 Z" />
+    <path d="M70 42 C66 42 65 50 68 58 C70 64 67 70 72 72 C77 70 74 64 76 58 C78 50 74 42 70 42 Z" />
+  </>,
+  // dragonfly
+  <>
+    <ellipse cx="34" cy="34" rx="20" ry="9" transform="rotate(-25 34 34)" />
+    <ellipse cx="66" cy="34" rx="20" ry="9" transform="rotate(25 66 34)" />
+    <ellipse cx="34" cy="66" rx="18" ry="8" transform="rotate(20 34 66)" />
+    <ellipse cx="66" cy="66" rx="18" ry="8" transform="rotate(-20 66 66)" />
+    <path d="M50 22 L50 80" />
+    <path d="M44 30 L56 30 M45 40 L55 40 M46 50 L54 50 M46 60 L54 60 M47 70 L53 70" />
+  </>,
+  // trilobite
+  <>
+    <path d="M50 18 C34 18 26 28 26 40 L26 62 C26 74 34 82 50 82 C66 82 74 74 74 62 L74 40 C74 28 66 18 50 18 Z" />
+    <path d="M50 18 L50 82" />
+    <path d="M30 32 L20 26 M30 44 L18 40 M30 56 L18 60 M30 68 L20 74 M70 32 L80 26 M70 44 L82 40 M70 56 L82 60 M70 68 L80 74" />
+  </>,
+  // fern frond
+  <>
+    <path d="M50 85 L50 18" />
+    <path d="M50 26 L30 18 M50 26 L70 18 M50 36 L28 30 M50 36 L72 30 M50 46 L30 42 M50 46 L70 42 M50 56 L32 54 M50 56 L68 54 M50 66 L34 66 M50 66 L66 66" />
+  </>,
+];
 
 export default function JunkDrawer() {
   const [started, setStarted] = useState(false);
@@ -150,7 +214,7 @@ export default function JunkDrawer() {
         rot: (rnd() - 0.5) * (i % 3 === 0 ? 30 : 150),
         light: k % 3 === 1,
       }));
-      return { ...sp, i, x, y, w: s.w, h: s.h, r: s.r, tone: BONE[i % BONE.length], rot: (rnd() - 0.5) * 26, creases };
+      return { ...sp, i, x, y, w: s.w, h: s.h, r: s.r, tone: BONE[i % BONE.length], rot: (rnd() - 0.5) * 26, icon: i % FOSSIL_ICONS.length, creases };
     });
     cleared.current = new Set();
     setLayout(next);
@@ -339,7 +403,11 @@ export default function JunkDrawer() {
 
   return (
     <main style={{ background: PAPER }}>
-      <link href="https://api.fontshare.com/v2/css?f[]=zodiak@400&f[]=comico@400&display=swap" rel="stylesheet" />
+      <style>{`
+        @font-face { font-family: 'Sentient'; src: url('/fonts/sentient/Sentient-Variable.woff2') format('woff2'); font-weight: 200 700; font-style: normal; font-display: swap; }
+        @font-face { font-family: 'Sentient'; src: url('/fonts/sentient/Sentient-VariableItalic.woff2') format('woff2'); font-weight: 200 700; font-style: italic; font-display: swap; }
+        @font-face { font-family: 'Comico'; src: url('/fonts/comico/Comico-Regular.woff2') format('woff2'); font-weight: 400; font-style: normal; font-display: swap; }
+      `}</style>
 
       {!started ? (
         <div className="flex items-center justify-center px-6 py-24" style={{ minHeight: "calc(100vh - 57px)" }}>
@@ -359,7 +427,7 @@ export default function JunkDrawer() {
               The Idea Bed
             </h1>
             <p className="mt-4 max-w-md text-lg italic" style={{ fontFamily: DISPLAY_FONT, color: "#6b5c40" }}>
-              Seven ideas I abandoned, buried where they fell. Nothing here is labelled. You'll have to brush it off yourself.
+              Nine ideas I abandoned, buried where they fell. Nothing here is labelled. You'll have to brush it off yourself.
             </p>
             <button
               onClick={() => setStarted(true)}
@@ -458,6 +526,24 @@ export default function JunkDrawer() {
                       }}
                     />
                   ))}
+                  <svg
+                    viewBox="0 0 100 100"
+                    fill="none"
+                    stroke="rgba(75,60,38,.62)"
+                    strokeWidth="3"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    style={{
+                      position: "absolute",
+                      left: "50%",
+                      top: "50%",
+                      width: "72%",
+                      height: "72%",
+                      transform: "translate(-50%, -50%)",
+                    }}
+                  >
+                    {FOSSIL_ICONS[sp.icon]}
+                  </svg>
                 </div>
               </div>
             ))}
