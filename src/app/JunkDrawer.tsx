@@ -15,6 +15,9 @@ const RUST = "#a4522c";
 
 const DISPLAY_FONT = "'Sentient', Georgia, serif";
 const LABEL_FONT = "'Comico', sans-serif";
+// Typewritten field-report feel for the blurb/reason body text — distinct from
+// Sentient's headline/tagline elegance, and from Gambarino (the main site's font).
+const BODY_FONT = "'Expose', Georgia, serif";
 
 interface Specimen {
   no: string;
@@ -508,6 +511,7 @@ export default function JunkDrawer() {
       <style>{`
         @font-face { font-family: 'Sentient'; src: url('/fonts/sentient/Sentient-Variable.woff2') format('woff2'); font-weight: 200 700; font-style: normal; font-display: swap; }
         @font-face { font-family: 'Sentient'; src: url('/fonts/sentient/Sentient-VariableItalic.woff2') format('woff2'); font-weight: 200 700; font-style: italic; font-display: swap; }
+        @font-face { font-family: 'Expose'; src: url('/fonts/expose/Expose-Regular.woff2') format('woff2'); font-weight: 400; font-style: normal; font-display: swap; }
         .specimen-card-scroll { scrollbar-width: thin; scrollbar-color: ${BORDER} transparent; }
         .specimen-card-scroll::-webkit-scrollbar { width: 11px; }
         .specimen-card-scroll::-webkit-scrollbar-track { background: transparent; }
@@ -897,7 +901,7 @@ export default function JunkDrawer() {
                 <div className="mt-3" style={{ fontFamily: DISPLAY_FONT, fontSize: 40, lineHeight: 1.06, color: INK }}>
                   {open.name}
                 </div>
-                <div className="mt-2 italic" style={{ fontFamily: DISPLAY_FONT, fontSize: 19, color: "#6b5c40" }}>
+                <div className="mt-2" style={{ fontFamily: BODY_FONT, fontSize: 17, color: "#6b5c40" }}>
                   {open.tagline}
                 </div>
                 <div className="mt-5" style={{ height: 1, background: BORDER }} />
@@ -912,11 +916,11 @@ export default function JunkDrawer() {
                           <img src={open.imageUrl} alt={open.name} style={{ width: "100%", display: "block" }} />
                         </div>
                       )}
-                      <div className="mt-5" style={{ fontFamily: DISPLAY_FONT, fontSize: 20, lineHeight: 1.5, color: "#3a3122" }}>
+                      <div className="mt-5" style={{ fontFamily: BODY_FONT, fontSize: 17, lineHeight: 1.6, color: "#3a3122" }}>
                         {open.blurb}
                       </div>
                       {open.reason && (
-                        <div className="mt-4" style={{ fontFamily: DISPLAY_FONT, fontSize: 18, lineHeight: 1.5, color: "#6b5c40" }}>
+                        <div className="mt-4" style={{ fontFamily: BODY_FONT, fontSize: 15, lineHeight: 1.6, color: "#6b5c40" }}>
                           {open.reason}
                         </div>
                       )}
@@ -950,11 +954,11 @@ export default function JunkDrawer() {
                         <img src={open.imageUrl} alt={open.name} style={{ width: "100%", display: "block" }} />
                       </div>
                     )}
-                    <div className="mt-5" style={{ fontFamily: DISPLAY_FONT, fontSize: 20, lineHeight: 1.5, color: "#3a3122" }}>
+                    <div className="mt-5" style={{ fontFamily: BODY_FONT, fontSize: 17, lineHeight: 1.6, color: "#3a3122" }}>
                       {open.blurb}
                     </div>
                     {open.reason && (
-                      <div className="mt-4" style={{ fontFamily: DISPLAY_FONT, fontSize: 18, lineHeight: 1.5, color: "#6b5c40" }}>
+                      <div className="mt-4" style={{ fontFamily: BODY_FONT, fontSize: 15, lineHeight: 1.6, color: "#6b5c40" }}>
                         {open.reason}
                       </div>
                     )}
