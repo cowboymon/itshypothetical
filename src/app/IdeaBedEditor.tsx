@@ -16,10 +16,19 @@ const BORDER = "#c3b291";
 const MUTED = "#8a7a5c";
 const RUST = "#a4522c";
 
-function blankRow(sortOrder: number): SpecimenRow {
+function nextSpecimenNo(rows: SpecimenRow[]): string {
+  const nums = rows
+    .map((r) => r.no.match(/^FD-(\d+)$/))
+    .filter((m): m is RegExpMatchArray => m !== null)
+    .map((m) => parseInt(m[1], 10));
+  const next = (nums.length ? Math.max(...nums) : 0) + 1;
+  return `FD-${String(next).padStart(2, "0")}`;
+}
+
+function blankRow(sortOrder: number, existingRows: SpecimenRow[]): SpecimenRow {
   return {
     id: "",
-    no: "",
+    no: nextSpecimenNo(existingRows),
     name: "",
     year: new Date().getFullYear(),
     tagline: "",
@@ -326,18 +335,31 @@ export default function IdeaBedEditor() {
               <p style={{ fontSize: 13, color: MUTED }}>Loading…</p>
             ) : (
               <>
-                {rows
-                  .slice()
-                  .sort((a, b) => a.sort_order - b.sort_order)
-                  .map((row) => (
-                    <SpecimenEditor key={row.id} row={row} onSaved={handleSaved} onDeleted={handleDeleted} />
-                  ))}
-                <SpecimenEditor
-                  key={`new-${rows.length}`}
-                  row={blankRow(rows.length)}
-                  onSaved={handleSaved}
-                  onDeleted={handleDeleted}
-                />
+                <div>
+                  <p className="mb-2" style={{ fontSize: 11, letterSpacing: "0.14em", color: MUTED, textTransform: "uppercase" }}>
+                    Add a new specimen
+                  </p>
+                  <SpecimenEditor
+                    key={`new-${rows.length}`}
+                    row={blankRow(rows.length, rows)}
+                    onSaved={handleSaved}
+                    onDeleted={handleDeleted}
+                  />
+                </div>
+
+                <div className="mt-2">
+                  <p className="mb-2" style={{ fontSize: 11, letterSpacing: "0.14em", color: MUTED, textTransform: "uppercase" }}>
+                    Existing specimens
+                  </p>
+                  <div className="flex flex-col gap-6">
+                    {rows
+                      .slice()
+                      .sort((a, b) => a.sort_order - b.sort_order)
+                      .map((row) => (
+                        <SpecimenEditor key={row.id} row={row} onSaved={handleSaved} onDeleted={handleDeleted} />
+                      ))}
+                  </div>
+                </div>
               </>
             )}
           </div>
