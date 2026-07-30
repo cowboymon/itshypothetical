@@ -250,6 +250,7 @@ export default function JunkDrawer() {
   const [touched, setTouched] = useState(false);
   const [dims, setDims] = useState({ w: 1200, h: 600 });
   const [found, setFound] = useState<Set<string>>(new Set());
+  const [dragPos, setDragPos] = useState<Record<number, { x: number; y: number }>>({});
 
   const digRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -257,6 +258,7 @@ export default function JunkDrawer() {
   const cleared = useRef<Set<string>>(new Set());
   const painting = useRef(false);
   const last = useRef<{ x: number; y: number } | null>(null);
+  const dragging = useRef<{ i: number; startX: number; startY: number; origX: number; origY: number; moved: boolean } | null>(null);
 
   function buildLayout(eraIdx: number, w: number, h: number) {
     const ideas = STRATA[eraIdx].ideas;
@@ -265,6 +267,14 @@ export default function JunkDrawer() {
     const rows = Math.ceil(ideas.length / cols);
     const cw = w / cols;
     const ch = h / rows;
+    // Shuffle which grid slot each specimen lands in — otherwise every stratum
+    // reads as the same row/col pattern with a bit of jitter, which looked
+    // suspiciously identical from one layer to the next.
+    const slots = Array.from({ length: cols * rows }, (_, k) => k);
+    for (let k = slots.length - 1; k > 0; k--) {
+      const j = Math.floor(rnd() * (k + 1));
+      [slots[k], slots[j]] = [slots[j], slots[k]];
+    }
     // Shapes were tuned for ~9 specimens in one bed — scale up when a stratum has fewer,
     // so a 4-5 idea layer doesn't look lost in all that empty dirt.
     const scale = Math.min(1.5, Math.sqrt(9 / ideas.length));
@@ -272,15 +282,17 @@ export default function JunkDrawer() {
       const base = SHAPES[i % SHAPES.length];
       const sw = Math.round(base.w * scale);
       const sh = Math.round(base.h * scale);
-      const col = i % cols;
-      const row = Math.floor(i / cols);
-      const x = Math.round(Math.max(16, Math.min(w - sw - 16, col * cw + (cw - sw) / 2 + (rnd() - 0.5) * cw * 0.3)));
-      const y = Math.round(Math.max(14, Math.min(h - sh - 14, row * ch + (ch - sh) / 2 + (rnd() - 0.5) * ch * 0.3)));
+      const slot = slots[i];
+      const col = slot % cols;
+      const row = Math.floor(slot / cols);
+      const x = Math.round(Math.max(16, Math.min(w - sw - 16, col * cw + (cw - sw) / 2 + (rnd() - 0.5) * cw * 0.55)));
+      const y = Math.round(Math.max(14, Math.min(h - sh - 14, row * ch + (ch - sh) / 2 + (rnd() - 0.5) * ch * 0.55)));
       return { ...sp, i, x, y, w: sw, h: sh, r: base.r, tone: BONE[i % BONE.length], rot: (rnd() - 0.5) * 26, icon: i % FOSSIL_ICONS.length };
     });
     cleared.current = new Set();
     setLayout(next);
     setExposed([]);
+    setDragPos({});
     setTouched(false);
   }
 
@@ -468,6 +480,40 @@ export default function JunkDrawer() {
     checkExposure();
   }
 
+  function fossilDown(sp: LaidOutSpecimen, e: React.PointerEvent) {
+    e.stopPropagation();
+    const off = dragPos[sp.i] ?? { x: 0, y: 0 };
+    dragging.current = { i: sp.i, startX: e.clientX, startY: e.clientY, origX: off.x, origY: off.y, moved: false };
+  }
+
+  useEffect(() => {
+    function onFossilMove(e: PointerEvent) {
+      const d = dragging.current;
+      if (!d) return;
+      const dx = e.clientX - d.startX;
+      const dy = e.clientY - d.startY;
+      if (!d.moved && Math.hypot(dx, dy) > 4) d.moved = true;
+      const sp = layout.find((s) => s.i === d.i);
+      if (!sp) return;
+      const nx = Math.max(-sp.x, Math.min(dims.w - sp.w - sp.x, d.origX + dx));
+      const ny = Math.max(-sp.y, Math.min(dims.h - sp.h - sp.y, d.origY + dy));
+      setDragPos((prev) => ({ ...prev, [d.i]: { x: nx, y: ny } }));
+    }
+    function onFossilUp() {
+      const d = dragging.current;
+      if (!d) return;
+      dragging.current = null;
+      if (!d.moved) setOpenId(d.i);
+    }
+    window.addEventListener("pointermove", onFossilMove);
+    window.addEventListener("pointerup", onFossilUp);
+    return () => {
+      window.removeEventListener("pointermove", onFossilMove);
+      window.removeEventListener("pointerup", onFossilUp);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [layout, dims]);
+
   const open = openId === null ? null : layout.find((s) => s.i === openId) || null;
 
   function nextSpecimen() {
@@ -483,6 +529,23 @@ export default function JunkDrawer() {
     setOpenId(null);
     measure(next, true);
   }
+
+  useEffect(() => {
+    if (!started) return;
+    function onKey(e: KeyboardEvent) {
+      if (openId !== null) return;
+      if (e.key === "ArrowUp") {
+        e.preventDefault();
+        goEra(-1);
+      } else if (e.key === "ArrowDown") {
+        e.preventDefault();
+        goEra(1);
+      }
+    }
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [started, openId, era]);
 
   return (
     <main style={{ background: PAPER }}>
@@ -511,6 +574,36 @@ export default function JunkDrawer() {
             <p className="mt-4 max-w-md text-lg italic" style={{ fontFamily: DISPLAY_FONT, color: "#6b5c40" }}>
               Ten ideas I abandoned, buried where they fell. Nothing here is labelled. You'll have to brush it off yourself.
             </p>
+
+            <div className="mt-8 w-full" style={{ border: `1px solid ${INK}` }}>
+              <div className="flex items-center justify-between px-5 py-3" style={{ borderBottom: `1px solid ${BORDER}` }}>
+                <span style={{ fontFamily: DISPLAY_FONT, fontSize: 15, color: INK }}>2026 · surface</span>
+              </div>
+              {STRATA.map((s, idx) => (
+                <div
+                  key={s.label + idx}
+                  className="flex items-center justify-between px-5 py-4"
+                  style={{
+                    background: s.dirt,
+                    borderBottom: idx < STRATA.length - 1 ? "1px solid rgba(43,35,24,.35)" : "none",
+                  }}
+                >
+                  <span style={{ fontFamily: LABEL_FONT, fontSize: 11, letterSpacing: "0.16em", color: idx > 1 ? PAPER : INK }}>
+                    {s.span}
+                  </span>
+                  <span
+                    className="uppercase"
+                    style={{ fontFamily: DISPLAY_FONT, fontSize: 15, letterSpacing: "0.14em", color: idx > 1 ? PAPER : INK }}
+                  >
+                    {s.label}
+                  </span>
+                  <span style={{ fontFamily: LABEL_FONT, fontSize: 11, letterSpacing: "0.12em", color: idx > 1 ? PAPER : INK }}>
+                    {s.ideas.length} specimens
+                  </span>
+                </div>
+              ))}
+            </div>
+
             <button
               onClick={() => setStarted(true)}
               className="mt-9 cursor-pointer"
@@ -535,21 +628,16 @@ export default function JunkDrawer() {
             className="absolute top-0 left-0 right-0 flex items-center justify-between px-8"
             style={{ height: 70, background: PAPER, borderBottom: `1px solid ${BORDER}`, zIndex: 60 }}
           >
-            <div className="flex items-center gap-6">
-              <Link
-                to="/"
-                className="hover:opacity-70 transition-opacity"
-                style={{ fontFamily: LABEL_FONT, fontSize: 11, letterSpacing: "0.14em", color: MUTED, textTransform: "uppercase" }}
-              >
-                ← surface
-              </Link>
-              <div className="flex flex-col gap-0.5">
-                <span style={{ fontFamily: DISPLAY_FONT, fontSize: 19, letterSpacing: "0.1em", textTransform: "uppercase", color: INK }}>
-                  The Idea Bed
-                </span>
-                <span style={{ fontFamily: LABEL_FONT, fontSize: 11, letterSpacing: "0.1em", color: MUTED }}>
-                  SITE SURVEY · IDEAS NOT PURSUED
-                </span>
+            <div className="flex flex-col gap-0.5">
+              <span style={{ fontFamily: DISPLAY_FONT, fontSize: 19, letterSpacing: "0.1em", textTransform: "uppercase", color: INK }}>
+                The Idea Bed
+              </span>
+              <div className="flex items-center gap-2" style={{ fontFamily: LABEL_FONT, fontSize: 11, letterSpacing: "0.1em", color: MUTED }}>
+                <Link to="/" className="hover:opacity-70 transition-opacity uppercase" style={{ letterSpacing: "0.14em" }}>
+                  ← surface
+                </Link>
+                <span>·</span>
+                <span>SITE SURVEY · IDEAS NOT PURSUED</span>
               </div>
             </div>
             <div className="flex items-center gap-8">
@@ -592,6 +680,7 @@ export default function JunkDrawer() {
                   height: sp.h,
                   zIndex: 5,
                   transform: `rotate(${sp.rot}deg)`,
+                  opacity: exposed.includes(sp.i) ? 0.25 : 1,
                 }}
               >
                 <div
@@ -636,20 +725,54 @@ export default function JunkDrawer() {
               exposed.map((i) => {
                 const sp = layout.find((s) => s.i === i);
                 if (!sp) return null;
+                const off = dragPos[i] ?? { x: 0, y: 0 };
+                const isDragging = dragging.current?.i === i;
                 return (
                   <div
                     key={i}
-                    onClick={() => setOpenId(i)}
+                    onPointerDown={(e) => fossilDown(sp, e)}
                     style={{
                       position: "absolute",
-                      left: sp.x,
-                      top: sp.y,
+                      left: sp.x + off.x,
+                      top: sp.y + off.y,
                       width: sp.w,
                       height: sp.h + 30,
-                      zIndex: 30,
-                      cursor: "pointer",
+                      zIndex: isDragging ? 40 : 30,
+                      cursor: isDragging ? "grabbing" : "grab",
+                      touchAction: "none",
                     }}
                   >
+                    <div
+                      style={{
+                        width: sp.w,
+                        height: sp.h,
+                        position: "relative",
+                        borderRadius: sp.r,
+                        backgroundColor: sp.tone,
+                        transform: `rotate(${sp.rot}deg)`,
+                        boxShadow: isDragging ? "0 14px 26px rgba(43,35,24,.35)" : "0 4px 10px rgba(43,35,24,.2)",
+                        transition: "box-shadow .15s",
+                      }}
+                    >
+                      <svg
+                        viewBox="0 0 100 100"
+                        fill="none"
+                        stroke="rgba(75,60,38,.62)"
+                        strokeWidth="3"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        style={{
+                          position: "absolute",
+                          left: "50%",
+                          top: "50%",
+                          width: "72%",
+                          height: "72%",
+                          transform: "translate(-50%, -50%)",
+                        }}
+                      >
+                        {FOSSIL_ICONS[sp.icon]}
+                      </svg>
+                    </div>
                     <div
                       style={{
                         position: "absolute",
@@ -664,6 +787,7 @@ export default function JunkDrawer() {
                         fontSize: 11,
                         letterSpacing: "0.14em",
                         textTransform: "uppercase",
+                        pointerEvents: "none",
                       }}
                     >
                       {sp.name}
