@@ -24,80 +24,106 @@ interface Specimen {
   cause: string;
 }
 
-const SPECIMENS: Specimen[] = [
+interface Stratum {
+  label: string;
+  span: string;
+  dirt: string;
+  specks: string;
+  ideas: Specimen[];
+}
+
+const STRATA: Stratum[] = [
   {
-    no: "FD-01",
-    name: "Critically Endangered",
-    tagline: "a zoo where the rarest thing in it is basically a lottery ticket",
-    blurb: "Every animal capped at exactly how many are left in the wild. 30 polar bears left on Earth? Then exactly 30 people, ever, get to own one in-game. No restock, no \"come back next season.\" Real money goes to real conservation, so the rarer (read: more expensive) the animal, the more good it's actually doing.",
-    reason: "Got as far as a Figma mockup before I killed it, because I already know myself, and I would commit several ethically grey acts to get a saber-toothed tiger into MY zoo.",
-    cause: "TRASHED FOR MY OWN PROTECTION",
+    label: "Topsoil",
+    span: "recent",
+    dirt: "#a8946b",
+    specks: "#8e7950",
+    ideas: [
+      {
+        no: "FD-01",
+        name: "Critically Endangered",
+        tagline: "a zoo where the rarest thing in it is basically a lottery ticket",
+        blurb: "Every animal capped at exactly how many are left in the wild. 30 polar bears left on Earth? Then exactly 30 people, ever, get to own one in-game. No restock, no \"come back next season.\" Real money goes to real conservation, so the rarer (read: more expensive) the animal, the more good it's actually doing.",
+        reason: "Got as far as a Figma mockup before I killed it, because I already know myself, and I would commit several ethically grey acts to get a saber-toothed tiger into MY zoo.",
+        cause: "TRASHED FOR MY OWN PROTECTION",
+      },
+      {
+        no: "FD-02",
+        name: "Sorted",
+        tagline: "point, scan, get told where your trash actually belongs",
+        blurb: "Scan a barcode, get told what's recyclable in your bin and where the rest needs to go. Built on the very reasonable idea that shame doesn't work on anyone standing alone in their kitchen at 11pm sorting yoghurt tubs.",
+        reason: "Never left the napkin sketch stage, because other people already built this, better, first.",
+        cause: "NOT SPECIAL",
+      },
+      {
+        no: "FD-03",
+        name: "Still Reachable",
+        tagline: "a number that's always theirs, no matter what",
+        blurb: "Upload a voice message from someone you've lost — touch with, or just lost — and get a number that's permanently theirs. Call it, hear them. Text it, it just sits there. No stranger eventually inheriting the number and going \"sorry, wrong number\" into the void where their voice used to live.",
+        reason: "Currently sitting at \"idea in a doc,\" untouched.",
+        cause: "UNTOUCHED, STILL POSSIBLE",
+      },
+      {
+        no: "FD-04",
+        name: "Sent Anyway",
+        tagline: "say the thing. it just never lands",
+        blurb: "Text your ex, or anyone gone, into an inbox that never reaches them. Same dumb little rush as hitting send, none of the aftermath. If it was bad enough, order the whole thread printed as a book, delivered with a single match, so the last thing you ever do with it is set it on fire.",
+        reason: "Got a working prototype together. The instinct's dead right — grief wants an inbox, closure sometimes wants a bonfire, not a Notes app. But \"$34, ships in 5–7 business days, comes with complimentary matches\" turns something tender into a checkout page, and I couldn't say that out loud with a straight face in a pitch meeting.",
+        cause: "TENDER TURNED INTO A CHECKOUT PAGE",
+      },
+      {
+        no: "FD-05",
+        name: "At Least Your Plants Answer",
+        tagline: "a houseplant that texts you back. rudely",
+        blurb: "Soil sensor, hooked to a chatbot that only communicates in plant grievances: \"kind of thirsty,\" \"you're doing too much,\" \"I am not a fern, Kevin, stop misting me.\" Prototyped it on my own windowsill, actually — it's a $40 Bluetooth moisture sensor cosplaying as a personality.",
+        reason: "Eventually somebody notices the man behind the curtain.",
+        cause: "THE CURTAIN SLIPS EVENTUALLY",
+      },
+    ],
   },
   {
-    no: "FD-02",
-    name: "Sorted",
-    tagline: "point, scan, get told where your trash actually belongs",
-    blurb: "Scan a barcode, get told what's recyclable in your bin and where the rest needs to go. Built on the very reasonable idea that shame doesn't work on anyone standing alone in their kitchen at 11pm sorting yoghurt tubs.",
-    reason: "Never left the napkin sketch stage, because other people already built this, better, first.",
-    cause: "NOT SPECIAL",
-  },
-  {
-    no: "FD-03",
-    name: "Still Reachable",
-    tagline: "a number that's always theirs, no matter what",
-    blurb: "Upload a voice message from someone you've lost — touch with, or just lost — and get a number that's permanently theirs. Call it, hear them. Text it, it just sits there. No stranger eventually inheriting the number and going \"sorry, wrong number\" into the void where their voice used to live.",
-    reason: "Currently sitting at \"idea in a doc,\" untouched.",
-    cause: "UNTOUCHED, STILL POSSIBLE",
-  },
-  {
-    no: "FD-04",
-    name: "Sent Anyway",
-    tagline: "say the thing. it just never lands",
-    blurb: "Text your ex, or anyone gone, into an inbox that never reaches them. Same dumb little rush as hitting send, none of the aftermath. If it was bad enough, order the whole thread printed as a book, delivered with a single match, so the last thing you ever do with it is set it on fire.",
-    reason: "Got a working prototype together. The instinct's dead right — grief wants an inbox, closure sometimes wants a bonfire, not a Notes app. But \"$34, ships in 5–7 business days, comes with complimentary matches\" turns something tender into a checkout page, and I couldn't say that out loud with a straight face in a pitch meeting.",
-    cause: "TENDER TURNED INTO A CHECKOUT PAGE",
-  },
-  {
-    no: "FD-05",
-    name: "At Least Your Plants Answer",
-    tagline: "a houseplant that texts you back. rudely",
-    blurb: "Soil sensor, hooked to a chatbot that only communicates in plant grievances: \"kind of thirsty,\" \"you're doing too much,\" \"I am not a fern, Kevin, stop misting me.\" Prototyped it on my own windowsill, actually — it's a $40 Bluetooth moisture sensor cosplaying as a personality.",
-    reason: "Eventually somebody notices the man behind the curtain.",
-    cause: "THE CURTAIN SLIPS EVENTUALLY",
-  },
-  {
-    no: "FD-06",
-    name: "The Alibi",
-    tagline: "a believable excuse to leave, on a countdown",
-    blurb: "Set a timer before any dinner, date, or work drinks you already regret agreeing to. At zero, it fires off a fake emergency text — one you wrote while sober, so future-you always has a getaway car.",
-    reason: "Made it to a clickable prototype. An app whose entire personality is \"helps you lie to people you love\" is a hard pitch at the best of times, and an impossible one at the family dinner you're currently trying to escape. Also: turns out you can just schedule texts now.",
-    cause: "TECH ALREADY DID THE CRIME",
-  },
-  {
-    no: "FD-07",
-    name: "Group Chat Court",
-    tagline: "screenshots in. verdict out",
-    blurb: "Submit your side of the dispute — who said they'd bring the speaker, who ghosted the group booking — and total strangers vote guilty or not guilty.",
-    reason: "Stayed a thought experiment. Handing the internet a gavel and pointing it at your actual friendships is exactly as bad an idea as it sounds on paper, and we knew that going in. Also Reddit exists. For a reason.",
-    cause: "REDDIT ALREADY EXISTS",
-  },
-  {
-    no: "FD-08",
-    name: "Paddle Pop Enterprise",
-    tagline: "a multi-level conspiracy to corner the frozen stick market, aged 8",
-    blurb: "Tried to hack the Paddle Pop prize system by cahoots-ing with a small ring of co-conspirators to artificially inflate demand — get enough kids buying, then swoop in and collect everyone's sticks once the hype had done its job.",
-    reason: "Basically ran a demand-side cartel out of a primary school tuckshop.",
-    cause: "NO REGRETS, MILD CONCERN",
-  },
-  {
-    no: "FD-09",
-    name: "Hollu the Horse and the Pumpkin Pea Patch",
-    tagline: "my first published universe. circulation: one photocopier, tops",
-    blurb: "A comic. Read way too much Captain Underpants, but was quietly into zines before zines were a thing anyone under 40 had heard of, so really I was just ahead of my time and nobody knew it yet.",
-    reason: "Plot, characters, and overall coherence: none of your business.",
-    cause: "AHEAD OF ITS TIME, ALLEGEDLY",
+    label: "Bedrock",
+    span: "further down",
+    dirt: "#8f7a52",
+    specks: "#75613d",
+    ideas: [
+      {
+        no: "FD-06",
+        name: "The Alibi",
+        tagline: "a believable excuse to leave, on a countdown",
+        blurb: "Set a timer before any dinner, date, or work drinks you already regret agreeing to. At zero, it fires off a fake emergency text — one you wrote while sober, so future-you always has a getaway car.",
+        reason: "Made it to a clickable prototype. An app whose entire personality is \"helps you lie to people you love\" is a hard pitch at the best of times, and an impossible one at the family dinner you're currently trying to escape. Also: turns out you can just schedule texts now.",
+        cause: "TECH ALREADY DID THE CRIME",
+      },
+      {
+        no: "FD-07",
+        name: "Group Chat Court",
+        tagline: "screenshots in. verdict out",
+        blurb: "Submit your side of the dispute — who said they'd bring the speaker, who ghosted the group booking — and total strangers vote guilty or not guilty.",
+        reason: "Stayed a thought experiment. Handing the internet a gavel and pointing it at your actual friendships is exactly as bad an idea as it sounds on paper, and we knew that going in. Also Reddit exists. For a reason.",
+        cause: "REDDIT ALREADY EXISTS",
+      },
+      {
+        no: "FD-08",
+        name: "Paddle Pop Enterprise",
+        tagline: "a multi-level conspiracy to corner the frozen stick market, aged 8",
+        blurb: "Tried to hack the Paddle Pop prize system by cahoots-ing with a small ring of co-conspirators to artificially inflate demand — get enough kids buying, then swoop in and collect everyone's sticks once the hype had done its job.",
+        reason: "Basically ran a demand-side cartel out of a primary school tuckshop.",
+        cause: "NO REGRETS, MILD CONCERN",
+      },
+      {
+        no: "FD-09",
+        name: "Hollu the Horse and the Pumpkin Pea Patch",
+        tagline: "my first published universe. circulation: one photocopier, tops",
+        blurb: "A comic. Read way too much Captain Underpants, but was quietly into zines before zines were a thing anyone under 40 had heard of, so really I was just ahead of my time and nobody knew it yet.",
+        reason: "Plot, characters, and overall coherence: none of your business.",
+        cause: "AHEAD OF ITS TIME, ALLEGEDLY",
+      },
+    ],
   },
 ];
+
+const TOTAL_IDEAS = STRATA.reduce((n, s) => n + s.ideas.length, 0);
 
 const SHAPES = [
   { w: 150, h: 120, r: "14% 5% 18% 7%/9% 16% 6% 19%" },
@@ -181,11 +207,13 @@ const FOSSIL_ICONS = [
 
 export default function JunkDrawer() {
   const [started, setStarted] = useState(false);
+  const [era, setEra] = useState(0);
   const [layout, setLayout] = useState<LaidOutSpecimen[]>([]);
   const [exposed, setExposed] = useState<number[]>([]);
   const [openId, setOpenId] = useState<number | null>(null);
   const [touched, setTouched] = useState(false);
   const [dims, setDims] = useState({ w: 1200, h: 600 });
+  const [found, setFound] = useState<Set<string>>(new Set());
 
   const digRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -194,13 +222,14 @@ export default function JunkDrawer() {
   const painting = useRef(false);
   const last = useRef<{ x: number; y: number } | null>(null);
 
-  function buildLayout(w: number, h: number) {
-    const rnd = prng(7717);
+  function buildLayout(eraIdx: number, w: number, h: number) {
+    const ideas = STRATA[eraIdx].ideas;
+    const rnd = prng((eraIdx + 3) * 7717);
     const cols = Math.max(2, Math.min(4, Math.floor(w / 280)));
-    const rows = Math.ceil(SPECIMENS.length / cols);
+    const rows = Math.ceil(ideas.length / cols);
     const cw = w / cols;
     const ch = h / rows;
-    const next: LaidOutSpecimen[] = SPECIMENS.map((sp, i) => {
+    const next: LaidOutSpecimen[] = ideas.map((sp, i) => {
       const s = SHAPES[i % SHAPES.length];
       const col = i % cols;
       const row = Math.floor(i / cols);
@@ -214,7 +243,7 @@ export default function JunkDrawer() {
     setTouched(false);
   }
 
-  function paintDirt(w: number, h: number) {
+  function paintDirt(eraIdx: number, w: number, h: number) {
     const cv = canvasRef.current;
     if (!cv) return;
     const dpr = Math.min(2, window.devicePixelRatio || 1);
@@ -222,12 +251,13 @@ export default function JunkDrawer() {
     cv.height = Math.round(h * dpr);
     const ctx = cv.getContext("2d");
     if (!ctx) return;
+    const E = STRATA[eraIdx];
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     ctx.globalCompositeOperation = "source-over";
     ctx.clearRect(0, 0, w, h);
-    ctx.fillStyle = DIRT;
+    ctx.fillStyle = E.dirt;
     ctx.fillRect(0, 0, w, h);
-    const rnd = prng(3301);
+    const rnd = prng((eraIdx + 11) * 3301);
     for (let b = 0; b < 26; b++) {
       const y = rnd() * h;
       const hh = 6 + rnd() * 30;
@@ -266,7 +296,12 @@ export default function JunkDrawer() {
     ctx.fillRect(0, 0, w, h);
   }
 
-  function measure(force = false) {
+  const eraRef = useRef(0);
+  useEffect(() => {
+    eraRef.current = era;
+  }, [era]);
+
+  function measure(eraIdx: number, force = false) {
     const el = digRef.current;
     if (!el) return;
     const r = el.getBoundingClientRect();
@@ -274,14 +309,14 @@ export default function JunkDrawer() {
     const h = Math.max(320, Math.round(r.height));
     if (!force && w === dims.w && h === dims.h && layout.length) return;
     setDims({ w, h });
-    buildLayout(w, h);
-    paintDirt(w, h);
+    buildLayout(eraIdx, w, h);
+    paintDirt(eraIdx, w, h);
   }
 
   useEffect(() => {
     if (!started) return;
-    measure(true);
-    const onResize = () => measure(true);
+    measure(era, true);
+    const onResize = () => measure(eraRef.current, true);
     window.addEventListener("resize", onResize);
     return () => window.removeEventListener("resize", onResize);
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -321,6 +356,13 @@ export default function JunkDrawer() {
       if (tot && hit / tot >= 0.6) ex.push(sp.i);
     });
     setExposed((prev) => (ex.length !== prev.length ? ex : prev));
+    if (ex.length) {
+      setFound((prev) => {
+        const next = new Set(prev);
+        ex.forEach((i) => next.add(layout[i]?.no ?? eraRef.current + "-" + i));
+        return next.size === prev.size ? prev : next;
+      });
+    }
   }
 
   function down(e: React.PointerEvent) {
@@ -393,6 +435,14 @@ export default function JunkDrawer() {
     setOpenId(exposed[(at + 1) % exposed.length]);
   }
 
+  function goEra(delta: number) {
+    const next = Math.max(0, Math.min(STRATA.length - 1, era + delta));
+    if (next === era) return;
+    setEra(next);
+    setOpenId(null);
+    measure(next, true);
+  }
+
   return (
     <main style={{ background: PAPER }}>
       <style>{`
@@ -444,23 +494,36 @@ export default function JunkDrawer() {
             className="absolute top-0 left-0 right-0 flex items-center justify-between px-8"
             style={{ height: 70, background: PAPER, borderBottom: `1px solid ${BORDER}`, zIndex: 60 }}
           >
-            <div className="flex flex-col gap-0.5">
+            <div className="flex items-center gap-6">
               <Link
                 to="/"
                 className="hover:opacity-70 transition-opacity"
-                style={{ fontFamily: DISPLAY_FONT, fontSize: 19, letterSpacing: "0.1em", textTransform: "uppercase", color: INK }}
+                style={{ fontFamily: LABEL_FONT, fontSize: 11, letterSpacing: "0.14em", color: MUTED, textTransform: "uppercase" }}
               >
-                The Idea Bed
+                ← surface
               </Link>
-              <span style={{ fontFamily: LABEL_FONT, fontSize: 11, letterSpacing: "0.1em", color: MUTED }}>
-                SITE SURVEY · IDEAS NOT PURSUED
-              </span>
+              <div className="flex flex-col gap-0.5">
+                <span style={{ fontFamily: DISPLAY_FONT, fontSize: 19, letterSpacing: "0.1em", textTransform: "uppercase", color: INK }}>
+                  The Idea Bed
+                </span>
+                <span style={{ fontFamily: LABEL_FONT, fontSize: 11, letterSpacing: "0.1em", color: MUTED }}>
+                  SITE SURVEY · IDEAS NOT PURSUED
+                </span>
+              </div>
             </div>
-            <div className="flex flex-col items-end gap-0.5">
-              <span style={{ fontFamily: LABEL_FONT, fontSize: 11, letterSpacing: "0.14em", color: MUTED }}>RECOVERED</span>
-              <span style={{ fontFamily: LABEL_FONT, fontSize: 16, color: INK }}>
-                {exposed.length} / {SPECIMENS.length}
-              </span>
+            <div className="flex items-center gap-8">
+              <div className="flex flex-col items-end gap-0.5">
+                <span style={{ fontFamily: LABEL_FONT, fontSize: 11, letterSpacing: "0.14em", color: MUTED }}>STRATUM</span>
+                <span style={{ fontFamily: DISPLAY_FONT, fontSize: 16, letterSpacing: "0.04em", color: INK }}>
+                  {STRATA[era].label}
+                </span>
+              </div>
+              <div className="flex flex-col items-end gap-0.5">
+                <span style={{ fontFamily: LABEL_FONT, fontSize: 11, letterSpacing: "0.14em", color: MUTED }}>RECOVERED</span>
+                <span style={{ fontFamily: LABEL_FONT, fontSize: 16, color: INK }}>
+                  {found.size} / {TOTAL_IDEAS}
+                </span>
+              </div>
             </div>
           </div>
 
@@ -625,6 +688,40 @@ export default function JunkDrawer() {
             <span style={{ fontFamily: LABEL_FONT, fontSize: 13, letterSpacing: "0.08em", color: MUTED }}>
               {exposed.length ? "click an exposed specimen to read it" : "brush the dirt · specimens are buried at random"}
             </span>
+            <div className="flex items-center gap-4">
+              <button
+                onClick={() => goEra(-1)}
+                disabled={era === 0}
+                className="cursor-pointer disabled:cursor-default"
+                style={{
+                  border: `1px solid ${era > 0 ? INK : BORDER}`,
+                  background: "transparent",
+                  color: era > 0 ? INK : BORDER,
+                  padding: "9px 18px",
+                  fontFamily: LABEL_FONT,
+                  fontSize: 12,
+                  letterSpacing: "0.16em",
+                }}
+              >
+                ↑ SHALLOWER
+              </button>
+              <button
+                onClick={() => goEra(1)}
+                disabled={era === STRATA.length - 1}
+                className="cursor-pointer disabled:cursor-default"
+                style={{
+                  border: `1px solid ${era < STRATA.length - 1 ? INK : BORDER}`,
+                  background: era < STRATA.length - 1 ? INK : "transparent",
+                  color: era < STRATA.length - 1 ? PAPER : BORDER,
+                  padding: "9px 18px",
+                  fontFamily: LABEL_FONT,
+                  fontSize: 12,
+                  letterSpacing: "0.16em",
+                }}
+              >
+                DIG DEEPER ↓
+              </button>
+            </div>
           </div>
 
           {/* detail card */}
