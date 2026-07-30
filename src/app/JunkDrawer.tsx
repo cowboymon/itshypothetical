@@ -1,6 +1,6 @@
 import { Link } from "react-router";
-import { motion, useScroll, useTransform } from "motion/react";
-import { useEffect, useRef } from "react";
+import { motion, useScroll, useTransform, useMotionValue, animate, AnimatePresence } from "motion/react";
+import { useEffect, useRef, useState } from "react";
 import rough from "roughjs";
 
 // ─── Junk drawer — trashed ideas + assorted drawer debris ─────────────────────
@@ -28,18 +28,20 @@ const LABEL_FONT = "Quicksand, sans-serif";
 interface TrashedIdea {
   title: string;
   note: string;
+  year: string;
+  status: string;
   top: string;
   left: string;
   rotate: number;
 }
 
 const trashedIdeas: TrashedIdea[] = [
-  { title: "Sock Drawer", note: "An inventory app for socks. Would've been the most niche app ever made.", top: "6%", left: "4%", rotate: -6 },
-  { title: "Ghosted", note: "Auto-drafts the text you'll never send. Too real, too sad. Shelved.", top: "2%", left: "34%", rotate: 4 },
-  { title: "Correct Weather", note: "Hyperlocal weather down to your specific balcony. Turns out — just look outside.", top: "30%", left: "58%", rotate: -3 },
-  { title: "Group Chat Butler", note: "Summarizes the 400-message group chat so you don't have to. Someone else built it, better and first.", top: "50%", left: "6%", rotate: 5 },
-  { title: "Apology Generator", note: "Pre-written apologies, ranked by sincerity. Legal said no.", top: "58%", left: "42%", rotate: -5 },
-  { title: "Speedrun My Life", note: "Gamifies chores as speedrun categories. Nobody wants a leaderboard for laundry.", top: "14%", left: "76%", rotate: 3 },
+  { title: "Sock Drawer", note: "An inventory app for socks. Would've been the most niche app ever made.", year: "2022", status: "trashed", top: "6%", left: "4%", rotate: -6 },
+  { title: "Ghosted", note: "Auto-drafts the text you'll never send. Too real, too sad. Shelved.", year: "2023", status: "shelved", top: "2%", left: "34%", rotate: 4 },
+  { title: "Correct Weather", note: "Hyperlocal weather down to your specific balcony. Turns out — just look outside.", year: "2023", status: "trashed", top: "30%", left: "58%", rotate: -3 },
+  { title: "Group Chat Butler", note: "Summarizes the 400-message group chat so you don't have to. Someone else built it, better and first.", year: "2024", status: "beaten to it", top: "50%", left: "6%", rotate: 5 },
+  { title: "Apology Generator", note: "Pre-written apologies, ranked by sincerity. Legal said no.", year: "2024", status: "vetoed", top: "58%", left: "42%", rotate: -5 },
+  { title: "Speedrun My Life", note: "Gamifies chores as speedrun categories. Nobody wants a leaderboard for laundry.", year: "2022", status: "trashed", top: "14%", left: "76%", rotate: 3 },
 ];
 
 // ─── Paper grain, mixed into the background so nothing feels flat ─────────────
@@ -138,6 +140,59 @@ function HighlighterIcon({ color, seedBase }: { color: string; seedBase: number 
   return <svg ref={ref} width="26" height="94" viewBox="0 0 26 94" />;
 }
 
+// ─── Closed drawer face — the literal thing you pull open ────────────────────
+
+function DrawerFaceIcon() {
+  const ref = useRoughDraw((rc) => {
+    const svg = ref.current!;
+    svg.appendChild(rc.rectangle(4, 4, 312, 132, { fill: DUSTY.terracotta, stroke: INK, fillStyle: "hachure", hachureGap: 5, roughness: 2, seed: 61 }));
+    svg.appendChild(rc.rectangle(140, 56, 40, 20, { fill: PAPER, stroke: INK, fillStyle: "solid", roughness: 2, seed: 62 }));
+  });
+  return <svg ref={ref} width="320" height="140" viewBox="0 0 320 140" />;
+}
+
+function DrawerIntro({ onOpen }: { onOpen: () => void }) {
+  const pullY = useMotionValue(0);
+  const OPEN_AT = 90;
+
+  function handleDragEnd() {
+    if (pullY.get() > OPEN_AT * 0.55) {
+      onOpen();
+    } else {
+      animate(pullY, 0, { type: "spring", stiffness: 320, damping: 22 });
+    }
+  }
+
+  return (
+    <motion.div
+      className="absolute inset-0 z-50 flex flex-col items-center justify-center gap-6"
+      style={{ background: PAPER, backgroundImage: NOISE_BG }}
+      exit={{ opacity: 0, y: 60 }}
+      transition={{ duration: 0.5 }}
+    >
+      <p className="text-sm tracking-wide" style={{ fontFamily: LABEL_FONT, fontWeight: 600, color: DUSTY.sage }}>
+        {trashedIdeas.length} canned ideas
+      </p>
+      <motion.div
+        drag="y"
+        dragConstraints={{ top: 0, bottom: OPEN_AT }}
+        dragElastic={0.15}
+        dragMomentum={false}
+        onDragEnd={handleDragEnd}
+        style={{ y: pullY, cursor: "grab" }}
+        whileTap={{ cursor: "grabbing" }}
+      >
+        <DrawerFaceIcon />
+      </motion.div>
+      <button onClick={onOpen} className="cursor-pointer">
+        <MarkerCircle color={DUSTY.lavender}>
+          <span style={{ fontFamily: LABEL_FONT, fontWeight: 600, color: INK }}>pull it open ↓</span>
+        </MarkerCircle>
+      </button>
+    </motion.div>
+  );
+}
+
 // ─── Draggable wrapper ─────────────────────────────────────────────────────────
 
 function DraggableItem({
@@ -148,6 +203,9 @@ function DraggableItem({
   delay,
   constraintsRef,
   className = "",
+  onTap,
+  faded = false,
+  labelText,
 }: {
   children: React.ReactNode;
   top: string;
@@ -156,10 +214,13 @@ function DraggableItem({
   delay: number;
   constraintsRef: React.RefObject<HTMLDivElement>;
   className?: string;
+  onTap?: () => void;
+  faded?: boolean;
+  labelText?: string;
 }) {
   return (
     <motion.div
-      className={`absolute cursor-grab active:cursor-grabbing select-none ${className}`}
+      className={`absolute cursor-grab active:cursor-grabbing select-none group ${className}`}
       style={{ top, left }}
       drag
       dragConstraints={constraintsRef}
@@ -168,44 +229,103 @@ function DraggableItem({
       whileDrag={{ scale: 1.08, zIndex: 40, boxShadow: "0 14px 30px rgba(58,50,38,0.25)" }}
       whileHover={{ scale: 1.04 }}
       initial={{ opacity: 0, y: -40, rotate: 0, scale: 0.85 }}
-      animate={{ opacity: 1, y: 0, rotate, scale: 1 }}
+      animate={{ opacity: faded ? 0.25 : 1, y: 0, rotate, scale: 1 }}
       transition={{ type: "spring", stiffness: 260, damping: 18, delay }}
+      onTap={onTap}
     >
+      {labelText && (
+        <span
+          className="absolute -top-7 left-1/2 -translate-x-1/2 whitespace-nowrap px-2 py-0.5 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none"
+          style={{ background: PAPER, color: INK, fontFamily: LABEL_FONT, fontWeight: 600, fontSize: 11, boxShadow: "0 2px 6px rgba(58,50,38,0.15)" }}
+        >
+          {labelText}
+        </span>
+      )}
       {children}
     </motion.div>
   );
 }
 
-// ─── Idea card — no hard box chrome, just paper + a hand-drawn accent ─────────
-// No border, no frame, barely any shadow — the color and the wobbly underline
-// do the work a card border normally would.
+// ─── Idea card — a folded note, not a corporate card ──────────────────────────
+// Closed by default (title only, crease lines suggesting a fold). Click — a real
+// tap, not a drag release — unfolds it into the full detail overlay below.
 
 function IdeaCard({ idea, frameColor }: { idea: TrashedIdea; frameColor: string }) {
   return (
     <div
-      className="w-56 sm:w-64 p-5"
+      className="w-44 sm:w-48 p-4 relative overflow-hidden"
       style={{
         background: PAPER,
         borderRadius: "16px 20px 14px 22px",
         boxShadow: "0 3px 9px rgba(58,50,38,0.10)",
       }}
     >
+      {/* fold creases */}
+      <svg className="absolute inset-0 pointer-events-none" width="100%" height="100%" preserveAspectRatio="none" viewBox="0 0 180 130">
+        <path d="M0 40 L180 52" stroke={INK} strokeOpacity="0.08" strokeWidth="1.5" />
+        <path d="M0 88 L180 78" stroke={INK} strokeOpacity="0.08" strokeWidth="1.5" />
+        <path d="M60 0 L52 130" stroke={INK} strokeOpacity="0.06" strokeWidth="1.5" />
+      </svg>
+
       <span
-        className="text-[11px] uppercase tracking-wide"
+        className="relative text-[11px] uppercase tracking-wide"
         style={{ fontFamily: LABEL_FONT, fontWeight: 700, color: frameColor }}
       >
         trashed
       </span>
-      <h3 className="text-2xl mt-1" style={{ fontFamily: DISPLAY_FONT, fontWeight: 700, color: INK }}>
+      <h3 className="relative text-2xl mt-1" style={{ fontFamily: DISPLAY_FONT, fontWeight: 700, color: INK }}>
         {idea.title}
       </h3>
-      <svg width="90" height="8" viewBox="0 0 90 8" className="mt-0.5 mb-1">
-        <path d="M2 5 C 20 2, 40 7, 60 4 S 85 2, 88 5" fill="none" stroke={frameColor} strokeWidth="2.5" strokeLinecap="round" />
+      <svg width="70" height="8" viewBox="0 0 70 8" className="relative mt-0.5">
+        <path d="M2 5 C 16 2, 30 7, 44 4 S 66 2, 68 5" fill="none" stroke={frameColor} strokeWidth="2.5" strokeLinecap="round" />
       </svg>
-      <p className="text-sm mt-2 leading-snug" style={{ fontFamily: LABEL_FONT, color: "#6B6252" }}>
-        {idea.note}
-      </p>
     </div>
+  );
+}
+
+// ─── Detail overlay — where an idea's fold actually unfolds ──────────────────
+
+function DetailOverlay({ idea, frameColor, onClose }: { idea: TrashedIdea; frameColor: string; onClose: () => void }) {
+  return (
+    <motion.div
+      className="absolute inset-0 z-[60] flex items-center justify-center px-6"
+      style={{ background: "rgba(58,50,38,0.28)" }}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      onClick={onClose}
+    >
+      <motion.div
+        className="w-full max-w-sm p-7 relative"
+        style={{ background: PAPER, borderRadius: "18px 24px 16px 26px", boxShadow: "0 20px 40px rgba(58,50,38,0.3)" }}
+        initial={{ opacity: 0, scale: 0.85, rotate: -3 }}
+        animate={{ opacity: 1, scale: 1, rotate: 0 }}
+        exit={{ opacity: 0, scale: 0.9 }}
+        transition={{ type: "spring", stiffness: 320, damping: 24 }}
+        onClick={(e) => e.stopPropagation()}
+      >
+        <button
+          onClick={onClose}
+          className="absolute top-3 right-3 w-7 h-7 flex items-center justify-center hover:opacity-60 transition-opacity"
+          style={{ fontFamily: LABEL_FONT, color: INK, fontSize: 18 }}
+          aria-label="Close"
+        >
+          ×
+        </button>
+        <span className="text-[11px] uppercase tracking-wide" style={{ fontFamily: LABEL_FONT, fontWeight: 700, color: frameColor }}>
+          {idea.year} · {idea.status}
+        </span>
+        <h3 className="text-4xl mt-1" style={{ fontFamily: DISPLAY_FONT, fontWeight: 700, color: INK }}>
+          {idea.title}
+        </h3>
+        <svg width="110" height="8" viewBox="0 0 110 8" className="mt-1 mb-3">
+          <path d="M2 5 C 26 2, 48 7, 70 4 S 104 2, 108 5" fill="none" stroke={frameColor} strokeWidth="2.5" strokeLinecap="round" />
+        </svg>
+        <p className="text-base leading-relaxed" style={{ fontFamily: LABEL_FONT, color: "#6B6252" }}>
+          {idea.note}
+        </p>
+      </motion.div>
+    </motion.div>
   );
 }
 
@@ -215,6 +335,11 @@ export default function JunkDrawer() {
   const collapseDistance = 260;
   const headerScale = useTransform(scrollY, [0, collapseDistance], [1, 0.82]);
   const headerOpacity = useTransform(scrollY, [0, collapseDistance], [1, 0]);
+
+  const [drawerOpen, setDrawerOpen] = useState(false);
+  const [openIdea, setOpenIdea] = useState<string | null>(null);
+  const openIdeaData = trashedIdeas.find((i) => i.title === openIdea);
+  const openIdeaIndex = trashedIdeas.findIndex((i) => i.title === openIdea);
 
   return (
     <main style={{ background: PAPER, backgroundImage: NOISE_BG }}>
@@ -263,49 +388,56 @@ export default function JunkDrawer() {
         animate={{ scale: 1, opacity: 1 }}
         transition={{ duration: 0.4 }}
       >
-          {/* Drawer front sliding open on load */}
-          <motion.div
-            className="absolute inset-0 z-50 flex items-end justify-center pb-8"
-            style={{ background: DUSTY.sage }}
-            initial={{ y: 0 }}
-            animate={{ y: "-100%" }}
-            transition={{ delay: 0.15, duration: 0.6, ease: [0.65, 0, 0.35, 1] }}
-          >
-            <div className="rotate-[-2deg]">
-              <MarkerCircle color={PAPER}>
-                <span style={{ fontFamily: DISPLAY_FONT, color: PAPER, fontSize: 22, fontWeight: 700 }}>opening...</span>
-              </MarkerCircle>
-            </div>
-          </motion.div>
+          {/* Closed drawer — pull it open, or tap the hint */}
+          <AnimatePresence>
+            {!drawerOpen && <DrawerIntro onOpen={() => setDrawerOpen(true)} />}
+          </AnimatePresence>
 
-          {trashedIdeas.map((idea, i) => (
-            <DraggableItem
-              key={idea.title}
-              top={idea.top}
-              left={idea.left}
-              rotate={idea.rotate}
-              delay={0.7 + i * 0.06}
-              constraintsRef={drawerRef}
-            >
-              <IdeaCard idea={idea} frameColor={frameColors[i % frameColors.length]} />
-            </DraggableItem>
-          ))}
+          {drawerOpen &&
+            trashedIdeas.map((idea, i) => (
+              <DraggableItem
+                key={idea.title}
+                top={idea.top}
+                left={idea.left}
+                rotate={idea.rotate}
+                delay={i * 0.06}
+                constraintsRef={drawerRef}
+                onTap={() => setOpenIdea(idea.title)}
+                faded={openIdea === idea.title}
+              >
+                <IdeaCard idea={idea} frameColor={frameColors[i % frameColors.length]} />
+              </DraggableItem>
+            ))}
 
-          <DraggableItem top="76%" left="72%" rotate={-8} delay={1.1} constraintsRef={drawerRef}>
-            <PenIcon />
-          </DraggableItem>
-          <DraggableItem top="70%" left="20%" rotate={6} delay={1.16} constraintsRef={drawerRef}>
-            <MintTinIcon />
-          </DraggableItem>
-          <DraggableItem top="4%" left="58%" rotate={-4} delay={1.22} constraintsRef={drawerRef}>
-            <SnackIcon />
-          </DraggableItem>
-          <DraggableItem top="36%" left="4%" rotate={12} delay={1.28} constraintsRef={drawerRef}>
-            <HighlighterIcon color={DUSTY.mustard} seedBase={41} />
-          </DraggableItem>
-          <DraggableItem top="42%" left="88%" rotate={-14} delay={1.34} constraintsRef={drawerRef}>
-            <HighlighterIcon color={DUSTY.lavender} seedBase={51} />
-          </DraggableItem>
+          {drawerOpen && (
+            <>
+              <DraggableItem top="76%" left="72%" rotate={-8} delay={0.4} constraintsRef={drawerRef} labelText="pen">
+                <PenIcon />
+              </DraggableItem>
+              <DraggableItem top="70%" left="20%" rotate={6} delay={0.46} constraintsRef={drawerRef} labelText="mint tin">
+                <MintTinIcon />
+              </DraggableItem>
+              <DraggableItem top="4%" left="58%" rotate={-4} delay={0.52} constraintsRef={drawerRef} labelText="snack">
+                <SnackIcon />
+              </DraggableItem>
+              <DraggableItem top="36%" left="4%" rotate={12} delay={0.58} constraintsRef={drawerRef} labelText="highlighter">
+                <HighlighterIcon color={DUSTY.mustard} seedBase={41} />
+              </DraggableItem>
+              <DraggableItem top="42%" left="88%" rotate={-14} delay={0.64} constraintsRef={drawerRef} labelText="highlighter">
+                <HighlighterIcon color={DUSTY.lavender} seedBase={51} />
+              </DraggableItem>
+            </>
+          )}
+
+          <AnimatePresence>
+            {openIdeaData && (
+              <DetailOverlay
+                idea={openIdeaData}
+                frameColor={frameColors[openIdeaIndex % frameColors.length]}
+                onClose={() => setOpenIdea(null)}
+              />
+            )}
+          </AnimatePresence>
       </motion.div>
     </main>
   );
