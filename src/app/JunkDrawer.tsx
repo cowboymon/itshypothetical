@@ -514,7 +514,7 @@ export default function JunkDrawer() {
             <p style={{ fontFamily: LABEL_FONT, fontSize: 12, letterSpacing: "0.24em", color: MUTED }}>FIELD SEASON 1994 — 2026</p>
             <h1
               className="mt-5 text-5xl sm:text-6xl uppercase"
-              style={{ fontFamily: DISPLAY_FONT, letterSpacing: "0.03em", color: INK }}
+              style={{ fontFamily: DISPLAY_FONT, fontWeight: 400, letterSpacing: "0.03em", color: INK }}
             >
               The Idea Bed
             </h1>
