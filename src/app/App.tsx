@@ -2,6 +2,7 @@ import { HashRouter, Routes, Route, Link, useNavigate, useLocation } from "react
 import React, { useEffect, useState } from "react";
 import { ImageWithFallback } from "./components/figma/ImageWithFallback";
 import JunkDrawer from "./JunkDrawer";
+import IdeaBedEditor from "./IdeaBedEditor";
 
 // ─── Types ──────────────────────────────────────────────────────────────────
 
@@ -670,6 +671,7 @@ export default function App() {
         <Route path="/quirks-and-all" element={<QuirksAndAll />} />
         <Route path="/straightforward-review" element={<StraightforwardReview />} />
         <Route path="/the-idea-bed" element={<JunkDrawer />} />
+        <Route path="/the-idea-bed/edit" element={<IdeaBedEditor />} />
       </Routes>
     </HashRouter>
   );

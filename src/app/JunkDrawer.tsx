@@ -1,5 +1,6 @@
 import { Link } from "react-router";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { fetchSpecimens, type SpecimenRow } from "../lib/specimens";
 
 // ─── The Idea Bed — a dig site, not a drawer ───────────────────────────────────
 // Field archaeology: a dirt canvas painted over buried "fossils" (trashed
@@ -34,101 +35,22 @@ interface Stratum {
   ideas: Specimen[];
 }
 
-// One flat list, ordered by when the idea actually happened — strata are
-// derived from this (sorted, chunked to <=5 per layer, deepest = oldest),
-// not hand-assigned. Add a new idea with a year and it slots in on its own.
+// Strata are derived from the fetched specimen list — sorted by year
+// descending, chunked to <=5 per layer, deepest = oldest. Add a specimen
+// with a year (via the editor) and it slots into the right depth on its own.
 
-const IDEAS: Specimen[] = [
-  {
-    no: "FD-01",
-    name: "Critically Endangered",
-    year: 2024,
-    tagline: "a zoo where the rarest thing in it is basically a lottery ticket",
-    blurb: "Every animal capped at exactly how many are left in the wild. 30 polar bears left on Earth? Then exactly 30 people, ever, get to own one in-game. No restock, no \"come back next season.\" Real money goes to real conservation, so the rarer (read: more expensive) the animal, the more good it's actually doing.",
-    reason: "Got as far as a Figma mockup before I killed it, because I already know myself, and I would commit several ethically grey acts to get a saber-toothed tiger into MY zoo.",
-    cause: "TRASHED FOR MY OWN PROTECTION",
-  },
-  {
-    no: "FD-02",
-    name: "Sorted",
-    year: 2019,
-    tagline: "point, scan, get told where your trash actually belongs",
-    blurb: "Scan a barcode, get told what's recyclable in your bin and where the rest needs to go. Built on the very reasonable idea that shame doesn't work on anyone standing alone in their kitchen at 11pm sorting yoghurt tubs.",
-    reason: "Never left the napkin sketch stage, because other people already built this, better, first.",
-    cause: "NOT SPECIAL",
-  },
-  {
-    no: "FD-03",
-    name: "Still Reachable",
-    year: 2025,
-    tagline: "a number that's always theirs, no matter what",
-    blurb: "Upload a voice message from someone you've lost — touch with, or just lost — and get a number that's permanently theirs. Call it, hear them. Text it, it just sits there. No stranger eventually inheriting the number and going \"sorry, wrong number\" into the void where their voice used to live.",
-    reason: "Currently sitting at \"idea in a doc,\" untouched.",
-    cause: "UNTOUCHED, STILL POSSIBLE",
-  },
-  {
-    no: "FD-04",
-    name: "Sent Anyway",
-    year: 2022,
-    tagline: "say the thing. it just never lands",
-    blurb: "Text your ex, or anyone gone, into an inbox that never reaches them. Same dumb little rush as hitting send, none of the aftermath. If it was bad enough, order the whole thread printed as a book, delivered with a single match, so the last thing you ever do with it is set it on fire.",
-    reason: "Got a working prototype together. The instinct's dead right — grief wants an inbox, closure sometimes wants a bonfire, not a Notes app. But \"$34, ships in 5–7 business days, comes with complimentary matches\" turns something tender into a checkout page, and I couldn't say that out loud with a straight face in a pitch meeting.",
-    cause: "TENDER TURNED INTO A CHECKOUT PAGE",
-  },
-  {
-    no: "FD-05",
-    name: "At Least Your Plants Answer",
-    year: 2021,
-    tagline: "a houseplant that texts you back. rudely",
-    blurb: "Soil sensor, hooked to a chatbot that only communicates in plant grievances: \"kind of thirsty,\" \"you're doing too much,\" \"I am not a fern, Kevin, stop misting me.\" Prototyped it on my own windowsill, actually — it's a $40 Bluetooth moisture sensor cosplaying as a personality.",
-    reason: "Eventually somebody notices the man behind the curtain.",
-    cause: "THE CURTAIN SLIPS EVENTUALLY",
-  },
-  {
-    no: "FD-06",
-    name: "The Alibi",
-    year: 2018,
-    tagline: "a believable excuse to leave, on a countdown",
-    blurb: "Set a timer before any dinner, date, or work drinks you already regret agreeing to. At zero, it fires off a fake emergency text — one you wrote while sober, so future-you always has a getaway car.",
-    reason: "Made it to a clickable prototype. An app whose entire personality is \"helps you lie to people you love\" is a hard pitch at the best of times, and an impossible one at the family dinner you're currently trying to escape. Also: turns out you can just schedule texts now.",
-    cause: "TECH ALREADY DID THE CRIME",
-  },
-  {
-    no: "FD-07",
-    name: "Group Chat Court",
-    year: 2017,
-    tagline: "screenshots in. verdict out",
-    blurb: "Submit your side of the dispute — who said they'd bring the speaker, who ghosted the group booking — and total strangers vote guilty or not guilty.",
-    reason: "Stayed a thought experiment. Handing the internet a gavel and pointing it at your actual friendships is exactly as bad an idea as it sounds on paper, and we knew that going in. Also Reddit exists. For a reason.",
-    cause: "REDDIT ALREADY EXISTS",
-  },
-  {
-    no: "FD-08",
-    name: "Paddle Pop Enterprise",
-    year: 2002,
-    tagline: "a multi-level conspiracy to corner the frozen stick market, aged 12",
-    blurb: "Tried to hack the Paddle Pop prize system by cahoots-ing with a small ring of co-conspirators to artificially inflate demand — get enough kids buying, then swoop in and collect everyone's sticks once the hype had done its job.",
-    reason: "Basically ran a demand-side cartel out of a primary school tuckshop.",
-    cause: "NO REGRETS, MILD CONCERN",
-  },
-  {
-    no: "FD-09",
-    name: "Holly the Horse & Pumpkin Pea Patch",
-    year: 2004,
-    tagline: "my first published universe. circulation: one photocopier, tops",
-    blurb: "A comic. Read way too much Captain Underpants, but was quietly into zines before zines were a thing anyone under 40 had heard of, so really I was just ahead of my time and nobody knew it yet.",
-    reason: "Plot, characters, and overall coherence: none of your business.",
-    cause: "AHEAD OF ITS TIME, ALLEGEDLY",
-  },
-  {
-    no: "FD-10",
-    name: "Actually Tasty",
-    year: 2023,
-    tagline: "turns out 4.5 stars just means it offended nobody",
-    blurb: "Got sick of walking into 4.5+ star restaurants, cafes, and bakeries and having a genuinely bad time, then spiraling about what was wrong with me. Eventual realisation: taste is subjective, and a 5-star average usually just means the food is generic enough to never upset anyone. Congratulations to that muffin, it has no personality and neither does your rating system. The idea: 10 menu items, one per vendor, you actually try. You rate how you felt eating each one, and that builds your taste profile — not \"is this objectively good\" but \"will YOU, specifically, enjoy this.\" Then you follow people with matching taste buds, so you stop taking recommendations from people whose mouths clearly work differently to yours.",
-    cause: "STILL COOKING",
-  },
-];
+function rowToSpecimen(row: SpecimenRow): Specimen {
+  return {
+    no: row.no,
+    name: row.name,
+    year: row.year,
+    tagline: row.tagline,
+    blurb: row.blurb,
+    reason: row.reason ?? undefined,
+    cause: row.cause,
+    imageUrl: row.image_url ?? undefined,
+  };
+}
 
 const MAX_PER_LAYER = 5;
 // Named/toned from shallow to deep — reused/clamped if there end up being more layers than names.
@@ -139,8 +61,8 @@ const STRATUM_LOOKS = [
   { label: "Bedrock", dirt: "#75603c", specks: "#5c4a2c" },
 ];
 
-function buildStrata(): Stratum[] {
-  const sorted = [...IDEAS].sort((a, b) => b.year - a.year);
+function buildStrata(ideas: Specimen[]): Stratum[] {
+  const sorted = [...ideas].sort((a, b) => b.year - a.year);
   const numLayers = Math.max(1, Math.ceil(sorted.length / MAX_PER_LAYER));
   const bucketSize = Math.ceil(sorted.length / numLayers);
   const strata: Stratum[] = [];
@@ -160,9 +82,6 @@ function buildStrata(): Stratum[] {
   }
   return strata;
 }
-
-const STRATA: Stratum[] = buildStrata();
-const TOTAL_IDEAS = IDEAS.length;
 
 const SHAPES = [
   { w: 150, h: 120, r: "14% 5% 18% 7%/9% 16% 6% 19%" },
@@ -243,6 +162,8 @@ const FOSSIL_ICONS = [
 ];
 
 export default function JunkDrawer() {
+  const [specimens, setSpecimens] = useState<Specimen[] | null>(null);
+  const [loadError, setLoadError] = useState<string | null>(null);
   const [started, setStarted] = useState(false);
   const [era, setEra] = useState(0);
   const [layout, setLayout] = useState<LaidOutSpecimen[]>([]);
@@ -252,6 +173,23 @@ export default function JunkDrawer() {
   const [dims, setDims] = useState({ w: 1200, h: 600 });
   const [found, setFound] = useState<Set<string>>(new Set());
   const [dragPos, setDragPos] = useState<Record<number, { x: number; y: number }>>({});
+
+  useEffect(() => {
+    let cancelled = false;
+    fetchSpecimens()
+      .then((rows) => {
+        if (!cancelled) setSpecimens(rows.map(rowToSpecimen));
+      })
+      .catch((err) => {
+        if (!cancelled) setLoadError(err instanceof Error ? err.message : "Failed to load specimens.");
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const STRATA = useMemo(() => buildStrata(specimens ?? []), [specimens]);
+  const TOTAL_IDEAS = specimens?.length ?? 0;
 
   const digRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -555,7 +493,13 @@ export default function JunkDrawer() {
         @font-face { font-family: 'Sentient'; src: url('/fonts/sentient/Sentient-VariableItalic.woff2') format('woff2'); font-weight: 200 700; font-style: italic; font-display: swap; }
       `}</style>
 
-      {!started ? (
+      {specimens === null ? (
+        <div className="flex items-center justify-center px-6" style={{ minHeight: "calc(100dvh - 57px)" }}>
+          <p style={{ fontFamily: LABEL_FONT, fontSize: 13, letterSpacing: "0.14em", color: MUTED, textTransform: "uppercase" }}>
+            {loadError ? `Couldn't load the dig site — ${loadError}` : "Surveying the site…"}
+          </p>
+        </div>
+      ) : !started ? (
         <div className="flex items-center justify-center px-6 py-24" style={{ minHeight: "calc(100dvh - 57px)" }}>
           <div className="w-full max-w-2xl flex flex-col items-center text-center">
             <Link
