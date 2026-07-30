@@ -502,7 +502,13 @@ export default function JunkDrawer() {
       if (!d) return;
       const dx = e.clientX - d.startX;
       const dy = e.clientY - d.startY;
-      if (!d.moved && Math.hypot(dx, dy) > 4) d.moved = true;
+      // Below this, it still reads as an undecided tap — the fossil stays put.
+      // Only once you've clearly committed to a drag does it start following
+      // the cursor, so there's no twitch while a plain click is happening.
+      if (!d.moved) {
+        if (Math.hypot(dx, dy) <= 8) return;
+        d.moved = true;
+      }
       const sp = layout.find((s) => s.i === d.i);
       if (!sp) return;
       const nx = Math.max(-sp.x, Math.min(dims.w - sp.w - sp.x, d.origX + dx));
