@@ -17,7 +17,7 @@ interface Project {
 
 // ─── Data ────────────────────────────────────────────────────────────────────
 
-const projects: Project[] = [
+export const projects: Project[] = [
   {
     slug: "loud-and-fine",
     name: "Loud & Fine",

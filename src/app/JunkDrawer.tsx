@@ -1,6 +1,7 @@
 import { Link } from "react-router";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { fetchSpecimens, type SpecimenRow } from "../lib/specimens";
+import { projects } from "./App";
 
 // ─── The Idea Bed — a dig site, not a drawer ───────────────────────────────────
 // Field archaeology: a dirt canvas painted over buried "fossils" (trashed
@@ -535,7 +536,7 @@ export default function JunkDrawer() {
             >
               ← back to the surface
             </Link>
-            <p style={{ fontFamily: LABEL_FONT, fontSize: 12, letterSpacing: "0.24em", color: MUTED }}>FIELD SEASON 1994 — 2026</p>
+            <p style={{ fontFamily: LABEL_FONT, fontSize: 12, letterSpacing: "0.24em", color: MUTED }}>FIELD SEASON 1994 — PRESENT</p>
             <h1
               className="mt-5 text-5xl sm:text-6xl uppercase"
               style={{ fontFamily: DISPLAY_FONT, fontWeight: 400, letterSpacing: "0.03em", color: INK }}
@@ -543,7 +544,7 @@ export default function JunkDrawer() {
               The Idea Bed
             </h1>
             <p className="mt-4 max-w-md text-lg italic" style={{ fontFamily: DISPLAY_FONT, color: "#6b5c40" }}>
-              Ten ideas I abandoned, buried where they fell. Nothing here is labelled. You'll have to brush it off yourself.
+              {TOTAL_IDEAS} ideas I abandoned, buried where they fell. Nothing here is labelled. You'll have to brush it off yourself.
             </p>
 
             <div className="mt-8 w-full" style={{ border: `1px solid ${INK}` }}>
@@ -551,7 +552,16 @@ export default function JunkDrawer() {
                 className="flex items-center justify-between px-5 py-4"
                 style={{ background: "#6E8C58" }}
               >
-                <span style={{ fontFamily: DISPLAY_FONT, fontSize: 15, color: "#fbf6e6" }}>2026 · surface</span>
+                <span style={{ fontFamily: LABEL_FONT, fontSize: 11, letterSpacing: "0.16em", color: "#fbf6e6" }}>NOW</span>
+                <span
+                  className="uppercase"
+                  style={{ fontFamily: DISPLAY_FONT, fontSize: 15, letterSpacing: "0.14em", color: "#fbf6e6" }}
+                >
+                  Surface
+                </span>
+                <span style={{ fontFamily: LABEL_FONT, fontSize: 11, letterSpacing: "0.12em", color: "#fbf6e6" }}>
+                  {projects.length} projects
+                </span>
               </div>
               {STRATA.map((s, idx) => (
                 <div
