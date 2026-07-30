@@ -784,7 +784,19 @@ export default function JunkDrawer() {
                         pointerEvents: "none",
                       }}
                     >
-                      {sp.confidential ? "🔒 REDACTED" : sp.name.length > MAX_LABEL_LEN ? "??" : sp.name}
+                      {sp.confidential ? (
+                        <span className="inline-flex items-center gap-1">
+                          <svg width="10" height="11" viewBox="0 0 24 26" style={{ flexShrink: 0 }}>
+                            <rect x="4" y="11" width="16" height="13" rx="2" fill="#d9a441" />
+                            <path d="M8 11V7a4 4 0 1 1 8 0v4" stroke="#d9a441" strokeWidth="2.6" fill="none" />
+                          </svg>
+                          REDACTED
+                        </span>
+                      ) : sp.name.length > MAX_LABEL_LEN ? (
+                        "??"
+                      ) : (
+                        sp.name
+                      )}
                     </div>
                   </div>
                 );
