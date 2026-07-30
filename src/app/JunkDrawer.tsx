@@ -93,6 +93,9 @@ const SHAPES = [
 const BONE = ["#e9dfc7", "#efe6d2", "#e3d8bd", "#eae0c9"];
 const CELL = 18;
 const MOBILE_BREAKPOINT = 640;
+// Long names crowd or wrap awkwardly on the small fossil tag — past this length,
+// tease with "??" instead. The real name always shows once the card is opened.
+const MAX_LABEL_LEN = 18;
 
 function prng(seed: number) {
   let a = seed >>> 0;
@@ -505,6 +508,11 @@ export default function JunkDrawer() {
       <style>{`
         @font-face { font-family: 'Sentient'; src: url('/fonts/sentient/Sentient-Variable.woff2') format('woff2'); font-weight: 200 700; font-style: normal; font-display: swap; }
         @font-face { font-family: 'Sentient'; src: url('/fonts/sentient/Sentient-VariableItalic.woff2') format('woff2'); font-weight: 200 700; font-style: italic; font-display: swap; }
+        .specimen-card-scroll { scrollbar-width: thin; scrollbar-color: ${BORDER} transparent; }
+        .specimen-card-scroll::-webkit-scrollbar { width: 11px; }
+        .specimen-card-scroll::-webkit-scrollbar-track { background: transparent; }
+        .specimen-card-scroll::-webkit-scrollbar-thumb { background: ${BORDER}; border: 2px solid #f4ecda; border-radius: 6px; }
+        .specimen-card-scroll::-webkit-scrollbar-thumb:hover { background: ${MUTED}; }
       `}</style>
 
       {specimens === null ? (
@@ -762,7 +770,7 @@ export default function JunkDrawer() {
                       }}
                     >
                       {sp.confidential ? "🔒 " : ""}
-                      {sp.name}
+                      {sp.name.length > MAX_LABEL_LEN ? "??" : sp.name}
                     </div>
                   </div>
                 );
@@ -866,7 +874,7 @@ export default function JunkDrawer() {
             <div className="absolute inset-0 flex items-center justify-center p-6" style={{ zIndex: 200 }}>
               <div className="absolute inset-0" style={{ background: "rgba(43,35,24,.5)" }} onClick={() => setOpenId(null)} />
               <div
-                className="relative overflow-auto"
+                className="relative overflow-auto specimen-card-scroll"
                 style={{
                   width: "min(620px, 94%)",
                   maxHeight: "100%",
