@@ -122,7 +122,7 @@ function NavLink({ section, label }: { section: string; label: string }) {
 
 function Footer({ nextProject }: { nextProject?: ProjectRow }) {
   return (
-    <footer className="border-t border-border mt-32">
+    <footer className="border-t border-border mt-16">
       <div className="max-w-5xl mx-auto px-6 py-12">
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
           <div>
@@ -209,7 +209,7 @@ function Homepage() {
       </section>
 
       {/* Project grid */}
-      <section id="projects" className="max-w-5xl mx-auto px-6 py-24">
+      <section id="projects" className="max-w-5xl mx-auto px-6 py-16">
         <h2 className="font-[Gambarino] text-4xl sm:text-5xl text-foreground mb-16">
           The family
         </h2>
@@ -228,7 +228,7 @@ function Homepage() {
       </section>
 
       {/* About strip */}
-      <section id="about" className="bg-card border-y border-border py-24">
+      <section id="about" className="bg-card border-y border-border py-16">
         <div className="max-w-5xl mx-auto px-6 grid grid-cols-1 lg:grid-cols-[1fr_2fr] gap-12 items-start">
           <div>
             <h2 className="font-[Gambarino] text-4xl sm:text-5xl text-foreground leading-tight">
