@@ -195,6 +195,10 @@ function Homepage() {
         </p>
         <a
           href="#projects"
+          onClick={(e) => {
+            e.preventDefault();
+            document.getElementById("projects")?.scrollIntoView({ behavior: "smooth" });
+          }}
           className="mt-12 inline-flex items-center gap-2 text-sm font-[General_Sans] text-foreground border-b border-foreground pb-0.5 w-fit hover:text-accent hover:border-accent transition-colors duration-200"
         >
           See what's real ↓
