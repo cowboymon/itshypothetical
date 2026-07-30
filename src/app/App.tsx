@@ -72,6 +72,8 @@ function Nav() {
   const { pathname } = useLocation();
   const isHome = pathname === "/";
 
+  if (pathname.startsWith("/the-idea-bed")) return null;
+
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 border-b border-border bg-background/90 backdrop-blur-sm">
       <div className="max-w-5xl mx-auto px-6 h-14 flex items-center justify-between">

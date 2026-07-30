@@ -289,7 +289,7 @@ export default function IdeaBedEditor() {
   }
 
   return (
-    <main style={{ background: PAPER, paddingTop: 57, minHeight: "100dvh" }}>
+    <main style={{ background: PAPER, minHeight: "100dvh" }}>
       <div className="max-w-3xl mx-auto px-6 py-16">
         <Link
           to="/the-idea-bed"

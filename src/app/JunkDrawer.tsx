@@ -489,20 +489,20 @@ export default function JunkDrawer() {
   }, [started, openId, era]);
 
   return (
-    <main style={{ background: PAPER, paddingTop: 57 }}>
+    <main style={{ background: PAPER }}>
       <style>{`
         @font-face { font-family: 'Sentient'; src: url('/fonts/sentient/Sentient-Variable.woff2') format('woff2'); font-weight: 200 700; font-style: normal; font-display: swap; }
         @font-face { font-family: 'Sentient'; src: url('/fonts/sentient/Sentient-VariableItalic.woff2') format('woff2'); font-weight: 200 700; font-style: italic; font-display: swap; }
       `}</style>
 
       {specimens === null ? (
-        <div className="flex items-center justify-center px-6" style={{ minHeight: "calc(100dvh - 57px)" }}>
+        <div className="flex items-center justify-center px-6" style={{ minHeight: "100dvh" }}>
           <p style={{ fontFamily: LABEL_FONT, fontSize: 13, letterSpacing: "0.14em", color: MUTED, textTransform: "uppercase" }}>
             {loadError ? `Couldn't load the dig site — ${loadError}` : "Surveying the site…"}
           </p>
         </div>
       ) : !started ? (
-        <div className="flex items-center justify-center px-6 py-24" style={{ minHeight: "calc(100dvh - 57px)" }}>
+        <div className="flex items-center justify-center px-6 py-24" style={{ minHeight: "100dvh" }}>
           <div className="w-full max-w-2xl flex flex-col items-center text-center">
             <Link
               to="/"
@@ -572,7 +572,7 @@ export default function JunkDrawer() {
           </div>
         </div>
       ) : (
-        <div className="relative w-full" style={{ height: "calc(100dvh - 57px)", overflow: "hidden" }}>
+        <div className="relative w-full" style={{ height: "100dvh", overflow: "hidden" }}>
           {/* top bar */}
           <div
             className="absolute top-0 left-0 right-0 flex items-center justify-between gap-3 px-4 sm:px-8"
