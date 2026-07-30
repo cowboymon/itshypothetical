@@ -28,6 +28,7 @@ function blankRow(sortOrder: number): SpecimenRow {
     cause: "",
     image_url: null,
     sort_order: sortOrder,
+    confidential: false,
   };
 }
 
@@ -173,6 +174,16 @@ function SpecimenEditor({
           )}
         </div>
       </Field>
+      <label className="flex items-center gap-2 cursor-pointer">
+        <input
+          type="checkbox"
+          checked={draft.confidential}
+          onChange={(e) => set("confidential", e.target.checked)}
+        />
+        <span style={{ fontSize: 13, color: INK }}>
+          Confidential — show on the dig site, but blur the details (in case I want it back one day)
+        </span>
+      </label>
 
       {error && <p style={{ color: RUST, fontSize: 13 }}>{error}</p>}
 

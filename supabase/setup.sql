@@ -14,8 +14,12 @@ create table if not exists public.specimens (
   cause text not null,
   image_url text,
   sort_order int not null default 0,
+  confidential boolean not null default false,
   created_at timestamptz not null default now()
 );
+
+-- Safe to re-run: adds the column if this script already ran before it existed.
+alter table public.specimens add column if not exists confidential boolean not null default false;
 
 alter table public.specimens enable row level security;
 

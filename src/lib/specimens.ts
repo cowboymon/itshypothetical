@@ -11,6 +11,7 @@ export interface SpecimenRow {
   cause: string;
   image_url: string | null;
   sort_order: number;
+  confidential: boolean;
 }
 
 export type SpecimenDraft = Omit<SpecimenRow, "id"> & { id?: string };

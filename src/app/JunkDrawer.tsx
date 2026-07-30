@@ -25,6 +25,7 @@ interface Specimen {
   reason?: string;
   cause: string;
   imageUrl?: string;
+  confidential?: boolean;
 }
 
 interface Stratum {
@@ -49,6 +50,7 @@ function rowToSpecimen(row: SpecimenRow): Specimen {
     reason: row.reason ?? undefined,
     cause: row.cause,
     imageUrl: row.image_url ?? undefined,
+    confidential: row.confidential,
   };
 }
 
@@ -744,6 +746,7 @@ export default function JunkDrawer() {
                         pointerEvents: "none",
                       }}
                     >
+                      {sp.confidential ? "🔒 " : ""}
                       {sp.name}
                     </div>
                   </div>
@@ -879,18 +882,57 @@ export default function JunkDrawer() {
                 <div className="mt-5" style={{ fontFamily: LABEL_FONT, fontSize: 11, letterSpacing: "0.14em", color: MUTED }}>
                   CONDITION — crumpled, legible
                 </div>
-                {open.imageUrl && (
-                  <div className="mt-6" style={{ border: `1px solid ${BORDER}` }}>
-                    <img src={open.imageUrl} alt={open.name} style={{ width: "100%", display: "block" }} />
+                {open.confidential ? (
+                  <div className="relative mt-6">
+                    <div style={{ filter: "blur(7px)", userSelect: "none", pointerEvents: "none" }}>
+                      {open.imageUrl && (
+                        <div style={{ border: `1px solid ${BORDER}` }}>
+                          <img src={open.imageUrl} alt={open.name} style={{ width: "100%", display: "block" }} />
+                        </div>
+                      )}
+                      <div className="mt-5" style={{ fontFamily: DISPLAY_FONT, fontSize: 20, lineHeight: 1.5, color: "#3a3122" }}>
+                        {open.blurb}
+                      </div>
+                      {open.reason && (
+                        <div className="mt-4" style={{ fontFamily: DISPLAY_FONT, fontSize: 18, lineHeight: 1.5, color: "#6b5c40" }}>
+                          {open.reason}
+                        </div>
+                      )}
+                    </div>
+                    <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+                      <div
+                        style={{
+                          border: "3px solid #a4231b",
+                          color: "#a4231b",
+                          padding: "8px 26px",
+                          fontFamily: LABEL_FONT,
+                          fontSize: 20,
+                          letterSpacing: "0.3em",
+                          transform: "rotate(-8deg)",
+                          background: "rgba(244,236,218,.6)",
+                          textTransform: "uppercase",
+                        }}
+                      >
+                        Confidential
+                      </div>
+                    </div>
                   </div>
-                )}
-                <div className="mt-5" style={{ fontFamily: DISPLAY_FONT, fontSize: 20, lineHeight: 1.5, color: "#3a3122" }}>
-                  {open.blurb}
-                </div>
-                {open.reason && (
-                  <div className="mt-4" style={{ fontFamily: DISPLAY_FONT, fontSize: 18, lineHeight: 1.5, color: "#6b5c40" }}>
-                    {open.reason}
-                  </div>
+                ) : (
+                  <>
+                    {open.imageUrl && (
+                      <div className="mt-6" style={{ border: `1px solid ${BORDER}` }}>
+                        <img src={open.imageUrl} alt={open.name} style={{ width: "100%", display: "block" }} />
+                      </div>
+                    )}
+                    <div className="mt-5" style={{ fontFamily: DISPLAY_FONT, fontSize: 20, lineHeight: 1.5, color: "#3a3122" }}>
+                      {open.blurb}
+                    </div>
+                    {open.reason && (
+                      <div className="mt-4" style={{ fontFamily: DISPLAY_FONT, fontSize: 18, lineHeight: 1.5, color: "#6b5c40" }}>
+                        {open.reason}
+                      </div>
+                    )}
+                  </>
                 )}
                 <div
                   className="mt-6 pt-4 flex items-center justify-between gap-4"
