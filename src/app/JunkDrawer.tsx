@@ -18,6 +18,7 @@ const LABEL_FONT = "'Comico', sans-serif";
 interface Specimen {
   no: string;
   name: string;
+  year: number;
   tagline: string;
   blurb: string;
   reason?: string;
@@ -32,105 +33,135 @@ interface Stratum {
   ideas: Specimen[];
 }
 
-const STRATA: Stratum[] = [
+// One flat list, ordered by when the idea actually happened — strata are
+// derived from this (sorted, chunked to <=5 per layer, deepest = oldest),
+// not hand-assigned. Add a new idea with a year and it slots in on its own.
+
+const IDEAS: Specimen[] = [
   {
-    label: "Topsoil",
-    span: "recent",
-    dirt: "#a8946b",
-    specks: "#8e7950",
-    ideas: [
-      {
-        no: "FD-01",
-        name: "Critically Endangered",
-        tagline: "a zoo where the rarest thing in it is basically a lottery ticket",
-        blurb: "Every animal capped at exactly how many are left in the wild. 30 polar bears left on Earth? Then exactly 30 people, ever, get to own one in-game. No restock, no \"come back next season.\" Real money goes to real conservation, so the rarer (read: more expensive) the animal, the more good it's actually doing.",
-        reason: "Got as far as a Figma mockup before I killed it, because I already know myself, and I would commit several ethically grey acts to get a saber-toothed tiger into MY zoo.",
-        cause: "TRASHED FOR MY OWN PROTECTION",
-      },
-      {
-        no: "FD-02",
-        name: "Sorted",
-        tagline: "point, scan, get told where your trash actually belongs",
-        blurb: "Scan a barcode, get told what's recyclable in your bin and where the rest needs to go. Built on the very reasonable idea that shame doesn't work on anyone standing alone in their kitchen at 11pm sorting yoghurt tubs.",
-        reason: "Never left the napkin sketch stage, because other people already built this, better, first.",
-        cause: "NOT SPECIAL",
-      },
-      {
-        no: "FD-03",
-        name: "Still Reachable",
-        tagline: "a number that's always theirs, no matter what",
-        blurb: "Upload a voice message from someone you've lost — touch with, or just lost — and get a number that's permanently theirs. Call it, hear them. Text it, it just sits there. No stranger eventually inheriting the number and going \"sorry, wrong number\" into the void where their voice used to live.",
-        reason: "Currently sitting at \"idea in a doc,\" untouched.",
-        cause: "UNTOUCHED, STILL POSSIBLE",
-      },
-      {
-        no: "FD-04",
-        name: "Sent Anyway",
-        tagline: "say the thing. it just never lands",
-        blurb: "Text your ex, or anyone gone, into an inbox that never reaches them. Same dumb little rush as hitting send, none of the aftermath. If it was bad enough, order the whole thread printed as a book, delivered with a single match, so the last thing you ever do with it is set it on fire.",
-        reason: "Got a working prototype together. The instinct's dead right — grief wants an inbox, closure sometimes wants a bonfire, not a Notes app. But \"$34, ships in 5–7 business days, comes with complimentary matches\" turns something tender into a checkout page, and I couldn't say that out loud with a straight face in a pitch meeting.",
-        cause: "TENDER TURNED INTO A CHECKOUT PAGE",
-      },
-      {
-        no: "FD-05",
-        name: "At Least Your Plants Answer",
-        tagline: "a houseplant that texts you back. rudely",
-        blurb: "Soil sensor, hooked to a chatbot that only communicates in plant grievances: \"kind of thirsty,\" \"you're doing too much,\" \"I am not a fern, Kevin, stop misting me.\" Prototyped it on my own windowsill, actually — it's a $40 Bluetooth moisture sensor cosplaying as a personality.",
-        reason: "Eventually somebody notices the man behind the curtain.",
-        cause: "THE CURTAIN SLIPS EVENTUALLY",
-      },
-    ],
+    no: "FD-01",
+    name: "Critically Endangered",
+    year: 2024,
+    tagline: "a zoo where the rarest thing in it is basically a lottery ticket",
+    blurb: "Every animal capped at exactly how many are left in the wild. 30 polar bears left on Earth? Then exactly 30 people, ever, get to own one in-game. No restock, no \"come back next season.\" Real money goes to real conservation, so the rarer (read: more expensive) the animal, the more good it's actually doing.",
+    reason: "Got as far as a Figma mockup before I killed it, because I already know myself, and I would commit several ethically grey acts to get a saber-toothed tiger into MY zoo.",
+    cause: "TRASHED FOR MY OWN PROTECTION",
   },
   {
-    label: "Bedrock",
-    span: "further down",
-    dirt: "#8f7a52",
-    specks: "#75613d",
-    ideas: [
-      {
-        no: "FD-06",
-        name: "The Alibi",
-        tagline: "a believable excuse to leave, on a countdown",
-        blurb: "Set a timer before any dinner, date, or work drinks you already regret agreeing to. At zero, it fires off a fake emergency text — one you wrote while sober, so future-you always has a getaway car.",
-        reason: "Made it to a clickable prototype. An app whose entire personality is \"helps you lie to people you love\" is a hard pitch at the best of times, and an impossible one at the family dinner you're currently trying to escape. Also: turns out you can just schedule texts now.",
-        cause: "TECH ALREADY DID THE CRIME",
-      },
-      {
-        no: "FD-07",
-        name: "Group Chat Court",
-        tagline: "screenshots in. verdict out",
-        blurb: "Submit your side of the dispute — who said they'd bring the speaker, who ghosted the group booking — and total strangers vote guilty or not guilty.",
-        reason: "Stayed a thought experiment. Handing the internet a gavel and pointing it at your actual friendships is exactly as bad an idea as it sounds on paper, and we knew that going in. Also Reddit exists. For a reason.",
-        cause: "REDDIT ALREADY EXISTS",
-      },
-      {
-        no: "FD-08",
-        name: "Paddle Pop Enterprise",
-        tagline: "a multi-level conspiracy to corner the frozen stick market, aged 8",
-        blurb: "Tried to hack the Paddle Pop prize system by cahoots-ing with a small ring of co-conspirators to artificially inflate demand — get enough kids buying, then swoop in and collect everyone's sticks once the hype had done its job.",
-        reason: "Basically ran a demand-side cartel out of a primary school tuckshop.",
-        cause: "NO REGRETS, MILD CONCERN",
-      },
-      {
-        no: "FD-09",
-        name: "Hollu the Horse and the Pumpkin Pea Patch",
-        tagline: "my first published universe. circulation: one photocopier, tops",
-        blurb: "A comic. Read way too much Captain Underpants, but was quietly into zines before zines were a thing anyone under 40 had heard of, so really I was just ahead of my time and nobody knew it yet.",
-        reason: "Plot, characters, and overall coherence: none of your business.",
-        cause: "AHEAD OF ITS TIME, ALLEGEDLY",
-      },
-      {
-        no: "FD-10",
-        name: "Actually Tasty",
-        tagline: "turns out 4.5 stars just means it offended nobody",
-        blurb: "Got sick of walking into 4.5+ star restaurants, cafes, and bakeries and having a genuinely bad time, then spiraling about what was wrong with me. Eventual realisation: taste is subjective, and a 5-star average usually just means the food is generic enough to never upset anyone. Congratulations to that muffin, it has no personality and neither does your rating system. The idea: 10 menu items, one per vendor, you actually try. You rate how you felt eating each one, and that builds your taste profile — not \"is this objectively good\" but \"will YOU, specifically, enjoy this.\" Then you follow people with matching taste buds, so you stop taking recommendations from people whose mouths clearly work differently to yours.",
-        cause: "STILL COOKING",
-      },
-    ],
+    no: "FD-02",
+    name: "Sorted",
+    year: 2019,
+    tagline: "point, scan, get told where your trash actually belongs",
+    blurb: "Scan a barcode, get told what's recyclable in your bin and where the rest needs to go. Built on the very reasonable idea that shame doesn't work on anyone standing alone in their kitchen at 11pm sorting yoghurt tubs.",
+    reason: "Never left the napkin sketch stage, because other people already built this, better, first.",
+    cause: "NOT SPECIAL",
+  },
+  {
+    no: "FD-03",
+    name: "Still Reachable",
+    year: 2025,
+    tagline: "a number that's always theirs, no matter what",
+    blurb: "Upload a voice message from someone you've lost — touch with, or just lost — and get a number that's permanently theirs. Call it, hear them. Text it, it just sits there. No stranger eventually inheriting the number and going \"sorry, wrong number\" into the void where their voice used to live.",
+    reason: "Currently sitting at \"idea in a doc,\" untouched.",
+    cause: "UNTOUCHED, STILL POSSIBLE",
+  },
+  {
+    no: "FD-04",
+    name: "Sent Anyway",
+    year: 2022,
+    tagline: "say the thing. it just never lands",
+    blurb: "Text your ex, or anyone gone, into an inbox that never reaches them. Same dumb little rush as hitting send, none of the aftermath. If it was bad enough, order the whole thread printed as a book, delivered with a single match, so the last thing you ever do with it is set it on fire.",
+    reason: "Got a working prototype together. The instinct's dead right — grief wants an inbox, closure sometimes wants a bonfire, not a Notes app. But \"$34, ships in 5–7 business days, comes with complimentary matches\" turns something tender into a checkout page, and I couldn't say that out loud with a straight face in a pitch meeting.",
+    cause: "TENDER TURNED INTO A CHECKOUT PAGE",
+  },
+  {
+    no: "FD-05",
+    name: "At Least Your Plants Answer",
+    year: 2021,
+    tagline: "a houseplant that texts you back. rudely",
+    blurb: "Soil sensor, hooked to a chatbot that only communicates in plant grievances: \"kind of thirsty,\" \"you're doing too much,\" \"I am not a fern, Kevin, stop misting me.\" Prototyped it on my own windowsill, actually — it's a $40 Bluetooth moisture sensor cosplaying as a personality.",
+    reason: "Eventually somebody notices the man behind the curtain.",
+    cause: "THE CURTAIN SLIPS EVENTUALLY",
+  },
+  {
+    no: "FD-06",
+    name: "The Alibi",
+    year: 2018,
+    tagline: "a believable excuse to leave, on a countdown",
+    blurb: "Set a timer before any dinner, date, or work drinks you already regret agreeing to. At zero, it fires off a fake emergency text — one you wrote while sober, so future-you always has a getaway car.",
+    reason: "Made it to a clickable prototype. An app whose entire personality is \"helps you lie to people you love\" is a hard pitch at the best of times, and an impossible one at the family dinner you're currently trying to escape. Also: turns out you can just schedule texts now.",
+    cause: "TECH ALREADY DID THE CRIME",
+  },
+  {
+    no: "FD-07",
+    name: "Group Chat Court",
+    year: 2017,
+    tagline: "screenshots in. verdict out",
+    blurb: "Submit your side of the dispute — who said they'd bring the speaker, who ghosted the group booking — and total strangers vote guilty or not guilty.",
+    reason: "Stayed a thought experiment. Handing the internet a gavel and pointing it at your actual friendships is exactly as bad an idea as it sounds on paper, and we knew that going in. Also Reddit exists. For a reason.",
+    cause: "REDDIT ALREADY EXISTS",
+  },
+  {
+    no: "FD-08",
+    name: "Paddle Pop Enterprise",
+    year: 2002,
+    tagline: "a multi-level conspiracy to corner the frozen stick market, aged 8",
+    blurb: "Tried to hack the Paddle Pop prize system by cahoots-ing with a small ring of co-conspirators to artificially inflate demand — get enough kids buying, then swoop in and collect everyone's sticks once the hype had done its job.",
+    reason: "Basically ran a demand-side cartel out of a primary school tuckshop.",
+    cause: "NO REGRETS, MILD CONCERN",
+  },
+  {
+    no: "FD-09",
+    name: "Holly the Horse & Pumpkin Pea Patch",
+    year: 2004,
+    tagline: "my first published universe. circulation: one photocopier, tops",
+    blurb: "A comic. Read way too much Captain Underpants, but was quietly into zines before zines were a thing anyone under 40 had heard of, so really I was just ahead of my time and nobody knew it yet.",
+    reason: "Plot, characters, and overall coherence: none of your business.",
+    cause: "AHEAD OF ITS TIME, ALLEGEDLY",
+  },
+  {
+    no: "FD-10",
+    name: "Actually Tasty",
+    year: 2023,
+    tagline: "turns out 4.5 stars just means it offended nobody",
+    blurb: "Got sick of walking into 4.5+ star restaurants, cafes, and bakeries and having a genuinely bad time, then spiraling about what was wrong with me. Eventual realisation: taste is subjective, and a 5-star average usually just means the food is generic enough to never upset anyone. Congratulations to that muffin, it has no personality and neither does your rating system. The idea: 10 menu items, one per vendor, you actually try. You rate how you felt eating each one, and that builds your taste profile — not \"is this objectively good\" but \"will YOU, specifically, enjoy this.\" Then you follow people with matching taste buds, so you stop taking recommendations from people whose mouths clearly work differently to yours.",
+    cause: "STILL COOKING",
   },
 ];
 
-const TOTAL_IDEAS = STRATA.reduce((n, s) => n + s.ideas.length, 0);
+const MAX_PER_LAYER = 5;
+// Named/toned from shallow to deep — reused/clamped if there end up being more layers than names.
+const STRATUM_LOOKS = [
+  { label: "Topsoil", dirt: "#a8946b", specks: "#8e7950" },
+  { label: "Subsoil", dirt: "#977f56", specks: "#7c6841" },
+  { label: "Deep Bed", dirt: "#8f7a52", specks: "#75613d" },
+  { label: "Bedrock", dirt: "#75603c", specks: "#5c4a2c" },
+];
+
+function buildStrata(): Stratum[] {
+  const sorted = [...IDEAS].sort((a, b) => b.year - a.year);
+  const numLayers = Math.max(1, Math.ceil(sorted.length / MAX_PER_LAYER));
+  const bucketSize = Math.ceil(sorted.length / numLayers);
+  const strata: Stratum[] = [];
+  for (let i = 0; i < numLayers; i++) {
+    const chunk = sorted.slice(i * bucketSize, (i + 1) * bucketSize);
+    if (!chunk.length) continue;
+    const lookIdx = numLayers === 1 ? 0 : Math.round((i * (STRATUM_LOOKS.length - 1)) / (numLayers - 1));
+    const look = STRATUM_LOOKS[Math.min(lookIdx, STRATUM_LOOKS.length - 1)];
+    const years = chunk.map((c) => c.year);
+    strata.push({
+      label: i === numLayers - 1 ? "Bedrock" : look.label,
+      span: `${Math.min(...years)}–${Math.max(...years)}`,
+      dirt: look.dirt,
+      specks: look.specks,
+      ideas: chunk,
+    });
+  }
+  return strata;
+}
+
+const STRATA: Stratum[] = buildStrata();
+const TOTAL_IDEAS = IDEAS.length;
 
 const SHAPES = [
   { w: 150, h: 120, r: "14% 5% 18% 7%/9% 16% 6% 19%" },
@@ -138,8 +169,6 @@ const SHAPES = [
   { w: 88, h: 84, r: "57% 41% 49% 53%/43% 62% 38% 57%" },
 ];
 const BONE = ["#e9dfc7", "#efe6d2", "#e3d8bd", "#eae0c9"];
-const DIRT = "#a8946b";
-const SPECKS = "#8e7950";
 const CELL = 18;
 
 function prng(seed: number) {
@@ -287,7 +316,7 @@ export default function JunkDrawer() {
       const x = rnd() * w;
       const y = rnd() * h;
       const s = rnd();
-      ctx.fillStyle = s > 0.62 ? "rgba(255,250,232,.3)" : s > 0.3 ? SPECKS : "rgba(46,36,22,.4)";
+      ctx.fillStyle = s > 0.62 ? "rgba(255,250,232,.3)" : s > 0.3 ? E.specks : "rgba(46,36,22,.4)";
       const r = s > 0.94 ? 2.4 : 1.1;
       ctx.fillRect(x, y, r, r);
     }
@@ -527,7 +556,7 @@ export default function JunkDrawer() {
               <div className="flex flex-col items-end gap-0.5">
                 <span style={{ fontFamily: LABEL_FONT, fontSize: 11, letterSpacing: "0.14em", color: MUTED }}>STRATUM</span>
                 <span style={{ fontFamily: DISPLAY_FONT, fontSize: 16, letterSpacing: "0.04em", color: INK }}>
-                  {STRATA[era].label}
+                  {STRATA[era].label} <span style={{ fontSize: 13, color: MUTED }}>({STRATA[era].span})</span>
                 </span>
               </div>
               <div className="flex flex-col items-end gap-0.5">
@@ -544,7 +573,7 @@ export default function JunkDrawer() {
             <div
               className="absolute inset-0"
               style={{
-                background: DIRT,
+                background: STRATA[era].dirt,
                 backgroundImage:
                   "radial-gradient(circle at 30% 20%, rgba(255,250,232,.16), transparent 55%), repeating-linear-gradient(2deg, rgba(46,36,22,.05) 0 2px, transparent 2px 9px)",
                 boxShadow: "inset 0 0 120px rgba(40,31,19,.35)",
@@ -759,7 +788,9 @@ export default function JunkDrawer() {
                 >
                   RE-BURY ✕
                 </div>
-                <div style={{ fontFamily: LABEL_FONT, fontSize: 11, letterSpacing: "0.2em", color: MUTED }}>SPECIMEN {open.no}</div>
+                <div style={{ fontFamily: LABEL_FONT, fontSize: 11, letterSpacing: "0.2em", color: MUTED }}>
+                  SPECIMEN {open.no} · {open.year}
+                </div>
                 <div className="mt-3" style={{ fontFamily: DISPLAY_FONT, fontSize: 40, lineHeight: 1.06, color: INK }}>
                   {open.name}
                 </div>
