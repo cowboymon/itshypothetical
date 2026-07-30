@@ -1,483 +1,634 @@
 import { Link } from "react-router";
-import { motion, useScroll, useTransform, useMotionValue, animate, AnimatePresence } from "motion/react";
 import { useEffect, useRef, useState } from "react";
-import rough from "roughjs";
 
-// ─── Junk drawer — trashed ideas + assorted drawer debris ─────────────────────
-// This page is deliberately its own world: hand-drawn, textured, warm and a
-// little messy — everything else on the site is calm and this isn't.
-// Item shapes are kept simple on purpose — real illustrations get swapped in later.
+// ─── The Idea Bed — a dig site, not a drawer ───────────────────────────────────
+// Field archaeology: a dirt canvas painted over buried "fossils" (trashed
+// ideas), brushed away by dragging. Museum specimen labels, typewriter field
+// data, real dirt. No cozy crayon here.
 
-const INK = "#3A3226";
-const PAPER = "#F1E9D8";
+const INK = "#2b2318";
+const PAPER = "#efe6d2";
+const BORDER = "#c3b291";
+const MUTED = "#8a7a5c";
+const RUST = "#a4522c";
 
-// Muted, dusty palette — never saturated or high-contrast
-const DUSTY = {
-  sage: "#A6AD86",
-  terracotta: "#C99B76",
-  mustard: "#D6BD74",
-  lavender: "#B0A3BC",
-};
-const frameColors = [DUSTY.sage, DUSTY.terracotta, DUSTY.mustard, DUSTY.lavender, DUSTY.sage, DUSTY.terracotta];
+const DISPLAY_FONT = "'Zodiak', Georgia, serif";
+const LABEL_FONT = "'Comico', sans-serif";
 
-// Big moments (headline, card titles) get the hand-lettered display font.
-// Everyday labels and body copy get a simple rounded sans — not a second script font.
-const DISPLAY_FONT = "Caveat, cursive";
-const LABEL_FONT = "Quicksand, sans-serif";
-
-interface TrashedIdea {
-  title: string;
+interface Specimen {
+  no: string;
+  name: string;
   tagline: string;
   blurb: string;
   reason?: string;
-  top: string;
-  left: string;
-  rotate: number;
+  cause: string;
 }
 
-const trashedIdeas: TrashedIdea[] = [
+const SPECIMENS: Specimen[] = [
   {
-    title: "Critically Endangered",
-    tagline: "A zoo where the rarest animals cost the most.",
+    no: "FD-01",
+    name: "Critically Endangered",
+    tagline: "a zoo where the rarest animals cost the most",
     blurb: "Every species is capped at exactly how many are left in the real world — if there are 30 vaquita left in the wild, only 30 people on the planet will ever be able to have one in their zoo, ever, full stop. No restock. Buying one sends real money to actual conservation, so the rarer and more expensive the animal, the more it's actually doing.",
     reason: "I don't know how to world build like that.",
-    top: "6%", left: "4%", rotate: -6,
+    cause: "SCOPE",
   },
   {
-    title: "Sorted",
-    tagline: "Scan it. We'll tell you where it actually goes.",
+    no: "FD-02",
+    name: "Sorted",
+    tagline: "scan it. we'll tell you where it actually goes",
     blurb: "Point your phone at a barcode and get told exactly what's recyclable in your home bin, and where the rest needs to go instead. Built on the idea that shame is a terrible motivator — nobody's cheering you on in your kitchen at 11pm with no one watching.",
     reason: "\"Tells you where your rubbish goes\" is a feature, not a product.",
-    top: "2%", left: "34%", rotate: 4,
+    cause: "TOO SMALL TO BE A PRODUCT",
   },
   {
-    title: "Best in Show",
-    tagline: "One category. Dog poop. Public vote.",
+    no: "FD-03",
+    name: "Best in Show",
+    tagline: "one category. dog poop. public vote",
     blurb: "You photograph the day's offering. So does everyone else. Funniest one wins. There is no further explanation, because there isn't one.",
     reason: "I couldn't find a version of this pitch that didn't end with someone asking me why.",
-    top: "30%", left: "58%", rotate: -3,
+    cause: "COULDN'T DEFEND IT",
   },
   {
-    title: "Still Reachable",
-    tagline: "A number that's always theirs.",
+    no: "FD-04",
+    name: "Still Reachable",
+    tagline: "a number that's always theirs",
     blurb: "Upload a voice message from someone you've lost touch with — or lost — and get a number where it's always waiting: call it to hear them, text it and it just sits there, without some stranger's \"sorry, wrong number\" eventually landing in its place.",
-    top: "50%", left: "8%", rotate: 6,
+    cause: "STILL VIABLE, HONESTLY",
   },
   {
-    title: "Sent Anyway",
-    tagline: "Say it. It just never lands.",
+    no: "FD-05",
+    name: "Sent Anyway",
+    tagline: "say it. it just never lands",
     blurb: "Text your ex — or anyone you've lost — into an inbox that never reaches them. Same rush as hitting send, none of the reply, none of the reopening a door you closed for a reason. If it was bad enough, you can order a printed book of the whole thread when you're done, delivered with a single match and a little kindling, so the last thing you do with it is burn it.",
-    reason: "the emotional insight is real — grief wants somewhere to send words, and closure sometimes wants a fire, not a notes file on your phone — but we don't want to be liable for creating arsonists.",
-    top: "46%", left: "40%", rotate: -5,
+    reason: "The emotional insight is real — grief wants somewhere to send words, and closure sometimes wants a fire, not a notes file on your phone — but we don't want to be liable for creating arsonists.",
+    cause: "LIABILITY",
   },
 ];
 
-// ─── Paper grain, mixed into the background so nothing feels flat ─────────────
+const SHAPES = [
+  { w: 150, h: 120, r: "14% 5% 18% 7%/9% 16% 6% 19%", c: 7 },
+  { w: 118, h: 104, r: "38% 19% 33% 24%/23% 37% 20% 35%", c: 10 },
+  { w: 88, h: 84, r: "57% 41% 49% 53%/43% 62% 38% 57%", c: 12 },
+];
+const BONE = ["#e9dfc7", "#efe6d2", "#e3d8bd", "#eae0c9"];
+const DIRT = "#a8946b";
+const SPECKS = "#8e7950";
+const CELL = 18;
 
-const NOISE_BG = `url("data:image/svg+xml,${encodeURIComponent(
-  `<svg xmlns='http://www.w3.org/2000/svg' width='240' height='240'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/><feColorMatrix type='matrix' values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 0.06 0'/></filter><rect width='100%' height='100%' fill='${PAPER}' filter='url(#n)'/></svg>`
-)}")`;
-
-// ─── A hand-drawn wobble behind a word, marker-circle style ───────────────────
-
-function MarkerCircle({ children, color = "#6FA8D8" }: { children: React.ReactNode; color?: string }) {
-  return (
-    <span className="relative inline-block px-2">
-      <svg
-        className="absolute -inset-x-2 -top-2 -bottom-1 w-[calc(100%+16px)] h-[calc(100%+12px)] pointer-events-none"
-        viewBox="0 0 220 90"
-        preserveAspectRatio="none"
-      >
-        <path
-          d="M14 46 C10 20, 60 6, 110 8 C165 10, 212 18, 206 46 C210 76, 150 84, 108 82 C55 80, 8 74, 14 46 Z"
-          fill="none"
-          stroke={color}
-          strokeWidth="4"
-          strokeLinecap="round"
-        />
-      </svg>
-      <span className="relative">{children}</span>
-    </span>
-  );
+function prng(seed: number) {
+  let a = seed >>> 0;
+  return () => {
+    a += 0x6d2b79f5;
+    let t = a;
+    t = Math.imul(t ^ (t >>> 15), t | 1);
+    t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
 }
 
-// ─── Rough.js-rendered items — sketchy hand-drawn line quality on simple shapes ─
-
-function useRoughDraw(draw: (rc: ReturnType<typeof rough.svg>) => void) {
-  const ref = useRef<SVGSVGElement>(null);
-  useEffect(() => {
-    const svg = ref.current;
-    if (!svg) return;
-    while (svg.firstChild) svg.removeChild(svg.firstChild);
-    draw(rough.svg(svg));
-  }, []);
-  return ref;
-}
-
-function PenIcon() {
-  const ref = useRoughDraw((rc) => {
-    const svg = ref.current!;
-    svg.appendChild(rc.rectangle(2, 8, 58, 9, { fill: INK, stroke: INK, fillStyle: "solid", roughness: 2.2, seed: 11 }));
-    svg.appendChild(rc.rectangle(2, 8, 12, 9, { fill: "#C9BFAE", stroke: INK, fillStyle: "solid", roughness: 2.2, seed: 12 }));
-    svg.appendChild(rc.polygon([[60, 6], [86, 12], [60, 18]], { fill: DUSTY.terracotta, stroke: INK, fillStyle: "hachure", roughness: 2.2, seed: 13 }));
-  });
-  return <svg ref={ref} width="92" height="24" viewBox="0 0 92 24" />;
-}
-
-function MintTinIcon() {
-  const ref = useRoughDraw((rc) => {
-    const svg = ref.current!;
-    svg.appendChild(rc.rectangle(2, 2, 82, 54, { fill: "#EDE4CC", stroke: INK, fillStyle: "solid", roughness: 2.4, seed: 21 }));
-    svg.appendChild(rc.rectangle(2, 2, 82, 19, { fill: DUSTY.sage, stroke: INK, fillStyle: "solid", roughness: 2.4, seed: 22 }));
-    svg.appendChild(rc.ellipse(20, 38, 8, 8, { fill: "#EDE4CC", stroke: DUSTY.sage, fillStyle: "solid", roughness: 1.8, seed: 23 }));
-    svg.appendChild(rc.ellipse(32, 38, 8, 8, { fill: "#EDE4CC", stroke: DUSTY.sage, fillStyle: "solid", roughness: 1.8, seed: 24 }));
-    svg.appendChild(rc.ellipse(44, 38, 8, 8, { fill: "#EDE4CC", stroke: DUSTY.sage, fillStyle: "solid", roughness: 1.8, seed: 25 }));
-  });
-  return (
-    <svg ref={ref} width="86" height="58" viewBox="0 0 86 58">
-      <text x="43" y="15" fontSize="8" fill="#F1E9D8" textAnchor="middle" fontFamily={LABEL_FONT} fontWeight={700}>
-        mints
-      </text>
-    </svg>
-  );
-}
-
-function SnackIcon() {
-  const ref = useRoughDraw((rc) => {
-    const svg = ref.current!;
-    svg.appendChild(rc.polygon([[15, 8], [2, 2], [2, 46], [15, 40]], { fill: DUSTY.sage, stroke: INK, fillStyle: "solid", roughness: 2.2, seed: 31 }));
-    svg.appendChild(rc.rectangle(15, 4, 64, 40, { fill: DUSTY.mustard, stroke: INK, fillStyle: "solid", roughness: 2.2, seed: 32 }));
-    svg.appendChild(rc.polygon([[79, 8], [92, 2], [92, 46], [79, 40]], { fill: DUSTY.sage, stroke: INK, fillStyle: "solid", roughness: 2.2, seed: 33 }));
-  });
-  return (
-    <svg ref={ref} width="94" height="48" viewBox="0 0 94 48">
-      <text x="47" y="28" fontSize="9" fill={INK} textAnchor="middle" fontFamily={LABEL_FONT} fontWeight={700}>
-        snack
-      </text>
-    </svg>
-  );
-}
-
-function HighlighterIcon({ color, seedBase }: { color: string; seedBase: number }) {
-  const ref = useRoughDraw((rc) => {
-    const svg = ref.current!;
-    svg.appendChild(rc.rectangle(5, 22, 16, 68, { fill: color, stroke: INK, fillStyle: "solid", roughness: 1.8, seed: seedBase }));
-    svg.appendChild(rc.polygon([[5, 22], [13, 2], [21, 22]], { fill: INK, stroke: INK, fillStyle: "solid", roughness: 1.8, seed: seedBase + 1 }));
-    svg.appendChild(rc.rectangle(8, 74, 10, 12, { fill: "#F1E9D8", stroke: INK, fillStyle: "solid", roughness: 1.6, seed: seedBase + 2 }));
-  });
-  return <svg ref={ref} width="26" height="94" viewBox="0 0 26 94" />;
-}
-
-// ─── Closed drawer face — the literal thing you pull open ────────────────────
-
-function DrawerFaceIcon() {
-  const ref = useRoughDraw((rc) => {
-    const svg = ref.current!;
-    svg.appendChild(rc.rectangle(4, 4, 312, 132, { fill: DUSTY.terracotta, stroke: INK, fillStyle: "hachure", hachureGap: 5, roughness: 2, seed: 61 }));
-    svg.appendChild(rc.rectangle(140, 56, 40, 20, { fill: PAPER, stroke: INK, fillStyle: "solid", roughness: 2, seed: 62 }));
-  });
-  return <svg ref={ref} width="320" height="140" viewBox="0 0 320 140" />;
-}
-
-function DrawerIntro({ onOpen }: { onOpen: () => void }) {
-  const pullY = useMotionValue(0);
-  const OPEN_AT = 90;
-
-  function handleDragEnd() {
-    if (pullY.get() > OPEN_AT * 0.55) {
-      onOpen();
-    } else {
-      animate(pullY, 0, { type: "spring", stiffness: 320, damping: 22 });
-    }
-  }
-
-  return (
-    <motion.div
-      className="absolute inset-0 z-50 flex flex-col items-center justify-center gap-6"
-      style={{ background: PAPER, backgroundImage: NOISE_BG }}
-      exit={{ opacity: 0, y: 60 }}
-      transition={{ duration: 0.5 }}
-    >
-      <p className="text-sm tracking-wide" style={{ fontFamily: LABEL_FONT, fontWeight: 600, color: DUSTY.sage }}>
-        {trashedIdeas.length} canned ideas
-      </p>
-      <motion.div
-        drag="y"
-        dragConstraints={{ top: 0, bottom: OPEN_AT }}
-        dragElastic={0.15}
-        dragMomentum={false}
-        onDragEnd={handleDragEnd}
-        style={{ y: pullY, cursor: "grab" }}
-        whileTap={{ cursor: "grabbing" }}
-      >
-        <DrawerFaceIcon />
-      </motion.div>
-      <button onClick={onOpen} className="cursor-pointer">
-        <MarkerCircle color={DUSTY.lavender}>
-          <span style={{ fontFamily: LABEL_FONT, fontWeight: 600, color: INK }}>pull it open ↓</span>
-        </MarkerCircle>
-      </button>
-    </motion.div>
-  );
-}
-
-// ─── Draggable wrapper ─────────────────────────────────────────────────────────
-
-function DraggableItem({
-  children,
-  top,
-  left,
-  rotate,
-  delay,
-  constraintsRef,
-  className = "",
-  onTap,
-  faded = false,
-  labelText,
-}: {
-  children: React.ReactNode;
-  top: string;
-  left: string;
-  rotate: number;
-  delay: number;
-  constraintsRef: React.RefObject<HTMLDivElement>;
-  className?: string;
-  onTap?: () => void;
-  faded?: boolean;
-  labelText?: string;
-}) {
-  return (
-    <motion.div
-      className={`absolute cursor-grab active:cursor-grabbing select-none group ${className}`}
-      style={{ top, left }}
-      drag
-      dragConstraints={constraintsRef}
-      dragElastic={0.2}
-      dragMomentum={false}
-      whileDrag={{ scale: 1.08, zIndex: 40, boxShadow: "0 14px 30px rgba(58,50,38,0.25)" }}
-      whileHover={{ scale: 1.04 }}
-      initial={{ opacity: 0, y: -40, rotate: 0, scale: 0.85 }}
-      animate={{ opacity: faded ? 0.25 : 1, y: 0, rotate, scale: 1 }}
-      transition={{ type: "spring", stiffness: 260, damping: 18, delay }}
-      onTap={onTap}
-    >
-      {labelText && (
-        <span
-          className="absolute -top-7 left-1/2 -translate-x-1/2 whitespace-nowrap px-2 py-0.5 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none"
-          style={{ background: PAPER, color: INK, fontFamily: LABEL_FONT, fontWeight: 600, fontSize: 11, boxShadow: "0 2px 6px rgba(58,50,38,0.15)" }}
-        >
-          {labelText}
-        </span>
-      )}
-      {children}
-    </motion.div>
-  );
-}
-
-// ─── Idea card — a folded note, not a corporate card ──────────────────────────
-// Closed by default (title only, crease lines suggesting a fold). Click — a real
-// tap, not a drag release — unfolds it into the full detail overlay below.
-
-function IdeaCard({ idea, frameColor }: { idea: TrashedIdea; frameColor: string }) {
-  return (
-    <div
-      className="w-44 sm:w-48 p-4 relative overflow-hidden"
-      style={{
-        background: PAPER,
-        borderRadius: "16px 20px 14px 22px",
-        boxShadow: "0 3px 9px rgba(58,50,38,0.10)",
-      }}
-    >
-      {/* fold creases */}
-      <svg className="absolute inset-0 pointer-events-none" width="100%" height="100%" preserveAspectRatio="none" viewBox="0 0 180 130">
-        <path d="M0 40 L180 52" stroke={INK} strokeOpacity="0.08" strokeWidth="1.5" />
-        <path d="M0 88 L180 78" stroke={INK} strokeOpacity="0.08" strokeWidth="1.5" />
-        <path d="M60 0 L52 130" stroke={INK} strokeOpacity="0.06" strokeWidth="1.5" />
-      </svg>
-
-      <span
-        className="relative text-[11px] uppercase tracking-wide"
-        style={{ fontFamily: LABEL_FONT, fontWeight: 700, color: frameColor }}
-      >
-        trashed
-      </span>
-      <h3 className="relative text-2xl mt-1 leading-tight" style={{ fontFamily: DISPLAY_FONT, fontWeight: 700, color: INK }}>
-        {idea.title}
-      </h3>
-      <svg width="70" height="8" viewBox="0 0 70 8" className="relative mt-0.5">
-        <path d="M2 5 C 16 2, 30 7, 44 4 S 66 2, 68 5" fill="none" stroke={frameColor} strokeWidth="2.5" strokeLinecap="round" />
-      </svg>
-      <p className="relative text-xs mt-2 leading-snug" style={{ fontFamily: LABEL_FONT, color: "#6B6252" }}>
-        {idea.tagline}
-      </p>
-    </div>
-  );
-}
-
-// ─── Detail overlay — where an idea's fold actually unfolds ──────────────────
-
-function DetailOverlay({ idea, frameColor, onClose }: { idea: TrashedIdea; frameColor: string; onClose: () => void }) {
-  return (
-    <motion.div
-      className="absolute inset-0 z-[60] flex items-center justify-center px-6"
-      style={{ background: "rgba(58,50,38,0.28)" }}
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      onClick={onClose}
-    >
-      <motion.div
-        className="w-full max-w-sm p-7 relative"
-        style={{ background: PAPER, borderRadius: "18px 24px 16px 26px", boxShadow: "0 20px 40px rgba(58,50,38,0.3)" }}
-        initial={{ opacity: 0, scale: 0.85, rotate: -3 }}
-        animate={{ opacity: 1, scale: 1, rotate: 0 }}
-        exit={{ opacity: 0, scale: 0.9 }}
-        transition={{ type: "spring", stiffness: 320, damping: 24 }}
-        onClick={(e) => e.stopPropagation()}
-      >
-        <button
-          onClick={onClose}
-          className="absolute top-3 right-3 w-7 h-7 flex items-center justify-center hover:opacity-60 transition-opacity"
-          style={{ fontFamily: LABEL_FONT, color: INK, fontSize: 18 }}
-          aria-label="Close"
-        >
-          ×
-        </button>
-        <span className="text-[11px] uppercase tracking-wide" style={{ fontFamily: LABEL_FONT, fontWeight: 700, color: frameColor }}>
-          trashed
-        </span>
-        <h3 className="text-4xl mt-1 leading-tight" style={{ fontFamily: DISPLAY_FONT, fontWeight: 700, color: INK }}>
-          {idea.title}
-        </h3>
-        <svg width="110" height="8" viewBox="0 0 110 8" className="mt-1 mb-1">
-          <path d="M2 5 C 26 2, 48 7, 70 4 S 104 2, 108 5" fill="none" stroke={frameColor} strokeWidth="2.5" strokeLinecap="round" />
-        </svg>
-        <p className="text-base italic mb-3" style={{ fontFamily: LABEL_FONT, fontWeight: 600, color: INK }}>
-          {idea.tagline}
-        </p>
-        <p className="text-base leading-relaxed" style={{ fontFamily: LABEL_FONT, color: "#6B6252" }}>
-          {idea.blurb}
-        </p>
-        {idea.reason && (
-          <p className="text-sm italic leading-relaxed mt-4 pt-4" style={{ fontFamily: LABEL_FONT, color: frameColor, borderTop: `1px solid ${frameColor}33` }}>
-            Trashed because {idea.reason}
-          </p>
-        )}
-      </motion.div>
-    </motion.div>
-  );
+interface LaidOutSpecimen extends Specimen {
+  i: number;
+  x: number;
+  y: number;
+  w: number;
+  h: number;
+  r: string;
+  tone: string;
+  rot: number;
+  creases: { top: number; left: number; len: number; rot: number; light: boolean }[];
 }
 
 export default function JunkDrawer() {
-  const drawerRef = useRef<HTMLDivElement>(null);
-  const { scrollY } = useScroll();
-  const collapseDistance = 260;
-  const headerScale = useTransform(scrollY, [0, collapseDistance], [1, 0.82]);
-  const headerOpacity = useTransform(scrollY, [0, collapseDistance], [1, 0]);
+  const [started, setStarted] = useState(false);
+  const [layout, setLayout] = useState<LaidOutSpecimen[]>([]);
+  const [exposed, setExposed] = useState<number[]>([]);
+  const [openId, setOpenId] = useState<number | null>(null);
+  const [touched, setTouched] = useState(false);
+  const [dims, setDims] = useState({ w: 1200, h: 600 });
 
-  const [drawerOpen, setDrawerOpen] = useState(false);
-  const [openIdea, setOpenIdea] = useState<string | null>(null);
-  const openIdeaData = trashedIdeas.find((i) => i.title === openIdea);
-  const openIdeaIndex = trashedIdeas.findIndex((i) => i.title === openIdea);
+  const digRef = useRef<HTMLDivElement>(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const brushRef = useRef<HTMLDivElement>(null);
+  const cleared = useRef<Set<string>>(new Set());
+  const painting = useRef(false);
+  const last = useRef<{ x: number; y: number } | null>(null);
+
+  function buildLayout(w: number, h: number) {
+    const rnd = prng(7717);
+    const cols = Math.max(2, Math.min(4, Math.floor(w / 280)));
+    const rows = Math.ceil(SPECIMENS.length / cols);
+    const cw = w / cols;
+    const ch = h / rows;
+    const next: LaidOutSpecimen[] = SPECIMENS.map((sp, i) => {
+      const s = SHAPES[i % SHAPES.length];
+      const col = i % cols;
+      const row = Math.floor(i / cols);
+      const x = Math.round(Math.max(16, Math.min(w - s.w - 16, col * cw + (cw - s.w) / 2 + (rnd() - 0.5) * cw * 0.3)));
+      const y = Math.round(Math.max(14, Math.min(h - s.h - 14, row * ch + (ch - s.h) / 2 + (rnd() - 0.5) * ch * 0.3)));
+      const creases = Array.from({ length: s.c }, (_, k) => ({
+        top: Math.round(-6 + rnd() * (s.h + 10)),
+        left: Math.round(-12 + rnd() * (s.w * 0.4)),
+        len: Math.round(s.w * (0.5 + rnd() * 0.8)),
+        rot: (rnd() - 0.5) * (i % 3 === 0 ? 30 : 150),
+        light: k % 3 === 1,
+      }));
+      return { ...sp, i, x, y, w: s.w, h: s.h, r: s.r, tone: BONE[i % BONE.length], rot: (rnd() - 0.5) * 26, creases };
+    });
+    cleared.current = new Set();
+    setLayout(next);
+    setExposed([]);
+    setTouched(false);
+  }
+
+  function paintDirt(w: number, h: number) {
+    const cv = canvasRef.current;
+    if (!cv) return;
+    const dpr = Math.min(2, window.devicePixelRatio || 1);
+    cv.width = Math.round(w * dpr);
+    cv.height = Math.round(h * dpr);
+    const ctx = cv.getContext("2d");
+    if (!ctx) return;
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.globalCompositeOperation = "source-over";
+    ctx.clearRect(0, 0, w, h);
+    ctx.fillStyle = DIRT;
+    ctx.fillRect(0, 0, w, h);
+    const rnd = prng(3301);
+    for (let b = 0; b < 26; b++) {
+      const y = rnd() * h;
+      const hh = 6 + rnd() * 30;
+      ctx.fillStyle = rnd() > 0.5 ? "rgba(255,248,228,.05)" : "rgba(50,40,26,.06)";
+      ctx.beginPath();
+      ctx.moveTo(0, y);
+      for (let x = 0; x <= w; x += 40) ctx.lineTo(x, y + Math.sin(x / 110) * 7 + (rnd() - 0.5) * 4);
+      ctx.lineTo(w, y + hh);
+      for (let x = w; x >= 0; x -= 40) ctx.lineTo(x, y + hh + Math.sin(x / 130) * 6);
+      ctx.closePath();
+      ctx.fill();
+    }
+    const n = Math.round((w * h) / 170);
+    for (let i = 0; i < n; i++) {
+      const x = rnd() * w;
+      const y = rnd() * h;
+      const s = rnd();
+      ctx.fillStyle = s > 0.62 ? "rgba(255,250,232,.3)" : s > 0.3 ? SPECKS : "rgba(46,36,22,.4)";
+      const r = s > 0.94 ? 2.4 : 1.1;
+      ctx.fillRect(x, y, r, r);
+    }
+    for (let i = 0; i < Math.round(w / 26); i++) {
+      const x = rnd() * w;
+      const y = rnd() * h;
+      ctx.strokeStyle = "rgba(46,36,22,.13)";
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(x, y);
+      ctx.lineTo(x + (rnd() - 0.5) * 40, y + (rnd() - 0.5) * 20);
+      ctx.stroke();
+    }
+    const vg = ctx.createRadialGradient(w / 2, h / 2, Math.min(w, h) * 0.25, w / 2, h / 2, Math.max(w, h) * 0.72);
+    vg.addColorStop(0, "rgba(0,0,0,0)");
+    vg.addColorStop(1, "rgba(40,31,19,.3)");
+    ctx.fillStyle = vg;
+    ctx.fillRect(0, 0, w, h);
+  }
+
+  function measure(force = false) {
+    const el = digRef.current;
+    if (!el) return;
+    const r = el.getBoundingClientRect();
+    const w = Math.max(420, Math.round(r.width));
+    const h = Math.max(320, Math.round(r.height));
+    if (!force && w === dims.w && h === dims.h && layout.length) return;
+    setDims({ w, h });
+    buildLayout(w, h);
+    paintDirt(w, h);
+  }
+
+  useEffect(() => {
+    if (!started) return;
+    measure(true);
+    const onResize = () => measure(true);
+    window.addEventListener("resize", onResize);
+    return () => window.removeEventListener("resize", onResize);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [started]);
+
+  function brushAt(x: number, y: number) {
+    const cv = canvasRef.current;
+    if (!cv) return;
+    const ctx = cv.getContext("2d");
+    if (!ctx) return;
+    const r = 40;
+    ctx.globalCompositeOperation = "destination-out";
+    const g = ctx.createRadialGradient(x, y, 0, x, y, r);
+    g.addColorStop(0, "rgba(0,0,0,1)");
+    g.addColorStop(0.55, "rgba(0,0,0,.95)");
+    g.addColorStop(1, "rgba(0,0,0,0)");
+    ctx.fillStyle = g;
+    ctx.beginPath();
+    ctx.arc(x, y, r, 0, Math.PI * 2);
+    ctx.fill();
+    const rr = r * 0.72;
+    for (let cx = Math.floor((x - rr) / CELL); cx <= Math.floor((x + rr) / CELL); cx++)
+      for (let cy = Math.floor((y - rr) / CELL); cy <= Math.floor((y + rr) / CELL); cy++)
+        cleared.current.add(cx + "," + cy);
+  }
+
+  function checkExposure() {
+    const ex: number[] = [];
+    layout.forEach((sp) => {
+      let tot = 0;
+      let hit = 0;
+      for (let x = sp.x + 8; x < sp.x + sp.w - 8; x += CELL)
+        for (let y = sp.y + 8; y < sp.y + sp.h - 8; y += CELL) {
+          tot++;
+          if (cleared.current.has(Math.floor(x / CELL) + "," + Math.floor(y / CELL))) hit++;
+        }
+      if (tot && hit / tot >= 0.6) ex.push(sp.i);
+    });
+    setExposed((prev) => (ex.length !== prev.length ? ex : prev));
+  }
+
+  function down(e: React.PointerEvent) {
+    if (openId !== null) return;
+    painting.current = true;
+    const cv = canvasRef.current;
+    if (!cv) return;
+    const r = cv.getBoundingClientRect();
+    const x = e.clientX - r.left;
+    const y = e.clientY - r.top;
+    last.current = { x, y };
+    brushAt(x, y);
+    checkExposure();
+    if (!touched) setTouched(true);
+  }
+
+  useEffect(() => {
+    function onMove(e: PointerEvent) {
+      const cv = canvasRef.current;
+      if (!cv) return;
+      const r = cv.getBoundingClientRect();
+      const x = e.clientX - r.left;
+      const y = e.clientY - r.top;
+      const inside = x >= 0 && y >= 0 && x <= r.width && y <= r.height;
+      const b = brushRef.current;
+      if (b) {
+        b.style.transform = "translate(" + x + "px," + y + "px)";
+        b.style.opacity = inside && openId === null && started ? "1" : "0";
+      }
+      if (!painting.current) return;
+      const l = last.current || { x, y };
+      const d = Math.hypot(x - l.x, y - l.y);
+      const steps = Math.max(1, Math.ceil(d / 9));
+      for (let s = 1; s <= steps; s++) brushAt(l.x + (x - l.x) * (s / steps), l.y + (y - l.y) * (s / steps));
+      last.current = { x, y };
+      checkExposure();
+    }
+    function onUp() {
+      painting.current = false;
+      last.current = null;
+    }
+    window.addEventListener("pointermove", onMove);
+    window.addEventListener("pointerup", onUp);
+    return () => {
+      window.removeEventListener("pointermove", onMove);
+      window.removeEventListener("pointerup", onUp);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [openId, started, layout]);
+
+  function clearAll() {
+    const cv = canvasRef.current;
+    if (!cv) return;
+    const ctx = cv.getContext("2d");
+    if (!ctx) return;
+    ctx.globalCompositeOperation = "destination-out";
+    ctx.fillStyle = "rgba(0,0,0,1)";
+    ctx.fillRect(0, 0, dims.w, dims.h);
+    for (let cx = 0; cx <= Math.ceil(dims.w / CELL); cx++)
+      for (let cy = 0; cy <= Math.ceil(dims.h / CELL); cy++) cleared.current.add(cx + "," + cy);
+    setTouched(true);
+    checkExposure();
+  }
+
+  const open = openId === null ? null : layout.find((s) => s.i === openId) || null;
+
+  function nextSpecimen() {
+    if (!exposed.length) return;
+    const at = exposed.indexOf(openId ?? -1);
+    setOpenId(exposed[(at + 1) % exposed.length]);
+  }
 
   return (
-    <main style={{ background: PAPER, backgroundImage: NOISE_BG }}>
-      <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&family=Quicksand:wght@500;600;700&display=swap" />
+    <main style={{ background: PAPER }}>
+      <link href="https://api.fontshare.com/v2/css?f[]=zodiak@400&f[]=comico@400&display=swap" rel="stylesheet" />
 
-      {/* Header — collapses (scales + fades) as you scroll into the drawer, layout height stays fixed */}
-      <div className="overflow-hidden">
-        <motion.div
-          className="max-w-5xl mx-auto px-6 pt-32 pb-16"
-          style={{ scale: headerScale, opacity: headerOpacity, transformOrigin: "top center" }}
-        >
-          <Link
-            to="/"
-            className="inline-flex items-center gap-1.5 text-sm hover:opacity-70 transition-opacity duration-200 group"
-            style={{ fontFamily: LABEL_FONT, fontWeight: 600, color: INK }}
-          >
-            <span className="transition-transform duration-200 group-hover:-translate-x-0.5 inline-block">←</span>
-            Back to the sensible website
-          </Link>
-
-          <div className="mt-12">
-            <p className="text-sm tracking-wide mb-4" style={{ fontFamily: LABEL_FONT, fontWeight: 600, color: DUSTY.sage }}>
-              everything that didn't make it
-            </p>
-            <h1 className="text-6xl sm:text-8xl leading-[1.05]" style={{ fontFamily: DISPLAY_FONT, fontWeight: 700, color: INK }}>
-              The <MarkerCircle color="#8FAAC7">junk drawer</MarkerCircle>.
+      {!started ? (
+        <div className="flex items-center justify-center px-6 py-24" style={{ minHeight: "calc(100vh - 57px)" }}>
+          <div className="w-full max-w-2xl flex flex-col items-center text-center">
+            <Link
+              to="/"
+              className="mb-10 text-xs hover:opacity-70 transition-opacity"
+              style={{ fontFamily: LABEL_FONT, letterSpacing: "0.18em", color: MUTED, textTransform: "uppercase" }}
+            >
+              ← back to the surface
+            </Link>
+            <p style={{ fontFamily: LABEL_FONT, fontSize: 12, letterSpacing: "0.24em", color: MUTED }}>FIELD SEASON 2018 — 2026</p>
+            <h1
+              className="mt-5 text-5xl sm:text-6xl uppercase"
+              style={{ fontFamily: DISPLAY_FONT, letterSpacing: "0.03em", color: INK }}
+            >
+              The Idea Bed
             </h1>
-            <p className="text-lg mt-6 max-w-xl leading-relaxed" style={{ fontFamily: LABEL_FONT, color: "#6B6252" }}>
-              Ideas that got as far as a name and then didn't. Drag stuff around — it's a drawer, that's what it's for.
+            <p className="mt-4 max-w-md text-lg italic" style={{ fontFamily: DISPLAY_FONT, color: "#6b5c40" }}>
+              Five ideas I abandoned, buried where they fell. Nothing here is labelled. You'll have to brush it off yourself.
             </p>
+            <button
+              onClick={() => setStarted(true)}
+              className="mt-9 cursor-pointer"
+              style={{
+                border: `1px solid ${INK}`,
+                background: INK,
+                color: PAPER,
+                padding: "13px 34px",
+                fontFamily: LABEL_FONT,
+                fontSize: 13,
+                letterSpacing: "0.2em",
+              }}
+            >
+              BEGIN THE DIG
+            </button>
           </div>
-        </motion.div>
-      </div>
-
-      {/* The drawer itself — full bleed, edge to edge */}
-      <motion.div
-        ref={drawerRef}
-        className="relative w-full h-[85vh] min-h-[600px] overflow-hidden mt-16"
-        style={{
-          background: "#E7DCC1",
-          backgroundImage: NOISE_BG,
-          boxShadow: "inset 0 0 60px rgba(58,50,38,0.14)",
-          borderTop: `2px solid ${DUSTY.mustard}`,
-        }}
-        initial={{ scale: 0.98, opacity: 0 }}
-        animate={{ scale: 1, opacity: 1 }}
-        transition={{ duration: 0.4 }}
-      >
-          {/* Closed drawer — pull it open, or tap the hint */}
-          <AnimatePresence>
-            {!drawerOpen && <DrawerIntro onOpen={() => setDrawerOpen(true)} />}
-          </AnimatePresence>
-
-          {drawerOpen &&
-            trashedIdeas.map((idea, i) => (
-              <DraggableItem
-                key={idea.title}
-                top={idea.top}
-                left={idea.left}
-                rotate={idea.rotate}
-                delay={i * 0.06}
-                constraintsRef={drawerRef}
-                onTap={() => setOpenIdea(idea.title)}
-                faded={openIdea === idea.title}
+        </div>
+      ) : (
+        <div className="relative w-full" style={{ height: "calc(100vh - 57px)", overflow: "hidden" }}>
+          {/* top bar */}
+          <div
+            className="absolute top-0 left-0 right-0 flex items-center justify-between px-8"
+            style={{ height: 70, background: PAPER, borderBottom: `1px solid ${BORDER}`, zIndex: 60 }}
+          >
+            <div className="flex flex-col gap-0.5">
+              <Link
+                to="/"
+                className="hover:opacity-70 transition-opacity"
+                style={{ fontFamily: DISPLAY_FONT, fontSize: 19, letterSpacing: "0.1em", textTransform: "uppercase", color: INK }}
               >
-                <IdeaCard idea={idea} frameColor={frameColors[i % frameColors.length]} />
-              </DraggableItem>
+                The Idea Bed
+              </Link>
+              <span style={{ fontFamily: LABEL_FONT, fontSize: 11, letterSpacing: "0.1em", color: MUTED }}>
+                SITE SURVEY · IDEAS NOT PURSUED
+              </span>
+            </div>
+            <div className="flex flex-col items-end gap-0.5">
+              <span style={{ fontFamily: LABEL_FONT, fontSize: 11, letterSpacing: "0.14em", color: MUTED }}>RECOVERED</span>
+              <span style={{ fontFamily: LABEL_FONT, fontSize: 16, color: INK }}>
+                {exposed.length} / {SPECIMENS.length}
+              </span>
+            </div>
+          </div>
+
+          {/* dig area */}
+          <div ref={digRef} className="absolute left-0 right-0" style={{ top: 70, bottom: 60, overflow: "hidden" }}>
+            <div
+              className="absolute inset-0"
+              style={{
+                background: DIRT,
+                backgroundImage:
+                  "radial-gradient(circle at 30% 20%, rgba(255,250,232,.16), transparent 55%), repeating-linear-gradient(2deg, rgba(46,36,22,.05) 0 2px, transparent 2px 9px)",
+                boxShadow: "inset 0 0 120px rgba(40,31,19,.35)",
+                zIndex: 1,
+              }}
+            />
+
+            {layout.map((sp) => (
+              <div
+                key={sp.i}
+                style={{
+                  position: "absolute",
+                  left: sp.x,
+                  top: sp.y,
+                  width: sp.w,
+                  height: sp.h,
+                  zIndex: 5,
+                  transform: `rotate(${sp.rot}deg)`,
+                }}
+              >
+                <div
+                  style={{
+                    width: "100%",
+                    height: "100%",
+                    position: "relative",
+                    borderRadius: sp.r,
+                    backgroundColor: sp.tone,
+                    backgroundImage: "repeating-linear-gradient(102deg, rgba(255,255,255,.42) 0 2px, transparent 2px 5px)",
+                    border: "1.5px solid #6f5c3c",
+                    overflow: "hidden",
+                    boxShadow: "inset -12px -14px 20px rgba(110,92,60,.3), inset 9px 10px 14px rgba(255,252,240,.55)",
+                  }}
+                >
+                  {sp.creases.map((c, k) => (
+                    <div
+                      key={k}
+                      style={{
+                        position: "absolute",
+                        top: c.top,
+                        left: c.left,
+                        width: c.len,
+                        borderTop: c.light ? "1.5px solid rgba(255,252,240,.8)" : "1px solid rgba(112,93,61,.55)",
+                        transform: `rotate(${c.rot}deg)`,
+                        transformOrigin: "left center",
+                      }}
+                    />
+                  ))}
+                </div>
+              </div>
             ))}
 
-          {drawerOpen && (
-            <>
-              <DraggableItem top="76%" left="72%" rotate={-8} delay={0.4} constraintsRef={drawerRef} labelText="pen">
-                <PenIcon />
-              </DraggableItem>
-              <DraggableItem top="70%" left="20%" rotate={6} delay={0.46} constraintsRef={drawerRef} labelText="mint tin">
-                <MintTinIcon />
-              </DraggableItem>
-              <DraggableItem top="4%" left="58%" rotate={-4} delay={0.52} constraintsRef={drawerRef} labelText="snack">
-                <SnackIcon />
-              </DraggableItem>
-              <DraggableItem top="36%" left="4%" rotate={12} delay={0.58} constraintsRef={drawerRef} labelText="highlighter">
-                <HighlighterIcon color={DUSTY.mustard} seedBase={41} />
-              </DraggableItem>
-              <DraggableItem top="42%" left="88%" rotate={-14} delay={0.64} constraintsRef={drawerRef} labelText="highlighter">
-                <HighlighterIcon color={DUSTY.lavender} seedBase={51} />
-              </DraggableItem>
-            </>
-          )}
+            <canvas
+              ref={canvasRef}
+              onPointerDown={down}
+              onDoubleClick={clearAll}
+              style={{ position: "absolute", inset: 0, width: "100%", height: "100%", zIndex: 20, cursor: "none", touchAction: "none" }}
+            />
 
-          <AnimatePresence>
-            {openIdeaData && (
-              <DetailOverlay
-                idea={openIdeaData}
-                frameColor={frameColors[openIdeaIndex % frameColors.length]}
-                onClose={() => setOpenIdea(null)}
+            {openId === null &&
+              exposed.map((i) => {
+                const sp = layout.find((s) => s.i === i);
+                if (!sp) return null;
+                return (
+                  <div
+                    key={i}
+                    onClick={() => setOpenId(i)}
+                    style={{
+                      position: "absolute",
+                      left: sp.x,
+                      top: sp.y,
+                      width: sp.w,
+                      height: sp.h + 30,
+                      zIndex: 30,
+                      cursor: "pointer",
+                    }}
+                  >
+                    <div
+                      style={{
+                        position: "absolute",
+                        left: "50%",
+                        bottom: 0,
+                        transform: "translateX(-50%)",
+                        whiteSpace: "nowrap",
+                        background: INK,
+                        color: PAPER,
+                        padding: "3px 10px 4px",
+                        fontFamily: LABEL_FONT,
+                        fontSize: 11,
+                        letterSpacing: "0.14em",
+                        textTransform: "uppercase",
+                      }}
+                    >
+                      {sp.name}
+                    </div>
+                  </div>
+                );
+              })}
+
+            <div
+              ref={brushRef}
+              style={{
+                position: "absolute",
+                left: 0,
+                top: 0,
+                width: 78,
+                height: 78,
+                margin: "-39px 0 0 -39px",
+                zIndex: 50,
+                pointerEvents: "none",
+                opacity: 0,
+                transition: "opacity .18s",
+              }}
+            >
+              <div style={{ position: "absolute", inset: 0, borderRadius: "50%", border: "1px solid rgba(43,35,24,.28)" }} />
+              <div
+                style={{
+                  position: "absolute",
+                  left: "50%",
+                  top: "50%",
+                  width: 9,
+                  height: 9,
+                  margin: "-4.5px 0 0 -4.5px",
+                  borderRadius: "50%",
+                  background: "rgba(43,35,24,.5)",
+                }}
               />
+            </div>
+
+            {!touched && (
+              <div className="absolute left-0 right-0 text-center pointer-events-none" style={{ bottom: 26, zIndex: 45 }}>
+                <span
+                  style={{
+                    display: "inline-block",
+                    fontFamily: LABEL_FONT,
+                    fontSize: 13,
+                    letterSpacing: "0.14em",
+                    color: "rgba(239,230,210,.82)",
+                    background: "rgba(43,35,24,.34)",
+                    padding: "7px 16px",
+                  }}
+                >
+                  DRAG TO BRUSH THE DIRT AWAY · DOUBLE-CLICK TO CLEAR THE PATCH
+                </span>
+              </div>
             )}
-          </AnimatePresence>
-      </motion.div>
+          </div>
+
+          {/* bottom bar */}
+          <div
+            className="absolute bottom-0 left-0 right-0 flex items-center justify-between px-8"
+            style={{ height: 60, background: PAPER, borderTop: `1px solid ${BORDER}`, zIndex: 60 }}
+          >
+            <span style={{ fontFamily: LABEL_FONT, fontSize: 13, letterSpacing: "0.08em", color: MUTED }}>
+              {exposed.length ? "click an exposed specimen to read it" : "brush the dirt · specimens are buried at random"}
+            </span>
+          </div>
+
+          {/* detail card */}
+          {open && (
+            <div className="absolute inset-0 flex items-center justify-center p-6" style={{ zIndex: 200 }}>
+              <div className="absolute inset-0" style={{ background: "rgba(43,35,24,.5)" }} onClick={() => setOpenId(null)} />
+              <div
+                className="relative overflow-auto"
+                style={{
+                  width: "min(620px, 94%)",
+                  maxHeight: "100%",
+                  background: "#f4ecda",
+                  border: `1px solid ${INK}`,
+                  outline: `5px solid #f4ecda`,
+                  boxShadow: "0 26px 60px rgba(43,35,24,.45)",
+                  padding: "34px 38px 30px",
+                }}
+              >
+                <div
+                  onClick={() => setOpenId(null)}
+                  className="absolute cursor-pointer hover:opacity-70 transition-opacity"
+                  style={{ top: 16, right: 20, fontFamily: LABEL_FONT, fontSize: 12, letterSpacing: "0.12em", color: MUTED }}
+                >
+                  RE-BURY ✕
+                </div>
+                <div style={{ fontFamily: LABEL_FONT, fontSize: 11, letterSpacing: "0.2em", color: MUTED }}>SPECIMEN {open.no}</div>
+                <div className="mt-3" style={{ fontFamily: DISPLAY_FONT, fontSize: 40, lineHeight: 1.06, color: INK }}>
+                  {open.name}
+                </div>
+                <div className="mt-2 italic" style={{ fontFamily: DISPLAY_FONT, fontSize: 19, color: "#6b5c40" }}>
+                  {open.tagline}
+                </div>
+                <div className="mt-5" style={{ height: 1, background: BORDER }} />
+                <div className="mt-5" style={{ fontFamily: LABEL_FONT, fontSize: 11, letterSpacing: "0.14em", color: MUTED }}>
+                  CONDITION — crumpled, legible
+                </div>
+                <div
+                  className="mt-6 flex items-center justify-center"
+                  style={{
+                    height: 160,
+                    border: `1px solid ${BORDER}`,
+                    background: "repeating-linear-gradient(45deg, #ece2cc 0 8px, #e4d8bd 8px 16px)",
+                    fontFamily: LABEL_FONT,
+                    fontSize: 11,
+                    letterSpacing: "0.16em",
+                    color: MUTED,
+                  }}
+                >
+                  PLATE — DROP ILLUSTRATION HERE
+                </div>
+                <div className="mt-5" style={{ fontFamily: DISPLAY_FONT, fontSize: 20, lineHeight: 1.5, color: "#3a3122" }}>
+                  {open.blurb}
+                </div>
+                {open.reason && (
+                  <div className="mt-4" style={{ fontFamily: DISPLAY_FONT, fontSize: 18, lineHeight: 1.5, color: "#6b5c40" }}>
+                    {open.reason}
+                  </div>
+                )}
+                <div
+                  className="mt-6 pt-4 flex items-center justify-between gap-4"
+                  style={{ borderTop: `1px solid ${BORDER}` }}
+                >
+                  <span style={{ fontFamily: LABEL_FONT, fontSize: 11, letterSpacing: "0.14em", color: RUST }}>
+                    CAUSE OF EXTINCTION — {open.cause}
+                  </span>
+                  {exposed.length > 1 && (
+                    <span
+                      onClick={nextSpecimen}
+                      className="cursor-pointer whitespace-nowrap"
+                      style={{ fontFamily: LABEL_FONT, fontSize: 12, letterSpacing: "0.12em", color: INK }}
+                    >
+                      NEXT SPECIMEN →
+                    </span>
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
     </main>
   );
 }
