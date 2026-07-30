@@ -38,8 +38,24 @@ function blankRow(sortOrder: number, existingRows: SpecimenRow[]): SpecimenRow {
     image_url: null,
     sort_order: sortOrder,
     confidential: false,
+    icon: null,
   };
 }
+
+// Keep in sync with FOSSIL_ICONS' named keys in JunkDrawer.tsx.
+const ICON_OPTIONS = [
+  { value: "", label: "Auto (generic fossil)" },
+  { value: "phone", label: "Phone" },
+  { value: "envelope", label: "Envelope" },
+  { value: "timer", label: "Hourglass" },
+  { value: "gavel", label: "Gavel" },
+  { value: "popsicle", label: "Paddle pop stick" },
+  { value: "plant", label: "Potted plant" },
+  { value: "bin", label: "Bin" },
+  { value: "ticket", label: "Ticket" },
+  { value: "book", label: "Open book" },
+  { value: "cutlery", label: "Fork & spoon" },
+];
 
 function Field({
   label,
@@ -164,6 +180,19 @@ function SpecimenEditor({
           value={draft.reason ?? ""}
           onChange={(e) => set("reason", e.target.value)}
         />
+      </Field>
+      <Field label="Fossil icon">
+        <select
+          style={inputStyle}
+          value={draft.icon ?? ""}
+          onChange={(e) => set("icon", e.target.value || null)}
+        >
+          {ICON_OPTIONS.map((opt) => (
+            <option key={opt.value} value={opt.value}>
+              {opt.label}
+            </option>
+          ))}
+        </select>
       </Field>
       <Field label="Plate image">
         <div className="flex items-center gap-3 flex-wrap">

@@ -18,6 +18,7 @@ export interface SpecimenRow {
   image_url: string | null;
   sort_order: number;
   confidential: boolean;
+  icon: string | null;
 }
 
 export type SpecimenDraft = Omit<SpecimenRow, "id"> & { id?: string };

@@ -1,5 +1,5 @@
 import { Link } from "react-router";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { fetchSpecimens, type SpecimenRow } from "../lib/specimens";
 import { projects } from "./App";
 
@@ -30,6 +30,7 @@ interface Specimen {
   cause: string;
   imageUrl?: string;
   confidential?: boolean;
+  icon?: string;
 }
 
 interface Stratum {
@@ -55,6 +56,7 @@ function rowToSpecimen(row: SpecimenRow): Specimen {
     cause: row.cause,
     imageUrl: row.image_url ?? undefined,
     confidential: row.confidential,
+    icon: row.icon ?? undefined,
   };
 }
 
@@ -121,55 +123,125 @@ interface LaidOutSpecimen extends Specimen {
   r: string;
   tone: string;
   rot: number;
-  icon: number;
+  icon: string;
 }
 
 // ─── Fossil imprints — what's actually etched into each rock ─────────────────
-// Flat single-stroke line art, cycled across specimens. Not literal to the
-// idea's content — just varied, so the bed doesn't read as one repeated shape.
+// Flat single-stroke line art. Keyed by concept where a specimen picks one
+// deliberately (a phone for "Still Reachable", a gavel for "Group Chat
+// Court"); GENERIC_ICON_KEYS is the fallback cycle for specimens without one.
 
-const FOSSIL_ICONS = [
-  // ammonite spiral
-  <path d="M50 50 C50 38 40 34 32 40 C22 47 24 62 36 66 C50 70 62 58 58 44 C54 30 36 24 24 34 C10 46 14 68 32 76" />,
-  // fish skeleton
-  <>
-    <path d="M12 50 Q50 34 88 50" />
-    <path d="M20 50 L28 38 M28 50 L36 36 M36 50 L44 36 M44 50 L52 36 M52 50 L60 37 M60 50 L68 38" />
-    <path d="M20 50 L28 62 M28 50 L36 64 M36 50 L44 64 M44 50 L52 64 M52 50 L60 63 M60 50 L68 62" />
-    <path d="M88 50 L98 40 M88 50 L98 60 M88 50 L94 50" />
-  </>,
-  // skull / jaw
-  <>
-    <path d="M20 40 Q20 22 42 20 Q70 18 84 34 Q90 42 82 48 L78 46 Q76 56 64 58 L60 66 L54 58 L46 66 L42 58 Q28 56 24 46 Z" />
-    <circle cx="36" cy="34" r="4" />
-  </>,
-  // three-toed footprint
-  <>
-    <path d="M50 30 C46 30 44 40 46 50 C48 60 44 68 50 70 C56 68 52 60 54 50 C56 40 54 30 50 30 Z" />
-    <path d="M30 42 C26 42 25 50 28 58 C30 64 27 70 32 72 C37 70 34 64 36 58 C38 50 34 42 30 42 Z" />
-    <path d="M70 42 C66 42 65 50 68 58 C70 64 67 70 72 72 C77 70 74 64 76 58 C78 50 74 42 70 42 Z" />
-  </>,
-  // dragonfly
-  <>
-    <ellipse cx="34" cy="34" rx="20" ry="9" transform="rotate(-25 34 34)" />
-    <ellipse cx="66" cy="34" rx="20" ry="9" transform="rotate(25 66 34)" />
-    <ellipse cx="34" cy="66" rx="18" ry="8" transform="rotate(20 34 66)" />
-    <ellipse cx="66" cy="66" rx="18" ry="8" transform="rotate(-20 66 66)" />
-    <path d="M50 22 L50 80" />
-    <path d="M44 30 L56 30 M45 40 L55 40 M46 50 L54 50 M46 60 L54 60 M47 70 L53 70" />
-  </>,
-  // trilobite
-  <>
-    <path d="M50 18 C34 18 26 28 26 40 L26 62 C26 74 34 82 50 82 C66 82 74 74 74 62 L74 40 C74 28 66 18 50 18 Z" />
-    <path d="M50 18 L50 82" />
-    <path d="M30 32 L20 26 M30 44 L18 40 M30 56 L18 60 M30 68 L20 74 M70 32 L80 26 M70 44 L82 40 M70 56 L82 60 M70 68 L80 74" />
-  </>,
-  // fern frond
-  <>
-    <path d="M50 85 L50 18" />
-    <path d="M50 26 L30 18 M50 26 L70 18 M50 36 L28 30 M50 36 L72 30 M50 46 L30 42 M50 46 L70 42 M50 56 L32 54 M50 56 L68 54 M50 66 L34 66 M50 66 L66 66" />
-  </>,
-];
+const FOSSIL_ICONS: Record<string, ReactNode> = {
+  // a phone handset — Still Reachable
+  phone: (
+    <path d="M28 30 C28 25 33 21 37 23 L46 28 C49 30 49 34 46 37 L41 41 C46 54 56 64 60 60 L64 55 C67 52 71 52 74 55 L79 64 C81 68 77 73 72 73 C52 73 28 50 28 30 Z" />
+  ),
+  // a sealed envelope — Sent Anyway
+  envelope: (
+    <>
+      <path d="M18 28 L82 28 L82 72 L18 72 Z" />
+      <path d="M18 28 L50 54 L82 28" />
+    </>
+  ),
+  // an hourglass — The Alibi
+  timer: (
+    <>
+      <path d="M28 18 L72 18 M28 82 L72 82" />
+      <path d="M30 18 L30 30 C30 42 44 46 50 50 C56 54 70 58 70 70 L70 82 L30 82 L30 70 C30 58 44 54 50 50 C56 46 70 42 70 30 L70 18 Z" />
+    </>
+  ),
+  // a gavel — Group Chat Court
+  gavel: (
+    <>
+      <rect x="16" y="18" width="36" height="18" rx="4" transform="rotate(-35 34 27)" />
+      <path d="M38 34 L64 60" />
+      <path d="M18 80 L64 80" />
+    </>
+  ),
+  // a paddle-pop stick — Paddle Pop Enterprise
+  popsicle: (
+    <>
+      <path d="M32 14 L68 14 C72 14 74 18 74 22 L74 52 C74 60 68 66 60 66 L40 66 C32 66 26 60 26 52 L26 22 C26 18 28 14 32 14 Z" />
+      <path d="M50 66 L50 88" />
+    </>
+  ),
+  // a potted plant — At Least Your Plants Answer
+  plant: (
+    <>
+      <path d="M36 58 L64 58 L60 84 L40 84 Z" />
+      <path d="M50 58 C50 44 40 40 32 30 M50 58 C50 42 60 36 70 26 M50 58 C50 46 50 34 50 16" />
+    </>
+  ),
+  // a bin — Sorted
+  bin: (
+    <>
+      <path d="M28 30 L72 30 L66 84 L34 84 Z" />
+      <path d="M22 30 L78 30 M40 20 L60 20" />
+      <path d="M42 40 L45 74 M58 40 L55 74" />
+    </>
+  ),
+  // a raffle ticket — Critically Endangered
+  ticket: (
+    <>
+      <path d="M14 36 L86 36 L86 64 L14 64 Z" />
+      <path d="M56 36 L56 64" strokeDasharray="4 5" />
+      <circle cx="70" cy="50" r="7" />
+    </>
+  ),
+  // an open book/comic — Holly the Horse & Pumpkin Pea Patch
+  book: (
+    <>
+      <path d="M18 28 L50 33 L82 28 L82 76 L50 71 L18 76 Z" />
+      <path d="M50 33 L50 71" />
+    </>
+  ),
+  // fork & spoon — Actually Tasty
+  cutlery: (
+    <>
+      <path d="M28 14 L28 36 M22 14 L22 32 C22 36 26 38 28 38 M34 14 L34 32 C34 36 30 38 28 38 L28 88" />
+      <path d="M70 14 C60 14 58 26 64 34 C67 38 68 40 68 44 L68 88" />
+    </>
+  ),
+  // generic fallback pool, cycled for specimens without a chosen icon
+  spiral: (
+    <path d="M50 50 C50 38 40 34 32 40 C22 47 24 62 36 66 C50 70 62 58 58 44 C54 30 36 24 24 34 C10 46 14 68 32 76" />
+  ),
+  footprint: (
+    <>
+      <path d="M50 30 C46 30 44 40 46 50 C48 60 44 68 50 70 C56 68 52 60 54 50 C56 40 54 30 50 30 Z" />
+      <path d="M30 42 C26 42 25 50 28 58 C30 64 27 70 32 72 C37 70 34 64 36 58 C38 50 34 42 30 42 Z" />
+      <path d="M70 42 C66 42 65 50 68 58 C70 64 67 70 72 72 C77 70 74 64 76 58 C78 50 74 42 70 42 Z" />
+    </>
+  ),
+  dragonfly: (
+    <>
+      <ellipse cx="34" cy="34" rx="20" ry="9" transform="rotate(-25 34 34)" />
+      <ellipse cx="66" cy="34" rx="20" ry="9" transform="rotate(25 66 34)" />
+      <ellipse cx="34" cy="66" rx="18" ry="8" transform="rotate(20 34 66)" />
+      <ellipse cx="66" cy="66" rx="18" ry="8" transform="rotate(-20 66 66)" />
+      <path d="M50 22 L50 80" />
+      <path d="M44 30 L56 30 M45 40 L55 40 M46 50 L54 50 M46 60 L54 60 M47 70 L53 70" />
+    </>
+  ),
+  trilobite: (
+    <>
+      <path d="M50 18 C34 18 26 28 26 40 L26 62 C26 74 34 82 50 82 C66 82 74 74 74 62 L74 40 C74 28 66 18 50 18 Z" />
+      <path d="M50 18 L50 82" />
+      <path d="M30 32 L20 26 M30 44 L18 40 M30 56 L18 60 M30 68 L20 74 M70 32 L80 26 M70 44 L82 40 M70 56 L82 60 M70 68 L80 74" />
+    </>
+  ),
+  fern: (
+    <>
+      <path d="M50 85 L50 18" />
+      <path d="M50 26 L30 18 M50 26 L70 18 M50 36 L28 30 M50 36 L72 30 M50 46 L30 42 M50 46 L70 42 M50 56 L32 54 M50 56 L68 54 M50 66 L34 66 M50 66 L66 66" />
+    </>
+  ),
+};
+
+// Curated icons a specimen can be assigned on purpose, in the editor.
+const NAMED_ICON_KEYS = ["phone", "envelope", "timer", "gavel", "popsicle", "plant", "bin", "ticket", "book", "cutlery"];
+// Fallback cycle for specimens with no icon chosen.
+const GENERIC_ICON_KEYS = ["spiral", "footprint", "dragonfly", "trilobite", "fern"];
 
 export default function JunkDrawer() {
   const [specimens, setSpecimens] = useState<Specimen[] | null>(null);
@@ -241,7 +313,8 @@ export default function JunkDrawer() {
       const row = Math.floor(slot / cols);
       const x = Math.round(Math.max(margin, Math.min(w - sw - margin, col * cw + (cw - sw) / 2 + (rnd() - 0.5) * cw * jitter)));
       const y = Math.round(Math.max(margin, Math.min(h - sh - margin, row * ch + (ch - sh) / 2 + (rnd() - 0.5) * ch * jitter)));
-      return { ...sp, i, x, y, w: sw, h: sh, r: base.r, tone: BONE[i % BONE.length], rot: (rnd() - 0.5) * 26, icon: i % FOSSIL_ICONS.length };
+      const icon = sp.icon && FOSSIL_ICONS[sp.icon] ? sp.icon : GENERIC_ICON_KEYS[i % GENERIC_ICON_KEYS.length];
+      return { ...sp, i, x, y, w: sw, h: sh, r: base.r, tone: BONE[i % BONE.length], rot: (rnd() - 0.5) * 26, icon };
     });
     cleared.current = new Set();
     setLayout(next);
