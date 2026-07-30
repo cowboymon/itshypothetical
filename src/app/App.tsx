@@ -1,56 +1,14 @@
-import { HashRouter, Routes, Route, Link, useNavigate, useLocation } from "react-router";
+import { HashRouter, Routes, Route, Link, useNavigate, useLocation, useParams } from "react-router";
 import React, { useEffect, useState } from "react";
 import { ImageWithFallback } from "./components/figma/ImageWithFallback";
 import JunkDrawer from "./JunkDrawer";
 import IdeaBedEditor from "./IdeaBedEditor";
-
-// ─── Types ──────────────────────────────────────────────────────────────────
-
-interface Project {
-  slug: string;
-  name: string;
-  tagline: string;
-  description: string;
-  status: "Live" | "In beta" | "In validation" | "In concept" | "In dev" | "Wrapped";
-  hasPage?: boolean;
-}
+import ProjectsEditor from "./ProjectsEditor";
+import { fetchProjects, type ProjectRow } from "../lib/projects";
 
 // ─── Data ────────────────────────────────────────────────────────────────────
 
-export const projects: Project[] = [
-  {
-    slug: "loud-and-fine",
-    name: "Loud & Fine",
-    tagline: "Loud world. Fine dog.",
-    description: "Sound desensitization for anxious dogs — no trainer required, several treats required.",
-    status: "In dev",
-    hasPage: false,
-  },
-  {
-    slug: "quirks-and-all",
-    name: "Quirks & All",
-    tagline: "Away, but known.",
-    description: "Every weird habit your dog has, written down and handed off on purpose.",
-    status: "In beta",
-  },
-  {
-    slug: "reach",
-    name: "Reach",
-    tagline: "Alone, not lost.",
-    description: "A loneliness app — because knowing you're not alone shouldn't take this much effort.",
-    status: "In validation",
-    hasPage: false,
-  },
-  {
-    slug: "straightforward-review",
-    name: "Straightforward Review",
-    tagline: "Reviews without the bullshit.",
-    description: "Reviews in two sentences or less. You already know what you want — this just confirms it.",
-    status: "Wrapped",
-  },
-];
-
-const statusStyle: Record<string, string> = {
+export const statusStyle: Record<string, string> = {
   "Live": "bg-[#1C1A17] text-[#F8F5F0]",
   "In beta": "bg-[#6E7F6B] text-[#F8F5F0]",
   "In validation": "bg-[#C4845A] text-[#F8F5F0]",
@@ -74,7 +32,7 @@ function Nav() {
   const { pathname } = useLocation();
   const isHome = pathname === "/";
 
-  if (pathname.startsWith("/the-idea-bed")) return null;
+  if (pathname.startsWith("/the-idea-bed") || pathname.startsWith("/projects/edit")) return null;
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 border-b border-border bg-background/90 backdrop-blur-sm">
@@ -162,7 +120,7 @@ function NavLink({ section, label }: { section: string; label: string }) {
 
 // ─── Footer ──────────────────────────────────────────────────────────────────
 
-function Footer({ nextProject }: { nextProject?: Project }) {
+function Footer({ nextProject }: { nextProject?: ProjectRow }) {
   return (
     <footer className="border-t border-border mt-32">
       <div className="max-w-5xl mx-auto px-6 py-12">
@@ -205,6 +163,23 @@ function Footer({ nextProject }: { nextProject?: Project }) {
 // ─── Homepage ────────────────────────────────────────────────────────────────
 
 function Homepage() {
+  const [projects, setProjects] = useState<ProjectRow[] | null>(null);
+  const [loadError, setLoadError] = useState<string | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    fetchProjects()
+      .then((rows) => {
+        if (!cancelled) setProjects(rows);
+      })
+      .catch((err) => {
+        if (!cancelled) setLoadError(err instanceof Error ? err.message : "Failed to load projects.");
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
   return (
     <main>
       {/* Hero */}
@@ -235,11 +210,17 @@ function Homepage() {
           The family
         </h2>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-px bg-border border border-border">
-          {projects.map((p) => (
-            <ProjectCard key={p.slug} project={p} />
-          ))}
-        </div>
+        {loadError ? (
+          <p className="font-[General_Sans] text-sm text-muted-foreground">Couldn't load projects — {loadError}</p>
+        ) : projects === null ? (
+          <p className="font-[General_Sans] text-sm text-muted-foreground">Loading…</p>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-px bg-border border border-border">
+            {projects.map((p) => (
+              <ProjectCard key={p.slug} project={p} />
+            ))}
+          </div>
+        )}
       </section>
 
       {/* About strip */}
@@ -269,8 +250,8 @@ function Homepage() {
   );
 }
 
-function ProjectCard({ project }: { project: Project }) {
-  const hasPage = project.hasPage !== false;
+function ProjectCard({ project }: { project: ProjectRow }) {
+  const hasPage = project.has_page !== false;
 
   const content = (
     <>
@@ -284,7 +265,7 @@ function ProjectCard({ project }: { project: Project }) {
           </p>
         </div>
         <span
-          className={`shrink-0 mt-1 inline-block font-[General_Sans] font-medium text-[10px] tracking-[0.12em] uppercase px-2.5 py-1 ${statusStyle[project.status]}`}
+          className={`shrink-0 mt-1 inline-block font-[General_Sans] font-medium text-[10px] tracking-[0.12em] uppercase px-2.5 py-1 ${statusStyle[project.status] ?? statusStyle["In concept"]}`}
         >
           {project.status}
         </span>
@@ -417,247 +398,146 @@ function Reviews({ items }: { items?: { quote: string; author?: string }[] }) {
   );
 }
 
-// ─── Loud & Fine ─────────────────────────────────────────────────────────────
+// ─── Project detail page (generic — shared by every project) ─────────────────
 
-// Placeholder screenshots/reviews — swap for the real ones before shipping
-const loudAndFineScreenshots: { src: string; alt: string }[] = [
-  { src: "https://picsum.photos/seed/loud-and-fine-1/300/650", alt: "Loud & Fine app screenshot — sound picker" },
-  { src: "https://picsum.photos/seed/loud-and-fine-2/300/650", alt: "Loud & Fine app screenshot — session in progress" },
-  { src: "https://picsum.photos/seed/loud-and-fine-3/300/650", alt: "Loud & Fine app screenshot — progress tracking" },
-];
-const loudAndFineReviews: { quote: string; author?: string }[] = [
-  { quote: "My dog used to hide in the bathtub every time it thundered. Now he just glances at the window.", author: "Sarah, and a much calmer beagle" },
-  { quote: "Wish this existed before the fireworks incident of 2023. We're rebuilding trust, slowly.", author: "Marcus" },
-  { quote: "$2.99 and no subscription almost made me suspicious. It just works.", author: "Priya" },
-];
+function ProjectPage() {
+  const { slug } = useParams();
+  const [projects, setProjects] = useState<ProjectRow[] | null>(null);
+  const [loadError, setLoadError] = useState<string | null>(null);
 
-function LoudAndFine() {
-  const nextProject = projects[1];
+  useEffect(() => {
+    let cancelled = false;
+    fetchProjects()
+      .then((rows) => {
+        if (!cancelled) setProjects(rows);
+      })
+      .catch((err) => {
+        if (!cancelled) setLoadError(err instanceof Error ? err.message : "Failed to load project.");
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  if (loadError) {
+    return (
+      <main className="max-w-5xl mx-auto px-6 pt-32">
+        <p className="font-[General_Sans] text-sm text-muted-foreground">Couldn't load this project — {loadError}</p>
+      </main>
+    );
+  }
+
+  if (projects === null) {
+    return (
+      <main className="max-w-5xl mx-auto px-6 pt-32">
+        <p className="font-[General_Sans] text-sm text-muted-foreground">Loading…</p>
+      </main>
+    );
+  }
+
+  const project = projects.find((p) => p.slug === slug && p.has_page);
+  if (!project) {
+    return (
+      <main className="max-w-5xl mx-auto px-6 pt-32">
+        <BackLink />
+        <p className="font-[General_Sans] text-sm text-muted-foreground mt-8">That project doesn't exist (yet).</p>
+      </main>
+    );
+  }
+
+  const pageProjects = projects.filter((p) => p.has_page).sort((a, b) => a.sort_order - b.sort_order);
+  const nextProject = pageProjects[pageProjects.findIndex((p) => p.slug === project.slug) + 1];
+
   return (
     <main>
       <div className="max-w-5xl mx-auto px-6 pt-32 pb-0">
         <BackLink />
 
         <div className="mt-12 pb-16 border-b border-border">
-          <span className={`font-[General_Sans] font-medium text-[10px] tracking-[0.12em] uppercase px-2.5 py-1 ${statusStyle["In beta"]} mb-6 inline-block`}>
-            In beta
+          <span className={`font-[General_Sans] font-medium text-[10px] tracking-[0.12em] uppercase px-2.5 py-1 ${statusStyle[project.status] ?? statusStyle["In concept"]} mb-6 inline-block`}>
+            {project.status}
           </span>
           <h1 className="font-[Gambarino] text-5xl sm:text-7xl lg:text-8xl text-foreground leading-[1.02] mt-3">
-            Loud & Fine
+            {project.name}
           </h1>
           <p className="font-[Gambarino] text-2xl sm:text-3xl text-muted-foreground mt-3">
-            Loud world. Fine dog.
+            {project.tagline}
           </p>
-          <p className="font-[General_Sans] font-light text-lg text-muted-foreground mt-6 max-w-xl leading-relaxed">
-            Systematic sound desensitization for dogs who lose it at vacuums, thunder, fireworks, and the doorbell. $2.99 once. No subscription. No ads.
-          </p>
-          <div className="mt-8">
-            <ProjectCTA label="Join the waitlist" />
-          </div>
+          {project.long_description && (
+            <p className="font-[General_Sans] font-light text-lg text-muted-foreground mt-6 max-w-xl leading-relaxed">
+              {project.long_description}
+            </p>
+          )}
+          {project.cta_label && (
+            <div className="mt-8">
+              <ProjectCTA label={project.cta_label} href={project.cta_href} />
+            </div>
+          )}
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-[2fr_1fr] gap-16 py-20">
           <div className="space-y-16">
-            {/* Problem */}
-            <section>
-              <h2 className="font-[General_Sans] font-medium text-xs tracking-[0.18em] text-muted-foreground uppercase mb-6">The problem</h2>
-              <p className="font-[General_Sans] font-light text-base sm:text-lg text-foreground leading-relaxed">
-                Most dogs who panic at loud noises aren't broken — they just haven't been introduced to the sound on their terms. The existing tools for this are built like they're from 2013, because they are. Loud & Fine does the same proven method (systematic desensitization) without making you read a manual first.
-              </p>
-            </section>
+            {project.problem && (
+              <section>
+                <h2 className="font-[General_Sans] font-medium text-xs tracking-[0.18em] text-muted-foreground uppercase mb-6">The problem</h2>
+                <p className="font-[General_Sans] font-light text-base sm:text-lg text-foreground leading-relaxed">
+                  {project.problem}
+                </p>
+              </section>
+            )}
 
-            {/* How it works */}
-            <section>
-              <h2 className="font-[General_Sans] font-medium text-xs tracking-[0.18em] text-muted-foreground uppercase mb-2">How it works</h2>
-              {[
-                "Pick the sound your dog struggles with — vacuum, storm, fireworks, clippers, crying baby",
-                "Play it at a volume they can handle, reward them, repeat",
-                "The app tracks progress so you know when to turn it up",
-                "No account, no cloud, no data leaving your phone",
-              ].map((step, i) => <HowItWorksItem key={i} text={step} index={i} />)}
-            </section>
+            {project.how_it_works.length > 0 && (
+              <section>
+                <h2 className="font-[General_Sans] font-medium text-xs tracking-[0.18em] text-muted-foreground uppercase mb-2">How it works</h2>
+                {project.how_it_works.map((step, i) => (
+                  <HowItWorksItem key={i} text={step} index={i} />
+                ))}
+              </section>
+            )}
 
-            {/* Voice sample */}
-            <section>
-              <h2 className="font-[General_Sans] font-medium text-xs tracking-[0.18em] text-muted-foreground uppercase mb-6">In the app</h2>
-              <Screenshots images={loudAndFineScreenshots} />
-            </section>
+            {project.screenshots.length > 0 && (
+              <section>
+                <h2 className="font-[General_Sans] font-medium text-xs tracking-[0.18em] text-muted-foreground uppercase mb-6">{project.screenshots_heading}</h2>
+                <Screenshots images={project.screenshots} />
+              </section>
+            )}
 
-            <Reviews items={loudAndFineReviews} />
+            {project.example_quotes.length > 0 && (
+              <section>
+                <h2 className="font-[General_Sans] font-medium text-xs tracking-[0.18em] text-muted-foreground uppercase mb-6">{project.example_heading}</h2>
+                <div className="space-y-4">
+                  {project.example_quotes.map((q, i) => (
+                    <QuoteBlock key={i}>{q}</QuoteBlock>
+                  ))}
+                </div>
+              </section>
+            )}
+
+            <Reviews items={project.reviews} />
           </div>
 
-          {/* Details */}
-          <aside>
-            <h2 className="font-[General_Sans] font-medium text-xs tracking-[0.18em] text-muted-foreground uppercase mb-4">Details</h2>
-            <div className="bg-card p-6 border border-border">
-              <DetailRow label="Price" value="$2.99 one-time" />
-              <DetailRow label="Platform" value="iOS" />
-              <DetailRow label="Data" value="100% on-device" />
-              <DetailRow label="Tone" value="Cool vet nurse — warm, deadpan" />
-            </div>
-            <div className="mt-8">
-              <ProjectCTA label="Join the waitlist" />
-            </div>
-          </aside>
+          {(project.details.length > 0 || project.cta_label) && (
+            <aside>
+              {project.details.length > 0 && (
+                <>
+                  <h2 className="font-[General_Sans] font-medium text-xs tracking-[0.18em] text-muted-foreground uppercase mb-4">Details</h2>
+                  <div className="bg-card p-6 border border-border">
+                    {project.details.map((d, i) => (
+                      <DetailRow key={i} label={d.label} value={d.value} />
+                    ))}
+                  </div>
+                </>
+              )}
+              {project.cta_label && (
+                <div className="mt-8">
+                  <ProjectCTA label={project.cta_label} href={project.cta_href} />
+                </div>
+              )}
+            </aside>
+          )}
         </div>
       </div>
       <Footer nextProject={nextProject} />
-    </main>
-  );
-}
-
-// ─── Quirks & All ────────────────────────────────────────────────────────────
-
-// Placeholder screenshots/reviews — swap for the real ones before shipping
-const quirksAndAllScreenshots: { src: string; alt: string }[] = [
-  { src: "https://picsum.photos/seed/quirks-and-all-1/300/650", alt: "Quirks & All app screenshot — dog profile" },
-  { src: "https://picsum.photos/seed/quirks-and-all-2/300/650", alt: "Quirks & All app screenshot — share link presets" },
-  { src: "https://picsum.photos/seed/quirks-and-all-3/300/650", alt: "Quirks & All app screenshot — missing poster generator" },
-];
-const quirksAndAllReviews: { quote: string; author?: string }[] = [
-  { quote: "My sitter texted back 'this is the best handoff doc I've ever gotten.' Weirdly proud of that.", author: "Jamie" },
-  { quote: "Finally a way to explain that 'off' means off the couch, not off the bed.", author: "Theo" },
-  { quote: "Haven't needed the missing poster generator. Comforting that it's there.", author: "Dana" },
-];
-
-function QuirksAndAll() {
-  const nextProject = projects[3];
-  return (
-    <main>
-      <div className="max-w-5xl mx-auto px-6 pt-32 pb-0">
-        <BackLink />
-
-        <div className="mt-12 pb-16 border-b border-border">
-          <span className={`font-[General_Sans] font-medium text-[10px] tracking-[0.12em] uppercase px-2.5 py-1 ${statusStyle["In beta"]} mb-6 inline-block`}>
-            In beta
-          </span>
-          <h1 className="font-[Gambarino] text-5xl sm:text-7xl lg:text-8xl text-foreground leading-[1.02] mt-3">
-            Quirks & All
-          </h1>
-          <p className="font-[Gambarino] text-2xl sm:text-3xl text-muted-foreground mt-3">
-            Away, but known.
-          </p>
-          <p className="font-[General_Sans] font-light text-lg text-muted-foreground mt-6 max-w-xl leading-relaxed">
-            The pet-care handoff doc your sitter actually reads — quirks, commands, and the one thing to know if things go sideways.
-          </p>
-          <div className="mt-8">
-            <ProjectCTA label="Visit the website" href="https://quirksandall.itshypothetical.com" />
-          </div>
-        </div>
-
-        <div className="grid grid-cols-1 lg:grid-cols-[2fr_1fr] gap-16 py-20">
-          <div className="space-y-16">
-            <section>
-              <h2 className="font-[General_Sans] font-medium text-xs tracking-[0.18em] text-muted-foreground uppercase mb-6">The problem</h2>
-              <p className="font-[General_Sans] font-light text-base sm:text-lg text-foreground leading-relaxed">
-                Handing your dog off to a sitter usually means a rushed text, a half-remembered command list, and hoping for the best. Quirks & All turns that into one link: what your dog's actually like, what commands mean what, and a one-tap missing-poster generator you hope you never need.
-              </p>
-            </section>
-
-            <section>
-              <h2 className="font-[General_Sans] font-medium text-xs tracking-[0.18em] text-muted-foreground uppercase mb-2">How it works</h2>
-              {[
-                "Build your dog's profile once — quirks, commands, routines",
-                "Generate a share link with a preset (Walk / Stay / Full) for whoever's looking after them",
-                "Sitters see exactly what they need, nothing they don't",
-                "If commands drift out of date, the app nudges you to check",
-              ].map((step, i) => <HowItWorksItem key={i} text={step} index={i} />)}
-            </section>
-
-            <section>
-              <h2 className="font-[General_Sans] font-medium text-xs tracking-[0.18em] text-muted-foreground uppercase mb-6">In the app</h2>
-              <Screenshots images={quirksAndAllScreenshots} />
-            </section>
-
-            <Reviews items={quirksAndAllReviews} />
-          </div>
-
-          <aside>
-            <h2 className="font-[General_Sans] font-medium text-xs tracking-[0.18em] text-muted-foreground uppercase mb-4">Details</h2>
-            <div className="bg-card p-6 border border-border">
-              <DetailRow label="Platform" value="Website" />
-              <DetailRow label="Model" value="Free to start" />
-              <DetailRow label="Tone" value="Quirks are charming, not problems" />
-            </div>
-            <div className="mt-8">
-              <ProjectCTA label="Visit the website" href="https://quirksandall.itshypothetical.com" />
-            </div>
-          </aside>
-        </div>
-      </div>
-      <Footer nextProject={nextProject} />
-    </main>
-  );
-}
-
-// ─── Straightforward Review ───────────────────────────────────────────────────
-
-const straightforwardReviewReviews: { quote: string; author?: string }[] = [];
-
-function StraightforwardReview() {
-  return (
-    <main>
-      <div className="max-w-5xl mx-auto px-6 pt-32 pb-0">
-        <BackLink />
-
-        <div className="mt-12 pb-16 border-b border-border">
-          <span className={`font-[General_Sans] font-medium text-[10px] tracking-[0.12em] uppercase px-2.5 py-1 ${statusStyle["Wrapped"]} mb-6 inline-block`}>
-            Wrapped
-          </span>
-          <h1 className="font-[Gambarino] text-5xl sm:text-7xl lg:text-8xl text-foreground leading-[1.02] mt-3">
-            Straightforward<br className="hidden sm:block" /> Review
-          </h1>
-          <p className="font-[Gambarino] text-2xl sm:text-3xl text-muted-foreground mt-3">
-            Reviews without the bullshit.
-          </p>
-          <p className="font-[General_Sans] font-light text-lg text-muted-foreground mt-6 max-w-xl leading-relaxed">
-            Reviews in two sentences or less. One thumb, up or down. You already know if the place was good — this just makes it quick to say so, and quick to check.
-          </p>
-        </div>
-
-        <div className="grid grid-cols-1 lg:grid-cols-[2fr_1fr] gap-16 py-20">
-          <div className="space-y-16">
-            <section>
-              <h2 className="font-[General_Sans] font-medium text-xs tracking-[0.18em] text-muted-foreground uppercase mb-6">The problem</h2>
-              <p className="font-[General_Sans] font-light text-base sm:text-lg text-foreground leading-relaxed">
-                Most reviews are 300 words of someone re-litigating their week. Nobody reads them, and nobody who writes them enjoys it either. Book, blender, ice cream, whatever — you don't need a novel to know if it's worth it. You need one honest signal from someone who's already been through it.
-              </p>
-            </section>
-
-            <section>
-              <h2 className="font-[General_Sans] font-medium text-xs tracking-[0.18em] text-muted-foreground uppercase mb-2">How it works</h2>
-              {[
-                "See a thing. Give it a thumb — up or down. No stars, no 1–10, no ambiguity.",
-                "Add up to two sentences if you want to. Not required.",
-                "Browsing: see the thumb split first, read the two-liners after — no scrolling through essays to find the one useful line.",
-                "No profiles to build, no reviewer level, no badges. That's the whole product.",
-              ].map((step, i) => <HowItWorksItem key={i} text={step} index={i} />)}
-            </section>
-
-            <section>
-              <h2 className="font-[General_Sans] font-medium text-xs tracking-[0.18em] text-muted-foreground uppercase mb-6">What a review looks like</h2>
-              <div className="space-y-4">
-                <QuoteBlock>Bloody good read. Finished in two weeks. Felt all the feels and then some.</QuoteBlock>
-                <QuoteBlock>Would endure the aftermaths of lactose intolerance again.</QuoteBlock>
-                <QuoteBlock>Clackity clack tap tap clack clop. Rough translation: I do be enjoying this.</QuoteBlock>
-              </div>
-            </section>
-
-            <Reviews items={straightforwardReviewReviews} />
-          </div>
-
-          <aside>
-            <h2 className="font-[General_Sans] font-medium text-xs tracking-[0.18em] text-muted-foreground uppercase mb-4">Details</h2>
-            <div className="bg-card p-6 border border-border">
-              <DetailRow label="Format" value="Thumbs up/down + 2 sentences" />
-              <DetailRow label="Platform" value="Website" />
-              <DetailRow label="Status" value="Wrapped" />
-              <DetailRow label="Tone" value="Utility over charm" />
-            </div>
-          </aside>
-        </div>
-      </div>
-      <Footer />
     </main>
   );
 }
@@ -671,10 +551,10 @@ export default function App() {
       <Nav />
       <Routes>
         <Route path="/" element={<Homepage />} />
-        <Route path="/quirks-and-all" element={<QuirksAndAll />} />
-        <Route path="/straightforward-review" element={<StraightforwardReview />} />
         <Route path="/the-idea-bed" element={<JunkDrawer />} />
         <Route path="/the-idea-bed/edit" element={<IdeaBedEditor />} />
+        <Route path="/projects/edit" element={<ProjectsEditor />} />
+        <Route path="/:slug" element={<ProjectPage />} />
       </Routes>
     </HashRouter>
   );

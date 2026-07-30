@@ -1,7 +1,7 @@
 import { Link } from "react-router";
 import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { fetchSpecimens, type SpecimenRow } from "../lib/specimens";
-import { projects } from "./App";
+import { fetchProjects } from "../lib/projects";
 
 // ─── The Idea Bed — a dig site, not a drawer ───────────────────────────────────
 // Field archaeology: a dirt canvas painted over buried "fossils" (trashed
@@ -224,6 +224,7 @@ export default function JunkDrawer() {
   const [dims, setDims] = useState({ w: 1200, h: 600 });
   const [found, setFound] = useState<Set<string>>(new Set());
   const [dragPos, setDragPos] = useState<Record<number, { x: number; y: number }>>({});
+  const [projectCount, setProjectCount] = useState<number | null>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -233,6 +234,13 @@ export default function JunkDrawer() {
       })
       .catch((err) => {
         if (!cancelled) setLoadError(err instanceof Error ? err.message : "Failed to load specimens.");
+      });
+    fetchProjects()
+      .then((rows) => {
+        if (!cancelled) setProjectCount(rows.length);
+      })
+      .catch(() => {
+        // Non-critical — the "N projects" line just won't render its count.
       });
     return () => {
       cancelled = true;
@@ -602,7 +610,7 @@ export default function JunkDrawer() {
                   Surface
                 </span>
                 <span style={{ fontFamily: LABEL_FONT, fontSize: 11, letterSpacing: "0.12em", color: "#fbf6e6", textAlign: "right" }}>
-                  {projects.length} projects
+                  {projectCount ?? "…"} projects
                 </span>
               </div>
               {STRATA.map((s, idx) => (

@@ -97,3 +97,107 @@ insert into public.specimens (no, name, year, tagline, blurb, reason, cause, sor
 -- cycled generic fossil glyph (see GENERIC_ICON_KEYS in JunkDrawer.tsx).
 -- Set icon_url on a specimen (via the editor's "Custom icon" upload) to
 -- give it its own icon instead.
+
+-- ─── Projects (homepage cards + project detail pages) ──────────────────────
+
+create table if not exists public.projects (
+  id uuid primary key default gen_random_uuid(),
+  slug text not null unique,
+  name text not null,
+  tagline text not null,
+  description text not null,
+  long_description text not null default '',
+  status text not null default 'In concept',
+  has_page boolean not null default true,
+  cta_label text,
+  cta_href text not null default '#',
+  problem text not null default '',
+  how_it_works jsonb not null default '[]'::jsonb,
+  screenshots_heading text not null default 'In the app',
+  screenshots jsonb not null default '[]'::jsonb,
+  example_heading text not null default '',
+  example_quotes jsonb not null default '[]'::jsonb,
+  reviews jsonb not null default '[]'::jsonb,
+  details jsonb not null default '[]'::jsonb,
+  sort_order int not null default 0,
+  created_at timestamptz not null default now()
+);
+
+alter table public.projects enable row level security;
+
+drop policy if exists "projects are publicly readable" on public.projects;
+create policy "projects are publicly readable"
+  on public.projects for select
+  using (true);
+
+drop policy if exists "authenticated users can insert projects" on public.projects;
+create policy "authenticated users can insert projects"
+  on public.projects for insert
+  to authenticated
+  with check (true);
+
+drop policy if exists "authenticated users can update projects" on public.projects;
+create policy "authenticated users can update projects"
+  on public.projects for update
+  to authenticated
+  using (true)
+  with check (true);
+
+drop policy if exists "authenticated users can delete projects" on public.projects;
+create policy "authenticated users can delete projects"
+  on public.projects for delete
+  to authenticated
+  using (true);
+
+-- Reuses the same bucket the Idea Bed's plate/icon images live in.
+insert into storage.buckets (id, name, public)
+values ('specimen-plates', 'specimen-plates', true)
+on conflict (id) do nothing;
+
+-- Seed data: the 4 existing projects, migrated from the hardcoded array.
+insert into public.projects (slug, name, tagline, description, long_description, status, has_page, cta_label, cta_href, problem, how_it_works, screenshots_heading, screenshots, reviews, details, sort_order) values (
+  'loud-and-fine', 'Loud & Fine', 'Loud world. Fine dog.',
+  'Sound desensitization for anxious dogs — no trainer required, several treats required.',
+  'Systematic sound desensitization for dogs who lose it at vacuums, thunder, fireworks, and the doorbell. $2.99 once. No subscription. No ads.',
+  'In dev', false, 'Join the waitlist', '#',
+  'Most dogs who panic at loud noises aren''t broken — they just haven''t been introduced to the sound on their terms. The existing tools for this are built like they''re from 2013, because they are. Loud & Fine does the same proven method (systematic desensitization) without making you read a manual first.',
+  '["Pick the sound your dog struggles with — vacuum, storm, fireworks, clippers, crying baby", "Play it at a volume they can handle, reward them, repeat", "The app tracks progress so you know when to turn it up", "No account, no cloud, no data leaving your phone"]'::jsonb,
+  'In the app',
+  '[{"src":"https://picsum.photos/seed/loud-and-fine-1/300/650","alt":"Loud & Fine app screenshot — sound picker"},{"src":"https://picsum.photos/seed/loud-and-fine-2/300/650","alt":"Loud & Fine app screenshot — session in progress"},{"src":"https://picsum.photos/seed/loud-and-fine-3/300/650","alt":"Loud & Fine app screenshot — progress tracking"}]'::jsonb,
+  '[{"quote":"My dog used to hide in the bathtub every time it thundered. Now he just glances at the window.","author":"Sarah, and a much calmer beagle"},{"quote":"Wish this existed before the fireworks incident of 2023. We''re rebuilding trust, slowly.","author":"Marcus"},{"quote":"$2.99 and no subscription almost made me suspicious. It just works.","author":"Priya"}]'::jsonb,
+  '[{"label":"Price","value":"$2.99 one-time"},{"label":"Platform","value":"iOS"},{"label":"Data","value":"100% on-device"},{"label":"Tone","value":"Cool vet nurse — warm, deadpan"}]'::jsonb,
+  0
+) on conflict (slug) do nothing;
+
+insert into public.projects (slug, name, tagline, description, long_description, status, has_page, cta_label, cta_href, problem, how_it_works, screenshots_heading, screenshots, reviews, details, sort_order) values (
+  'quirks-and-all', 'Quirks & All', 'Away, but known.',
+  'Every weird habit your dog has, written down and handed off on purpose.',
+  'The pet-care handoff doc your sitter actually reads — quirks, commands, and the one thing to know if things go sideways.',
+  'In beta', true, 'Visit the website', 'https://quirksandall.itshypothetical.com',
+  'Handing your dog off to a sitter usually means a rushed text, a half-remembered command list, and hoping for the best. Quirks & All turns that into one link: what your dog''s actually like, what commands mean what, and a one-tap missing-poster generator you hope you never need.',
+  '["Build your dog''s profile once — quirks, commands, routines", "Generate a share link with a preset (Walk / Stay / Full) for whoever''s looking after them", "Sitters see exactly what they need, nothing they don''t", "If commands drift out of date, the app nudges you to check"]'::jsonb,
+  'In the app',
+  '[{"src":"https://picsum.photos/seed/quirks-and-all-1/300/650","alt":"Quirks & All app screenshot — dog profile"},{"src":"https://picsum.photos/seed/quirks-and-all-2/300/650","alt":"Quirks & All app screenshot — share link presets"},{"src":"https://picsum.photos/seed/quirks-and-all-3/300/650","alt":"Quirks & All app screenshot — missing poster generator"}]'::jsonb,
+  '[{"quote":"My sitter texted back ''this is the best handoff doc I''ve ever gotten.'' Weirdly proud of that.","author":"Jamie"},{"quote":"Finally a way to explain that ''off'' means off the couch, not off the bed.","author":"Theo"},{"quote":"Haven''t needed the missing poster generator. Comforting that it''s there.","author":"Dana"}]'::jsonb,
+  '[{"label":"Platform","value":"Website"},{"label":"Model","value":"Free to start"},{"label":"Tone","value":"Quirks are charming, not problems"}]'::jsonb,
+  1
+) on conflict (slug) do nothing;
+
+insert into public.projects (slug, name, tagline, description, status, has_page, sort_order) values (
+  'reach', 'Reach', 'Alone, not lost.',
+  'A loneliness app — because knowing you''re not alone shouldn''t take this much effort.',
+  'In validation', false, 2
+) on conflict (slug) do nothing;
+
+insert into public.projects (slug, name, tagline, description, long_description, status, has_page, problem, how_it_works, example_heading, example_quotes, details, sort_order) values (
+  'straightforward-review', 'Straightforward Review', 'Reviews without the bullshit.',
+  'Reviews in two sentences or less. You already know what you want — this just confirms it.',
+  'Reviews in two sentences or less. One thumb, up or down. You already know if the place was good — this just makes it quick to say so, and quick to check.',
+  'Wrapped', true,
+  'Most reviews are 300 words of someone re-litigating their week. Nobody reads them, and nobody who writes them enjoys it either. Book, blender, ice cream, whatever — you don''t need a novel to know if it''s worth it. You need one honest signal from someone who''s already been through it.',
+  '["See a thing. Give it a thumb — up or down. No stars, no 1–10, no ambiguity.", "Add up to two sentences if you want to. Not required.", "Browsing: see the thumb split first, read the two-liners after — no scrolling through essays to find the one useful line.", "No profiles to build, no reviewer level, no badges. That''s the whole product."]'::jsonb,
+  'What a review looks like',
+  '["Bloody good read. Finished in two weeks. Felt all the feels and then some.", "Would endure the aftermaths of lactose intolerance again.", "Clackity clack tap tap clack clop. Rough translation: I do be enjoying this."]'::jsonb,
+  '[{"label":"Format","value":"Thumbs up/down + 2 sentences"},{"label":"Platform","value":"Website"},{"label":"Status","value":"Wrapped"},{"label":"Tone","value":"Utility over charm"}]'::jsonb,
+  3
+) on conflict (slug) do nothing;
