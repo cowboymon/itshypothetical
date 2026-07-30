@@ -119,6 +119,13 @@ const STRATA: Stratum[] = [
         reason: "Plot, characters, and overall coherence: none of your business.",
         cause: "AHEAD OF ITS TIME, ALLEGEDLY",
       },
+      {
+        no: "FD-10",
+        name: "Actually Tasty",
+        tagline: "turns out 4.5 stars just means it offended nobody",
+        blurb: "Got sick of walking into 4.5+ star restaurants, cafes, and bakeries and having a genuinely bad time, then spiraling about what was wrong with me. Eventual realisation: taste is subjective, and a 5-star average usually just means the food is generic enough to never upset anyone. Congratulations to that muffin, it has no personality and neither does your rating system. The idea: 10 menu items, one per vendor, you actually try. You rate how you felt eating each one, and that builds your taste profile — not \"is this objectively good\" but \"will YOU, specifically, enjoy this.\" Then you follow people with matching taste buds, so you stop taking recommendations from people whose mouths clearly work differently to yours.",
+        cause: "STILL COOKING",
+      },
     ],
   },
 ];
@@ -229,13 +236,18 @@ export default function JunkDrawer() {
     const rows = Math.ceil(ideas.length / cols);
     const cw = w / cols;
     const ch = h / rows;
+    // Shapes were tuned for ~9 specimens in one bed — scale up when a stratum has fewer,
+    // so a 4-5 idea layer doesn't look lost in all that empty dirt.
+    const scale = Math.min(1.5, Math.sqrt(9 / ideas.length));
     const next: LaidOutSpecimen[] = ideas.map((sp, i) => {
-      const s = SHAPES[i % SHAPES.length];
+      const base = SHAPES[i % SHAPES.length];
+      const sw = Math.round(base.w * scale);
+      const sh = Math.round(base.h * scale);
       const col = i % cols;
       const row = Math.floor(i / cols);
-      const x = Math.round(Math.max(16, Math.min(w - s.w - 16, col * cw + (cw - s.w) / 2 + (rnd() - 0.5) * cw * 0.3)));
-      const y = Math.round(Math.max(14, Math.min(h - s.h - 14, row * ch + (ch - s.h) / 2 + (rnd() - 0.5) * ch * 0.3)));
-      return { ...sp, i, x, y, w: s.w, h: s.h, r: s.r, tone: BONE[i % BONE.length], rot: (rnd() - 0.5) * 26, icon: i % FOSSIL_ICONS.length };
+      const x = Math.round(Math.max(16, Math.min(w - sw - 16, col * cw + (cw - sw) / 2 + (rnd() - 0.5) * cw * 0.3)));
+      const y = Math.round(Math.max(14, Math.min(h - sh - 14, row * ch + (ch - sh) / 2 + (rnd() - 0.5) * ch * 0.3)));
+      return { ...sp, i, x, y, w: sw, h: sh, r: base.r, tone: BONE[i % BONE.length], rot: (rnd() - 0.5) * 26, icon: i % FOSSIL_ICONS.length };
     });
     cleared.current = new Set();
     setLayout(next);
@@ -460,7 +472,7 @@ export default function JunkDrawer() {
             >
               ← back to the surface
             </Link>
-            <p style={{ fontFamily: LABEL_FONT, fontSize: 12, letterSpacing: "0.24em", color: MUTED }}>FIELD SEASON 2018 — 2026</p>
+            <p style={{ fontFamily: LABEL_FONT, fontSize: 12, letterSpacing: "0.24em", color: MUTED }}>FIELD SEASON 1994 — 2026</p>
             <h1
               className="mt-5 text-5xl sm:text-6xl uppercase"
               style={{ fontFamily: DISPLAY_FONT, letterSpacing: "0.03em", color: INK }}
@@ -468,7 +480,7 @@ export default function JunkDrawer() {
               The Idea Bed
             </h1>
             <p className="mt-4 max-w-md text-lg italic" style={{ fontFamily: DISPLAY_FONT, color: "#6b5c40" }}>
-              Nine ideas I abandoned, buried where they fell. Nothing here is labelled. You'll have to brush it off yourself.
+              Ten ideas I abandoned, buried where they fell. Nothing here is labelled. You'll have to brush it off yourself.
             </p>
             <button
               onClick={() => setStarted(true)}
