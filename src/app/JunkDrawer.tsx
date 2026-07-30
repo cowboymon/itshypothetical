@@ -15,21 +15,6 @@ const RUST = "#a4522c";
 const DISPLAY_FONT = "'Sentient', Georgia, serif";
 const LABEL_FONT = "'Comico', sans-serif";
 
-// Jagged grass-blade silhouette for the "surface" band in the strata preview.
-const GRASS_EDGE_PATH = (() => {
-  const w = 400;
-  const teeth = 22;
-  const step = w / teeth;
-  let d = "M0,0 ";
-  for (let i = 0; i <= teeth; i++) {
-    const x = i * step;
-    const y = i % 2 === 0 ? 18 : 6;
-    d += `L${x.toFixed(1)},${y} `;
-  }
-  d += `L${w},0 Z`;
-  return d;
-})();
-
 interface Specimen {
   no: string;
   name: string;
@@ -38,6 +23,7 @@ interface Specimen {
   blurb: string;
   reason?: string;
   cause: string;
+  imageUrl?: string;
 }
 
 interface Stratum {
@@ -591,20 +577,11 @@ export default function JunkDrawer() {
             </p>
 
             <div className="mt-8 w-full" style={{ border: `1px solid ${INK}` }}>
-              <div className="relative">
-                <div
-                  className="flex items-center justify-between px-5 py-3"
-                  style={{ background: "linear-gradient(180deg, #82ab57 0%, #557f38 100%)" }}
-                >
-                  <span style={{ fontFamily: DISPLAY_FONT, fontSize: 15, color: "#fbf6e6" }}>2026 · surface</span>
-                </div>
-                <svg
-                  viewBox="0 0 400 20"
-                  preserveAspectRatio="none"
-                  style={{ display: "block", width: "100%", height: 12 }}
-                >
-                  <path d={GRASS_EDGE_PATH} fill="#557f38" />
-                </svg>
+              <div
+                className="flex items-center justify-between px-5 py-4"
+                style={{ background: "#6E8C58" }}
+              >
+                <span style={{ fontFamily: DISPLAY_FONT, fontSize: 15, color: "#fbf6e6" }}>2026 · surface</span>
               </div>
               {STRATA.map((s, idx) => (
                 <div
@@ -958,20 +935,11 @@ export default function JunkDrawer() {
                 <div className="mt-5" style={{ fontFamily: LABEL_FONT, fontSize: 11, letterSpacing: "0.14em", color: MUTED }}>
                   CONDITION — crumpled, legible
                 </div>
-                <div
-                  className="mt-6 flex items-center justify-center"
-                  style={{
-                    height: 160,
-                    border: `1px solid ${BORDER}`,
-                    background: "repeating-linear-gradient(45deg, #ece2cc 0 8px, #e4d8bd 8px 16px)",
-                    fontFamily: LABEL_FONT,
-                    fontSize: 11,
-                    letterSpacing: "0.16em",
-                    color: MUTED,
-                  }}
-                >
-                  PLATE — DROP ILLUSTRATION HERE
-                </div>
+                {open.imageUrl && (
+                  <div className="mt-6" style={{ border: `1px solid ${BORDER}` }}>
+                    <img src={open.imageUrl} alt={open.name} style={{ width: "100%", display: "block" }} />
+                  </div>
+                )}
                 <div className="mt-5" style={{ fontFamily: DISPLAY_FONT, fontSize: 20, lineHeight: 1.5, color: "#3a3122" }}>
                   {open.blurb}
                 </div>
