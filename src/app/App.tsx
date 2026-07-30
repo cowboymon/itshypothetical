@@ -282,7 +282,7 @@ function ProjectCard({ project }: { project: Project }) {
           </p>
         </div>
         <span
-          className={`shrink-0 mt-1 inline-block font-[DM_Mono] text-[10px] tracking-[0.12em] uppercase px-2.5 py-1 ${statusStyle[project.status]}`}
+          className={`shrink-0 mt-1 inline-block font-[General_Sans] font-medium text-[10px] tracking-[0.12em] uppercase px-2.5 py-1 ${statusStyle[project.status]}`}
         >
           {project.status}
         </span>
@@ -335,7 +335,7 @@ function BackLink() {
 function DetailRow({ label, value }: { label: string; value: string }) {
   return (
     <div className="flex items-baseline justify-between py-3 border-b border-border last:border-0 gap-8">
-      <span className="font-[DM_Mono] text-xs text-muted-foreground uppercase tracking-[0.12em] shrink-0">{label}</span>
+      <span className="font-[General_Sans] font-medium text-xs text-muted-foreground uppercase tracking-[0.12em] shrink-0">{label}</span>
       <span className="font-[General_Sans] text-sm text-foreground text-right">{value}</span>
     </div>
   );
@@ -344,7 +344,7 @@ function DetailRow({ label, value }: { label: string; value: string }) {
 function HowItWorksItem({ text, index }: { text: string; index: number }) {
   return (
     <div className="flex gap-5 items-start py-4 border-b border-border last:border-0">
-      <span className="font-[DM_Mono] text-xs text-muted-foreground tabular-nums pt-0.5 w-5 shrink-0">
+      <span className="font-[General_Sans] font-medium text-xs text-muted-foreground tabular-nums pt-0.5 w-5 shrink-0">
         {String(index + 1).padStart(2, "0")}
       </span>
       <p className="font-[General_Sans] font-light text-base text-foreground leading-relaxed">{text}</p>
@@ -400,13 +400,13 @@ function Reviews({ items }: { items?: { quote: string; author?: string }[] }) {
   if (!items || items.length === 0) return null;
   return (
     <section>
-      <h2 className="font-[DM_Mono] text-xs tracking-[0.18em] text-muted-foreground uppercase mb-6">Reviews</h2>
+      <h2 className="font-[General_Sans] font-medium text-xs tracking-[0.18em] text-muted-foreground uppercase mb-6">Reviews</h2>
       <div className="space-y-6">
         {items.map((r, i) => (
           <div key={i} className="border-b border-border pb-6 last:border-0">
             <p className="font-[General_Sans] font-light text-base text-foreground leading-relaxed">"{r.quote}"</p>
             {r.author && (
-              <p className="font-[DM_Mono] text-xs text-muted-foreground uppercase tracking-[0.12em] mt-3">{r.author}</p>
+              <p className="font-[General_Sans] font-medium text-xs text-muted-foreground uppercase tracking-[0.12em] mt-3">{r.author}</p>
             )}
           </div>
         ))}
@@ -437,7 +437,7 @@ function LoudAndFine() {
         <BackLink />
 
         <div className="mt-12 pb-16 border-b border-border">
-          <span className={`font-[DM_Mono] text-[10px] tracking-[0.12em] uppercase px-2.5 py-1 ${statusStyle["In beta"]} mb-6 inline-block`}>
+          <span className={`font-[General_Sans] font-medium text-[10px] tracking-[0.12em] uppercase px-2.5 py-1 ${statusStyle["In beta"]} mb-6 inline-block`}>
             In beta
           </span>
           <h1 className="font-[Gambarino] text-5xl sm:text-7xl lg:text-8xl text-foreground leading-[1.02] mt-3">
@@ -458,7 +458,7 @@ function LoudAndFine() {
           <div className="space-y-16">
             {/* Problem */}
             <section>
-              <h2 className="font-[DM_Mono] text-xs tracking-[0.18em] text-muted-foreground uppercase mb-6">The problem</h2>
+              <h2 className="font-[General_Sans] font-medium text-xs tracking-[0.18em] text-muted-foreground uppercase mb-6">The problem</h2>
               <p className="font-[General_Sans] font-light text-base sm:text-lg text-foreground leading-relaxed">
                 Most dogs who panic at loud noises aren't broken — they just haven't been introduced to the sound on their terms. The existing tools for this are built like they're from 2013, because they are. Loud & Fine does the same proven method (systematic desensitization) without making you read a manual first.
               </p>
@@ -466,7 +466,7 @@ function LoudAndFine() {
 
             {/* How it works */}
             <section>
-              <h2 className="font-[DM_Mono] text-xs tracking-[0.18em] text-muted-foreground uppercase mb-2">How it works</h2>
+              <h2 className="font-[General_Sans] font-medium text-xs tracking-[0.18em] text-muted-foreground uppercase mb-2">How it works</h2>
               {[
                 "Pick the sound your dog struggles with — vacuum, storm, fireworks, clippers, crying baby",
                 "Play it at a volume they can handle, reward them, repeat",
@@ -477,7 +477,7 @@ function LoudAndFine() {
 
             {/* Voice sample */}
             <section>
-              <h2 className="font-[DM_Mono] text-xs tracking-[0.18em] text-muted-foreground uppercase mb-6">In the app</h2>
+              <h2 className="font-[General_Sans] font-medium text-xs tracking-[0.18em] text-muted-foreground uppercase mb-6">In the app</h2>
               <Screenshots images={loudAndFineScreenshots} />
             </section>
 
@@ -486,7 +486,7 @@ function LoudAndFine() {
 
           {/* Details */}
           <aside>
-            <h2 className="font-[DM_Mono] text-xs tracking-[0.18em] text-muted-foreground uppercase mb-4">Details</h2>
+            <h2 className="font-[General_Sans] font-medium text-xs tracking-[0.18em] text-muted-foreground uppercase mb-4">Details</h2>
             <div className="bg-card p-6 border border-border">
               <DetailRow label="Price" value="$2.99 one-time" />
               <DetailRow label="Platform" value="iOS" />
@@ -526,7 +526,7 @@ function QuirksAndAll() {
         <BackLink />
 
         <div className="mt-12 pb-16 border-b border-border">
-          <span className={`font-[DM_Mono] text-[10px] tracking-[0.12em] uppercase px-2.5 py-1 ${statusStyle["In beta"]} mb-6 inline-block`}>
+          <span className={`font-[General_Sans] font-medium text-[10px] tracking-[0.12em] uppercase px-2.5 py-1 ${statusStyle["In beta"]} mb-6 inline-block`}>
             In beta
           </span>
           <h1 className="font-[Gambarino] text-5xl sm:text-7xl lg:text-8xl text-foreground leading-[1.02] mt-3">
@@ -546,14 +546,14 @@ function QuirksAndAll() {
         <div className="grid grid-cols-1 lg:grid-cols-[2fr_1fr] gap-16 py-20">
           <div className="space-y-16">
             <section>
-              <h2 className="font-[DM_Mono] text-xs tracking-[0.18em] text-muted-foreground uppercase mb-6">The problem</h2>
+              <h2 className="font-[General_Sans] font-medium text-xs tracking-[0.18em] text-muted-foreground uppercase mb-6">The problem</h2>
               <p className="font-[General_Sans] font-light text-base sm:text-lg text-foreground leading-relaxed">
                 Handing your dog off to a sitter usually means a rushed text, a half-remembered command list, and hoping for the best. Quirks & All turns that into one link: what your dog's actually like, what commands mean what, and a one-tap missing-poster generator you hope you never need.
               </p>
             </section>
 
             <section>
-              <h2 className="font-[DM_Mono] text-xs tracking-[0.18em] text-muted-foreground uppercase mb-2">How it works</h2>
+              <h2 className="font-[General_Sans] font-medium text-xs tracking-[0.18em] text-muted-foreground uppercase mb-2">How it works</h2>
               {[
                 "Build your dog's profile once — quirks, commands, routines",
                 "Generate a share link with a preset (Walk / Stay / Full) for whoever's looking after them",
@@ -563,7 +563,7 @@ function QuirksAndAll() {
             </section>
 
             <section>
-              <h2 className="font-[DM_Mono] text-xs tracking-[0.18em] text-muted-foreground uppercase mb-6">In the app</h2>
+              <h2 className="font-[General_Sans] font-medium text-xs tracking-[0.18em] text-muted-foreground uppercase mb-6">In the app</h2>
               <Screenshots images={quirksAndAllScreenshots} />
             </section>
 
@@ -571,7 +571,7 @@ function QuirksAndAll() {
           </div>
 
           <aside>
-            <h2 className="font-[DM_Mono] text-xs tracking-[0.18em] text-muted-foreground uppercase mb-4">Details</h2>
+            <h2 className="font-[General_Sans] font-medium text-xs tracking-[0.18em] text-muted-foreground uppercase mb-4">Details</h2>
             <div className="bg-card p-6 border border-border">
               <DetailRow label="Platform" value="Website" />
               <DetailRow label="Model" value="Free to start" />
@@ -599,7 +599,7 @@ function StraightforwardReview() {
         <BackLink />
 
         <div className="mt-12 pb-16 border-b border-border">
-          <span className={`font-[DM_Mono] text-[10px] tracking-[0.12em] uppercase px-2.5 py-1 ${statusStyle["Wrapped"]} mb-6 inline-block`}>
+          <span className={`font-[General_Sans] font-medium text-[10px] tracking-[0.12em] uppercase px-2.5 py-1 ${statusStyle["Wrapped"]} mb-6 inline-block`}>
             Wrapped
           </span>
           <h1 className="font-[Gambarino] text-5xl sm:text-7xl lg:text-8xl text-foreground leading-[1.02] mt-3">
@@ -616,14 +616,14 @@ function StraightforwardReview() {
         <div className="grid grid-cols-1 lg:grid-cols-[2fr_1fr] gap-16 py-20">
           <div className="space-y-16">
             <section>
-              <h2 className="font-[DM_Mono] text-xs tracking-[0.18em] text-muted-foreground uppercase mb-6">The problem</h2>
+              <h2 className="font-[General_Sans] font-medium text-xs tracking-[0.18em] text-muted-foreground uppercase mb-6">The problem</h2>
               <p className="font-[General_Sans] font-light text-base sm:text-lg text-foreground leading-relaxed">
                 Most reviews are 300 words of someone re-litigating their week. Nobody reads them, and nobody who writes them enjoys it either. Book, blender, ice cream, whatever — you don't need a novel to know if it's worth it. You need one honest signal from someone who's already been through it.
               </p>
             </section>
 
             <section>
-              <h2 className="font-[DM_Mono] text-xs tracking-[0.18em] text-muted-foreground uppercase mb-2">How it works</h2>
+              <h2 className="font-[General_Sans] font-medium text-xs tracking-[0.18em] text-muted-foreground uppercase mb-2">How it works</h2>
               {[
                 "See a thing. Give it a thumb — up or down. No stars, no 1–10, no ambiguity.",
                 "Add up to two sentences if you want to. Not required.",
@@ -633,7 +633,7 @@ function StraightforwardReview() {
             </section>
 
             <section>
-              <h2 className="font-[DM_Mono] text-xs tracking-[0.18em] text-muted-foreground uppercase mb-6">What a review looks like</h2>
+              <h2 className="font-[General_Sans] font-medium text-xs tracking-[0.18em] text-muted-foreground uppercase mb-6">What a review looks like</h2>
               <div className="space-y-4">
                 <QuoteBlock>Bloody good read. Finished in two weeks. Felt all the feels and then some.</QuoteBlock>
                 <QuoteBlock>Would endure the aftermaths of lactose intolerance again.</QuoteBlock>
@@ -645,7 +645,7 @@ function StraightforwardReview() {
           </div>
 
           <aside>
-            <h2 className="font-[DM_Mono] text-xs tracking-[0.18em] text-muted-foreground uppercase mb-4">Details</h2>
+            <h2 className="font-[General_Sans] font-medium text-xs tracking-[0.18em] text-muted-foreground uppercase mb-4">Details</h2>
             <div className="bg-card p-6 border border-border">
               <DetailRow label="Format" value="Thumbs up/down + 2 sentences" />
               <DetailRow label="Platform" value="Website" />
