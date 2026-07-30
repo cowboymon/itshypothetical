@@ -11,7 +11,19 @@ import rough from "roughjs";
 const INK = "#3A3226";
 const PAPER = "#F1E9D8";
 
-const frameColors = ["#5FA8A0", "#E8846B", "#E0B84A", "#A794C4", "#8B9A5B", "#D98F6F"];
+// Muted, dusty palette — never saturated or high-contrast
+const DUSTY = {
+  sage: "#A6AD86",
+  terracotta: "#C99B76",
+  mustard: "#D6BD74",
+  lavender: "#B0A3BC",
+};
+const frameColors = [DUSTY.sage, DUSTY.terracotta, DUSTY.mustard, DUSTY.lavender, DUSTY.sage, DUSTY.terracotta];
+
+// Big moments (headline, card titles) get the hand-lettered display font.
+// Everyday labels and body copy get a simple rounded sans — not a second script font.
+const DISPLAY_FONT = "Caveat, cursive";
+const LABEL_FONT = "Quicksand, sans-serif";
 
 interface TrashedIdea {
   title: string;
@@ -75,9 +87,9 @@ function useRoughDraw(draw: (rc: ReturnType<typeof rough.svg>) => void) {
 function PenIcon() {
   const ref = useRoughDraw((rc) => {
     const svg = ref.current!;
-    svg.appendChild(rc.rectangle(2, 8, 58, 9, { fill: INK, stroke: INK, fillStyle: "solid", roughness: 1.8, seed: 11 }));
-    svg.appendChild(rc.rectangle(2, 8, 12, 9, { fill: "#C9BFAE", stroke: INK, fillStyle: "solid", roughness: 1.8, seed: 12 }));
-    svg.appendChild(rc.polygon([[60, 6], [86, 12], [60, 18]], { fill: "#E0956B", stroke: INK, fillStyle: "hachure", roughness: 1.8, seed: 13 }));
+    svg.appendChild(rc.rectangle(2, 8, 58, 9, { fill: INK, stroke: INK, fillStyle: "solid", roughness: 2.2, seed: 11 }));
+    svg.appendChild(rc.rectangle(2, 8, 12, 9, { fill: "#C9BFAE", stroke: INK, fillStyle: "solid", roughness: 2.2, seed: 12 }));
+    svg.appendChild(rc.polygon([[60, 6], [86, 12], [60, 18]], { fill: DUSTY.terracotta, stroke: INK, fillStyle: "hachure", roughness: 2.2, seed: 13 }));
   });
   return <svg ref={ref} width="92" height="24" viewBox="0 0 92 24" />;
 }
@@ -85,15 +97,15 @@ function PenIcon() {
 function MintTinIcon() {
   const ref = useRoughDraw((rc) => {
     const svg = ref.current!;
-    svg.appendChild(rc.rectangle(2, 2, 82, 54, { fill: "#EDE4CC", stroke: INK, fillStyle: "solid", roughness: 2, seed: 21 }));
-    svg.appendChild(rc.rectangle(2, 2, 82, 19, { fill: "#5FA8A0", stroke: INK, fillStyle: "solid", roughness: 2, seed: 22 }));
-    svg.appendChild(rc.ellipse(20, 38, 8, 8, { fill: "#EDE4CC", stroke: "#5FA8A0", fillStyle: "solid", roughness: 1.6, seed: 23 }));
-    svg.appendChild(rc.ellipse(32, 38, 8, 8, { fill: "#EDE4CC", stroke: "#5FA8A0", fillStyle: "solid", roughness: 1.6, seed: 24 }));
-    svg.appendChild(rc.ellipse(44, 38, 8, 8, { fill: "#EDE4CC", stroke: "#5FA8A0", fillStyle: "solid", roughness: 1.6, seed: 25 }));
+    svg.appendChild(rc.rectangle(2, 2, 82, 54, { fill: "#EDE4CC", stroke: INK, fillStyle: "solid", roughness: 2.4, seed: 21 }));
+    svg.appendChild(rc.rectangle(2, 2, 82, 19, { fill: DUSTY.sage, stroke: INK, fillStyle: "solid", roughness: 2.4, seed: 22 }));
+    svg.appendChild(rc.ellipse(20, 38, 8, 8, { fill: "#EDE4CC", stroke: DUSTY.sage, fillStyle: "solid", roughness: 1.8, seed: 23 }));
+    svg.appendChild(rc.ellipse(32, 38, 8, 8, { fill: "#EDE4CC", stroke: DUSTY.sage, fillStyle: "solid", roughness: 1.8, seed: 24 }));
+    svg.appendChild(rc.ellipse(44, 38, 8, 8, { fill: "#EDE4CC", stroke: DUSTY.sage, fillStyle: "solid", roughness: 1.8, seed: 25 }));
   });
   return (
     <svg ref={ref} width="86" height="58" viewBox="0 0 86 58">
-      <text x="43" y="15" fontSize="8" fill="#F1E9D8" textAnchor="middle" fontFamily="Kalam, cursive">
+      <text x="43" y="15" fontSize="8" fill="#F1E9D8" textAnchor="middle" fontFamily={LABEL_FONT} fontWeight={700}>
         mints
       </text>
     </svg>
@@ -103,13 +115,13 @@ function MintTinIcon() {
 function SnackIcon() {
   const ref = useRoughDraw((rc) => {
     const svg = ref.current!;
-    svg.appendChild(rc.polygon([[15, 8], [2, 2], [2, 46], [15, 40]], { fill: "#8B9A5B", stroke: INK, fillStyle: "solid", roughness: 1.8, seed: 31 }));
-    svg.appendChild(rc.rectangle(15, 4, 64, 40, { fill: "#E0B84A", stroke: INK, fillStyle: "solid", roughness: 1.8, seed: 32 }));
-    svg.appendChild(rc.polygon([[79, 8], [92, 2], [92, 46], [79, 40]], { fill: "#8B9A5B", stroke: INK, fillStyle: "solid", roughness: 1.8, seed: 33 }));
+    svg.appendChild(rc.polygon([[15, 8], [2, 2], [2, 46], [15, 40]], { fill: DUSTY.sage, stroke: INK, fillStyle: "solid", roughness: 2.2, seed: 31 }));
+    svg.appendChild(rc.rectangle(15, 4, 64, 40, { fill: DUSTY.mustard, stroke: INK, fillStyle: "solid", roughness: 2.2, seed: 32 }));
+    svg.appendChild(rc.polygon([[79, 8], [92, 2], [92, 46], [79, 40]], { fill: DUSTY.sage, stroke: INK, fillStyle: "solid", roughness: 2.2, seed: 33 }));
   });
   return (
     <svg ref={ref} width="94" height="48" viewBox="0 0 94 48">
-      <text x="47" y="28" fontSize="9" fill={INK} textAnchor="middle" fontFamily="Kalam, cursive">
+      <text x="47" y="28" fontSize="9" fill={INK} textAnchor="middle" fontFamily={LABEL_FONT} fontWeight={700}>
         snack
       </text>
     </svg>
@@ -164,28 +176,35 @@ function DraggableItem({
   );
 }
 
-// ─── Idea card — framed like a little postcard, not a corporate note ──────────
+// ─── Idea card — no hard box chrome, just paper + a hand-drawn accent ─────────
+// No border, no frame, barely any shadow — the color and the wobbly underline
+// do the work a card border normally would.
 
 function IdeaCard({ idea, frameColor }: { idea: TrashedIdea; frameColor: string }) {
   return (
     <div
-      className="w-56 sm:w-64 p-2.5 rounded-md"
-      style={{ background: frameColor, boxShadow: "0 10px 22px rgba(58,50,38,0.22)" }}
+      className="w-56 sm:w-64 p-5"
+      style={{
+        background: PAPER,
+        borderRadius: "16px 20px 14px 22px",
+        boxShadow: "0 3px 9px rgba(58,50,38,0.10)",
+      }}
     >
-      <div className="rounded-sm p-4" style={{ background: PAPER }}>
-        <span
-          className="text-[11px] uppercase tracking-wide"
-          style={{ fontFamily: "Kalam, cursive", color: frameColor, opacity: 0.9 }}
-        >
-          trashed
-        </span>
-        <h3 className="text-2xl mt-1" style={{ fontFamily: "Caveat, cursive", color: INK }}>
-          {idea.title}
-        </h3>
-        <p className="text-sm mt-2 leading-snug" style={{ fontFamily: "Kalam, cursive", color: "#6B6252" }}>
-          {idea.note}
-        </p>
-      </div>
+      <span
+        className="text-[11px] uppercase tracking-wide"
+        style={{ fontFamily: LABEL_FONT, fontWeight: 700, color: frameColor }}
+      >
+        trashed
+      </span>
+      <h3 className="text-2xl mt-1" style={{ fontFamily: DISPLAY_FONT, fontWeight: 700, color: INK }}>
+        {idea.title}
+      </h3>
+      <svg width="90" height="8" viewBox="0 0 90 8" className="mt-0.5 mb-1">
+        <path d="M2 5 C 20 2, 40 7, 60 4 S 85 2, 88 5" fill="none" stroke={frameColor} strokeWidth="2.5" strokeLinecap="round" />
+      </svg>
+      <p className="text-sm mt-2 leading-snug" style={{ fontFamily: LABEL_FONT, color: "#6B6252" }}>
+        {idea.note}
+      </p>
     </div>
   );
 }
@@ -199,7 +218,7 @@ export default function JunkDrawer() {
 
   return (
     <main style={{ background: PAPER, backgroundImage: NOISE_BG }}>
-      <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&family=Kalam:wght@400;700&display=swap" />
+      <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&family=Quicksand:wght@500;600;700&display=swap" />
 
       {/* Header — collapses (scales + fades) as you scroll into the drawer, layout height stays fixed */}
       <div className="overflow-hidden">
@@ -210,20 +229,20 @@ export default function JunkDrawer() {
           <Link
             to="/"
             className="inline-flex items-center gap-1.5 text-sm hover:opacity-70 transition-opacity duration-200 group"
-            style={{ fontFamily: "Kalam, cursive", color: INK }}
+            style={{ fontFamily: LABEL_FONT, fontWeight: 600, color: INK }}
           >
             <span className="transition-transform duration-200 group-hover:-translate-x-0.5 inline-block">←</span>
             Back to the sensible website
           </Link>
 
           <div className="mt-12">
-            <p className="text-sm tracking-wide mb-4" style={{ fontFamily: "Kalam, cursive", color: "#8B9A5B" }}>
+            <p className="text-sm tracking-wide mb-4" style={{ fontFamily: LABEL_FONT, fontWeight: 600, color: DUSTY.sage }}>
               everything that didn't make it
             </p>
-            <h1 className="text-6xl sm:text-8xl leading-[1.05]" style={{ fontFamily: "Caveat, cursive", fontWeight: 700, color: INK }}>
-              The <MarkerCircle color="#6FA8D8">junk drawer</MarkerCircle>.
+            <h1 className="text-6xl sm:text-8xl leading-[1.05]" style={{ fontFamily: DISPLAY_FONT, fontWeight: 700, color: INK }}>
+              The <MarkerCircle color="#8FAAC7">junk drawer</MarkerCircle>.
             </h1>
-            <p className="text-lg mt-6 max-w-xl leading-relaxed" style={{ fontFamily: "Kalam, cursive", color: "#6B6252" }}>
+            <p className="text-lg mt-6 max-w-xl leading-relaxed" style={{ fontFamily: LABEL_FONT, color: "#6B6252" }}>
               Ideas that got as far as a name and then didn't. Drag stuff around — it's a drawer, that's what it's for.
             </p>
           </div>
@@ -238,7 +257,7 @@ export default function JunkDrawer() {
           background: "#E7DCC1",
           backgroundImage: NOISE_BG,
           boxShadow: "inset 0 0 60px rgba(58,50,38,0.14)",
-          borderTop: "2px solid #D8C9A3",
+          borderTop: `2px solid ${DUSTY.mustard}`,
         }}
         initial={{ scale: 0.98, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
@@ -247,16 +266,15 @@ export default function JunkDrawer() {
           {/* Drawer front sliding open on load */}
           <motion.div
             className="absolute inset-0 z-50 flex items-end justify-center pb-8"
-            style={{ background: "#7C8B54" }}
+            style={{ background: DUSTY.sage }}
             initial={{ y: 0 }}
             animate={{ y: "-100%" }}
             transition={{ delay: 0.15, duration: 0.6, ease: [0.65, 0, 0.35, 1] }}
           >
-            <div
-              className="px-4 py-2 rounded-sm rotate-[-2deg]"
-              style={{ background: PAPER, fontFamily: "Caveat, cursive", color: INK, fontSize: 22, fontWeight: 700 }}
-            >
-              opening...
+            <div className="rotate-[-2deg]">
+              <MarkerCircle color={PAPER}>
+                <span style={{ fontFamily: DISPLAY_FONT, color: PAPER, fontSize: 22, fontWeight: 700 }}>opening...</span>
+              </MarkerCircle>
             </div>
           </motion.div>
 
@@ -283,10 +301,10 @@ export default function JunkDrawer() {
             <SnackIcon />
           </DraggableItem>
           <DraggableItem top="36%" left="4%" rotate={12} delay={1.28} constraintsRef={drawerRef}>
-            <HighlighterIcon color="#E0B84A" seedBase={41} />
+            <HighlighterIcon color={DUSTY.mustard} seedBase={41} />
           </DraggableItem>
           <DraggableItem top="42%" left="88%" rotate={-14} delay={1.34} constraintsRef={drawerRef}>
-            <HighlighterIcon color="#D9738F" seedBase={51} />
+            <HighlighterIcon color={DUSTY.lavender} seedBase={51} />
           </DraggableItem>
       </motion.div>
     </main>
