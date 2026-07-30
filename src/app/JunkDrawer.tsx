@@ -27,21 +27,49 @@ const LABEL_FONT = "Quicksand, sans-serif";
 
 interface TrashedIdea {
   title: string;
-  note: string;
-  year: string;
-  status: string;
+  tagline: string;
+  blurb: string;
+  reason?: string;
   top: string;
   left: string;
   rotate: number;
 }
 
 const trashedIdeas: TrashedIdea[] = [
-  { title: "Sock Drawer", note: "An inventory app for socks. Would've been the most niche app ever made.", year: "2022", status: "trashed", top: "6%", left: "4%", rotate: -6 },
-  { title: "Ghosted", note: "Auto-drafts the text you'll never send. Too real, too sad. Shelved.", year: "2023", status: "shelved", top: "2%", left: "34%", rotate: 4 },
-  { title: "Correct Weather", note: "Hyperlocal weather down to your specific balcony. Turns out — just look outside.", year: "2023", status: "trashed", top: "30%", left: "58%", rotate: -3 },
-  { title: "Group Chat Butler", note: "Summarizes the 400-message group chat so you don't have to. Someone else built it, better and first.", year: "2024", status: "beaten to it", top: "50%", left: "6%", rotate: 5 },
-  { title: "Apology Generator", note: "Pre-written apologies, ranked by sincerity. Legal said no.", year: "2024", status: "vetoed", top: "58%", left: "42%", rotate: -5 },
-  { title: "Speedrun My Life", note: "Gamifies chores as speedrun categories. Nobody wants a leaderboard for laundry.", year: "2022", status: "trashed", top: "14%", left: "76%", rotate: 3 },
+  {
+    title: "Critically Endangered",
+    tagline: "A zoo where the rarest animals cost the most.",
+    blurb: "Every species is capped at exactly how many are left in the real world — if there are 30 vaquita left in the wild, only 30 people on the planet will ever be able to have one in their zoo, ever, full stop. No restock. Buying one sends real money to actual conservation, so the rarer and more expensive the animal, the more it's actually doing.",
+    reason: "I don't know how to world build like that.",
+    top: "6%", left: "4%", rotate: -6,
+  },
+  {
+    title: "Sorted",
+    tagline: "Scan it. We'll tell you where it actually goes.",
+    blurb: "Point your phone at a barcode and get told exactly what's recyclable in your home bin, and where the rest needs to go instead. Built on the idea that shame is a terrible motivator — nobody's cheering you on in your kitchen at 11pm with no one watching.",
+    reason: "\"Tells you where your rubbish goes\" is a feature, not a product.",
+    top: "2%", left: "34%", rotate: 4,
+  },
+  {
+    title: "Best in Show",
+    tagline: "One category. Dog poop. Public vote.",
+    blurb: "You photograph the day's offering. So does everyone else. Funniest one wins. There is no further explanation, because there isn't one.",
+    reason: "I couldn't find a version of this pitch that didn't end with someone asking me why.",
+    top: "30%", left: "58%", rotate: -3,
+  },
+  {
+    title: "Still Reachable",
+    tagline: "A number that's always theirs.",
+    blurb: "Upload a voice message from someone you've lost touch with — or lost — and get a number where it's always waiting: call it to hear them, text it and it just sits there, without some stranger's \"sorry, wrong number\" eventually landing in its place.",
+    top: "50%", left: "8%", rotate: 6,
+  },
+  {
+    title: "Sent Anyway",
+    tagline: "Say it. It just never lands.",
+    blurb: "Text your ex — or anyone you've lost — into an inbox that never reaches them. Same rush as hitting send, none of the reply, none of the reopening a door you closed for a reason. If it was bad enough, you can order a printed book of the whole thread when you're done, delivered with a single match and a little kindling, so the last thing you do with it is burn it.",
+    reason: "the emotional insight is real — grief wants somewhere to send words, and closure sometimes wants a fire, not a notes file on your phone — but we don't want to be liable for creating arsonists.",
+    top: "46%", left: "40%", rotate: -5,
+  },
 ];
 
 // ─── Paper grain, mixed into the background so nothing feels flat ─────────────
@@ -273,12 +301,15 @@ function IdeaCard({ idea, frameColor }: { idea: TrashedIdea; frameColor: string 
       >
         trashed
       </span>
-      <h3 className="relative text-2xl mt-1" style={{ fontFamily: DISPLAY_FONT, fontWeight: 700, color: INK }}>
+      <h3 className="relative text-2xl mt-1 leading-tight" style={{ fontFamily: DISPLAY_FONT, fontWeight: 700, color: INK }}>
         {idea.title}
       </h3>
       <svg width="70" height="8" viewBox="0 0 70 8" className="relative mt-0.5">
         <path d="M2 5 C 16 2, 30 7, 44 4 S 66 2, 68 5" fill="none" stroke={frameColor} strokeWidth="2.5" strokeLinecap="round" />
       </svg>
+      <p className="relative text-xs mt-2 leading-snug" style={{ fontFamily: LABEL_FONT, color: "#6B6252" }}>
+        {idea.tagline}
+      </p>
     </div>
   );
 }
@@ -313,17 +344,25 @@ function DetailOverlay({ idea, frameColor, onClose }: { idea: TrashedIdea; frame
           ×
         </button>
         <span className="text-[11px] uppercase tracking-wide" style={{ fontFamily: LABEL_FONT, fontWeight: 700, color: frameColor }}>
-          {idea.year} · {idea.status}
+          trashed
         </span>
-        <h3 className="text-4xl mt-1" style={{ fontFamily: DISPLAY_FONT, fontWeight: 700, color: INK }}>
+        <h3 className="text-4xl mt-1 leading-tight" style={{ fontFamily: DISPLAY_FONT, fontWeight: 700, color: INK }}>
           {idea.title}
         </h3>
-        <svg width="110" height="8" viewBox="0 0 110 8" className="mt-1 mb-3">
+        <svg width="110" height="8" viewBox="0 0 110 8" className="mt-1 mb-1">
           <path d="M2 5 C 26 2, 48 7, 70 4 S 104 2, 108 5" fill="none" stroke={frameColor} strokeWidth="2.5" strokeLinecap="round" />
         </svg>
-        <p className="text-base leading-relaxed" style={{ fontFamily: LABEL_FONT, color: "#6B6252" }}>
-          {idea.note}
+        <p className="text-base italic mb-3" style={{ fontFamily: LABEL_FONT, fontWeight: 600, color: INK }}>
+          {idea.tagline}
         </p>
+        <p className="text-base leading-relaxed" style={{ fontFamily: LABEL_FONT, color: "#6B6252" }}>
+          {idea.blurb}
+        </p>
+        {idea.reason && (
+          <p className="text-sm italic leading-relaxed mt-4 pt-4" style={{ fontFamily: LABEL_FONT, color: frameColor, borderTop: `1px solid ${frameColor}33` }}>
+            Trashed because {idea.reason}
+          </p>
+        )}
       </motion.div>
     </motion.div>
   );
