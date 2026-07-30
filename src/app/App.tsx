@@ -207,7 +207,7 @@ function Homepage() {
     <main>
       {/* Hero */}
       <section className="min-h-[92vh] flex flex-col justify-end pb-20 pt-32 max-w-5xl mx-auto px-6">
-        <p className="font-[DM_Mono] text-xs tracking-[0.18em] text-muted-foreground mb-8 uppercase">
+        <p className="font-[General_Sans] text-xs tracking-[0.18em] text-muted-foreground mb-8 uppercase">
           A studio of small, useful ideas
         </p>
         <h1 className="font-[Gambarino] text-5xl sm:text-7xl lg:text-8xl text-foreground leading-[1.02] max-w-4xl">
