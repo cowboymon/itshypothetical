@@ -549,39 +549,40 @@ export default function JunkDrawer() {
 
             <div className="mt-8 w-full" style={{ border: `1px solid ${INK}` }}>
               <div
-                className="flex items-center justify-between px-5 py-4"
-                style={{ background: "#6E8C58" }}
+                className="grid items-center px-5 py-4"
+                style={{ background: "#6E8C58", gridTemplateColumns: "1fr auto 1fr" }}
               >
-                <span style={{ fontFamily: LABEL_FONT, fontSize: 11, letterSpacing: "0.16em", color: "#fbf6e6" }}>NOW</span>
+                <span style={{ fontFamily: LABEL_FONT, fontSize: 11, letterSpacing: "0.16em", color: "#fbf6e6", textAlign: "left" }}>NOW</span>
                 <span
                   className="uppercase"
-                  style={{ fontFamily: DISPLAY_FONT, fontSize: 15, letterSpacing: "0.14em", color: "#fbf6e6" }}
+                  style={{ fontFamily: DISPLAY_FONT, fontSize: 15, letterSpacing: "0.14em", color: "#fbf6e6", textAlign: "center" }}
                 >
                   Surface
                 </span>
-                <span style={{ fontFamily: LABEL_FONT, fontSize: 11, letterSpacing: "0.12em", color: "#fbf6e6" }}>
+                <span style={{ fontFamily: LABEL_FONT, fontSize: 11, letterSpacing: "0.12em", color: "#fbf6e6", textAlign: "right" }}>
                   {projects.length} projects
                 </span>
               </div>
               {STRATA.map((s, idx) => (
                 <div
                   key={s.label + idx}
-                  className="flex items-center justify-between px-5 py-4"
+                  className="grid items-center px-5 py-4"
                   style={{
+                    gridTemplateColumns: "1fr auto 1fr",
                     background: s.dirt,
                     borderBottom: idx < STRATA.length - 1 ? "1px solid rgba(43,35,24,.35)" : "none",
                   }}
                 >
-                  <span style={{ fontFamily: LABEL_FONT, fontSize: 11, letterSpacing: "0.16em", color: idx > 1 ? PAPER : INK }}>
+                  <span style={{ fontFamily: LABEL_FONT, fontSize: 11, letterSpacing: "0.16em", color: idx > 1 ? PAPER : INK, textAlign: "left" }}>
                     {s.span}
                   </span>
                   <span
                     className="uppercase"
-                    style={{ fontFamily: DISPLAY_FONT, fontSize: 15, letterSpacing: "0.14em", color: idx > 1 ? PAPER : INK }}
+                    style={{ fontFamily: DISPLAY_FONT, fontSize: 15, letterSpacing: "0.14em", color: idx > 1 ? PAPER : INK, textAlign: "center" }}
                   >
                     {s.label}
                   </span>
-                  <span style={{ fontFamily: LABEL_FONT, fontSize: 11, letterSpacing: "0.12em", color: idx > 1 ? PAPER : INK }}>
+                  <span style={{ fontFamily: LABEL_FONT, fontSize: 11, letterSpacing: "0.12em", color: idx > 1 ? PAPER : INK, textAlign: "right" }}>
                     {s.ideas.length} specimens
                   </span>
                 </div>
