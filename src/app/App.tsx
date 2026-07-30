@@ -11,7 +11,7 @@ interface Project {
   name: string;
   tagline: string;
   description: string;
-  status: "Live" | "In beta" | "In validation" | "In concept" | "Wrapped";
+  status: "Live" | "In beta" | "In validation" | "In concept" | "In dev" | "Wrapped";
   hasPage?: boolean;
 }
 
@@ -23,7 +23,8 @@ export const projects: Project[] = [
     name: "Loud & Fine",
     tagline: "Loud world. Fine dog.",
     description: "Sound desensitization for anxious dogs — no trainer required, several treats required.",
-    status: "In beta",
+    status: "In dev",
+    hasPage: false,
   },
   {
     slug: "quirks-and-all",
@@ -54,6 +55,7 @@ const statusStyle: Record<string, string> = {
   "In beta": "bg-[#6E7F6B] text-[#F8F5F0]",
   "In validation": "bg-[#C4845A] text-[#F8F5F0]",
   "In concept": "bg-[#E4E0DA] text-[#7A7368]",
+  "In dev": "bg-[#9C8B6E] text-[#F8F5F0]",
   "Wrapped": "bg-[#7C8798] text-[#F8F5F0]",
 };
 
@@ -669,7 +671,6 @@ export default function App() {
       <Nav />
       <Routes>
         <Route path="/" element={<Homepage />} />
-        <Route path="/loud-and-fine" element={<LoudAndFine />} />
         <Route path="/quirks-and-all" element={<QuirksAndAll />} />
         <Route path="/straightforward-review" element={<StraightforwardReview />} />
         <Route path="/the-idea-bed" element={<JunkDrawer />} />
