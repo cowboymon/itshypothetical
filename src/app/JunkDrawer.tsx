@@ -92,6 +92,7 @@ const SHAPES = [
 ];
 const BONE = ["#e9dfc7", "#efe6d2", "#e3d8bd", "#eae0c9"];
 const CELL = 18;
+const MOBILE_BREAKPOINT = 640;
 
 function prng(seed: number) {
   let a = seed >>> 0;
@@ -217,8 +218,13 @@ export default function JunkDrawer() {
       [slots[k], slots[j]] = [slots[j], slots[k]];
     }
     // Shapes were tuned for ~9 specimens in one bed — scale up when a stratum has fewer,
-    // so a 4-5 idea layer doesn't look lost in all that empty dirt.
-    const scale = Math.min(1.5, Math.sqrt(9 / ideas.length));
+    // so a 4-5 idea layer doesn't look lost in all that empty dirt. Shrunk further on
+    // narrow screens (smaller shapes, tighter jitter, wider edge margin) so a cramped
+    // 2-column mobile layout doesn't crowd, overlap, or clip a rotated fossil off-screen.
+    const mobile = w < MOBILE_BREAKPOINT;
+    const scale = Math.min(1.5, Math.sqrt(9 / ideas.length)) * (mobile ? 0.52 : 1);
+    const jitter = mobile ? 0.38 : 0.55;
+    const margin = mobile ? 22 : 16;
     const next: LaidOutSpecimen[] = ideas.map((sp, i) => {
       const base = SHAPES[i % SHAPES.length];
       const sw = Math.round(base.w * scale);
@@ -226,8 +232,8 @@ export default function JunkDrawer() {
       const slot = slots[i];
       const col = slot % cols;
       const row = Math.floor(slot / cols);
-      const x = Math.round(Math.max(16, Math.min(w - sw - 16, col * cw + (cw - sw) / 2 + (rnd() - 0.5) * cw * 0.55)));
-      const y = Math.round(Math.max(14, Math.min(h - sh - 14, row * ch + (ch - sh) / 2 + (rnd() - 0.5) * ch * 0.55)));
+      const x = Math.round(Math.max(margin, Math.min(w - sw - margin, col * cw + (cw - sw) / 2 + (rnd() - 0.5) * cw * jitter)));
+      const y = Math.round(Math.max(margin, Math.min(h - sh - margin, row * ch + (ch - sh) / 2 + (rnd() - 0.5) * ch * jitter)));
       return { ...sp, i, x, y, w: sw, h: sh, r: base.r, tone: BONE[i % BONE.length], rot: (rnd() - 0.5) * 26, icon: i % FOSSIL_ICONS.length };
     });
     cleared.current = new Set();
@@ -321,7 +327,7 @@ export default function JunkDrawer() {
     if (!cv) return;
     const ctx = cv.getContext("2d");
     if (!ctx) return;
-    const r = 40;
+    const r = dims.w < MOBILE_BREAKPOINT ? 54 : 40;
     ctx.globalCompositeOperation = "destination-out";
     const g = ctx.createRadialGradient(x, y, 0, x, y, r);
     g.addColorStop(0, "rgba(0,0,0,1)");
@@ -423,6 +429,12 @@ export default function JunkDrawer() {
 
   function fossilDown(sp: LaidOutSpecimen, e: React.PointerEvent) {
     e.stopPropagation();
+    // Dragging is a fiddly, precision interaction — on small screens a finger
+    // meant as a tap easily reads as a drag, so skip it there and just open.
+    if (dims.w < MOBILE_BREAKPOINT) {
+      setOpenId(sp.i);
+      return;
+    }
     const off = dragPos[sp.i] ?? { x: 0, y: 0 };
     dragging.current = { i: sp.i, startX: e.clientX, startY: e.clientY, origX: off.x, origY: off.y, moved: false };
   }
@@ -735,13 +747,16 @@ export default function JunkDrawer() {
                         left: "50%",
                         bottom: 0,
                         transform: "translateX(-50%)",
-                        whiteSpace: "nowrap",
+                        whiteSpace: dims.w < MOBILE_BREAKPOINT ? "normal" : "nowrap",
+                        maxWidth: dims.w < MOBILE_BREAKPOINT ? Math.max(sp.w, 84) : undefined,
+                        textAlign: "center",
                         background: INK,
                         color: PAPER,
                         padding: "3px 10px 4px",
                         fontFamily: LABEL_FONT,
-                        fontSize: 11,
-                        letterSpacing: "0.14em",
+                        fontSize: dims.w < MOBILE_BREAKPOINT ? 9.5 : 11,
+                        lineHeight: 1.3,
+                        letterSpacing: dims.w < MOBILE_BREAKPOINT ? "0.08em" : "0.14em",
                         textTransform: "uppercase",
                         pointerEvents: "none",
                       }}
