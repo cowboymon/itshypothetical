@@ -826,44 +826,44 @@ export default function JunkDrawer() {
 
           {/* bottom bar */}
           <div
-            className="absolute bottom-0 left-0 right-0 flex items-center justify-between px-8"
+            className="absolute bottom-0 left-0 right-0 flex items-center justify-end sm:justify-between gap-3 px-4 sm:px-8"
             style={{ height: 60, background: PAPER, borderTop: `1px solid ${BORDER}`, zIndex: 60 }}
           >
-            <span style={{ fontFamily: LABEL_FONT, fontSize: 13, letterSpacing: "0.08em", color: MUTED }}>
+            <span className="hidden sm:inline" style={{ fontFamily: LABEL_FONT, fontSize: 13, letterSpacing: "0.08em", color: MUTED }}>
               {exposed.length ? "click an exposed specimen to read it" : "brush the dirt · specimens are buried at random"}
             </span>
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-2 sm:gap-4">
               <button
                 onClick={() => goEra(-1)}
                 disabled={era === 0}
-                className="cursor-pointer disabled:cursor-default"
+                className="cursor-pointer disabled:cursor-default whitespace-nowrap"
                 style={{
                   border: `1px solid ${era > 0 ? INK : BORDER}`,
                   background: "transparent",
                   color: era > 0 ? INK : BORDER,
-                  padding: "9px 18px",
+                  padding: "7px 10px",
                   fontFamily: LABEL_FONT,
-                  fontSize: 12,
-                  letterSpacing: "0.16em",
+                  fontSize: "clamp(10px, 3vw, 12px)",
+                  letterSpacing: "0.1em",
                 }}
               >
-                ↑ SHALLOWER
+                ↑ <span className="hidden sm:inline">SHALLOWER</span>
               </button>
               <button
                 onClick={() => goEra(1)}
                 disabled={era === STRATA.length - 1}
-                className="cursor-pointer disabled:cursor-default"
+                className="cursor-pointer disabled:cursor-default whitespace-nowrap"
                 style={{
                   border: `1px solid ${era < STRATA.length - 1 ? INK : BORDER}`,
                   background: era < STRATA.length - 1 ? INK : "transparent",
                   color: era < STRATA.length - 1 ? PAPER : BORDER,
-                  padding: "9px 18px",
+                  padding: "7px 10px",
                   fontFamily: LABEL_FONT,
-                  fontSize: 12,
-                  letterSpacing: "0.16em",
+                  fontSize: "clamp(10px, 3vw, 12px)",
+                  letterSpacing: "0.1em",
                 }}
               >
-                DIG DEEPER ↓
+                <span className="hidden sm:inline">DIG DEEPER</span> ↓
               </button>
             </div>
           </div>
