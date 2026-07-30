@@ -15,6 +15,21 @@ const RUST = "#a4522c";
 const DISPLAY_FONT = "'Sentient', Georgia, serif";
 const LABEL_FONT = "'Comico', sans-serif";
 
+// Jagged grass-blade silhouette for the "surface" band in the strata preview.
+const GRASS_EDGE_PATH = (() => {
+  const w = 400;
+  const teeth = 22;
+  const step = w / teeth;
+  let d = "M0,0 ";
+  for (let i = 0; i <= teeth; i++) {
+    const x = i * step;
+    const y = i % 2 === 0 ? 18 : 6;
+    d += `L${x.toFixed(1)},${y} `;
+  }
+  d += `L${w},0 Z`;
+  return d;
+})();
+
 interface Specimen {
   no: string;
   name: string;
@@ -105,7 +120,7 @@ const IDEAS: Specimen[] = [
     no: "FD-08",
     name: "Paddle Pop Enterprise",
     year: 2002,
-    tagline: "a multi-level conspiracy to corner the frozen stick market, aged 8",
+    tagline: "a multi-level conspiracy to corner the frozen stick market, aged 12",
     blurb: "Tried to hack the Paddle Pop prize system by cahoots-ing with a small ring of co-conspirators to artificially inflate demand — get enough kids buying, then swoop in and collect everyone's sticks once the hype had done its job.",
     reason: "Basically ran a demand-side cartel out of a primary school tuckshop.",
     cause: "NO REGRETS, MILD CONCERN",
@@ -548,14 +563,14 @@ export default function JunkDrawer() {
   }, [started, openId, era]);
 
   return (
-    <main style={{ background: PAPER }}>
+    <main style={{ background: PAPER, paddingTop: 57 }}>
       <style>{`
         @font-face { font-family: 'Sentient'; src: url('/fonts/sentient/Sentient-Variable.woff2') format('woff2'); font-weight: 200 700; font-style: normal; font-display: swap; }
         @font-face { font-family: 'Sentient'; src: url('/fonts/sentient/Sentient-VariableItalic.woff2') format('woff2'); font-weight: 200 700; font-style: italic; font-display: swap; }
       `}</style>
 
       {!started ? (
-        <div className="flex items-center justify-center px-6 py-24" style={{ minHeight: "calc(100vh - 57px)" }}>
+        <div className="flex items-center justify-center px-6 py-24" style={{ minHeight: "calc(100dvh - 57px)" }}>
           <div className="w-full max-w-2xl flex flex-col items-center text-center">
             <Link
               to="/"
@@ -576,8 +591,20 @@ export default function JunkDrawer() {
             </p>
 
             <div className="mt-8 w-full" style={{ border: `1px solid ${INK}` }}>
-              <div className="flex items-center justify-between px-5 py-3" style={{ borderBottom: `1px solid ${BORDER}` }}>
-                <span style={{ fontFamily: DISPLAY_FONT, fontSize: 15, color: INK }}>2026 · surface</span>
+              <div className="relative">
+                <div
+                  className="flex items-center justify-between px-5 py-3"
+                  style={{ background: "linear-gradient(180deg, #82ab57 0%, #557f38 100%)" }}
+                >
+                  <span style={{ fontFamily: DISPLAY_FONT, fontSize: 15, color: "#fbf6e6" }}>2026 · surface</span>
+                </div>
+                <svg
+                  viewBox="0 0 400 20"
+                  preserveAspectRatio="none"
+                  style={{ display: "block", width: "100%", height: 12 }}
+                >
+                  <path d={GRASS_EDGE_PATH} fill="#557f38" />
+                </svg>
               </div>
               {STRATA.map((s, idx) => (
                 <div
@@ -622,37 +649,43 @@ export default function JunkDrawer() {
           </div>
         </div>
       ) : (
-        <div className="relative w-full" style={{ height: "calc(100vh - 57px)", overflow: "hidden" }}>
+        <div className="relative w-full" style={{ height: "calc(100dvh - 57px)", overflow: "hidden" }}>
           {/* top bar */}
           <div
-            className="absolute top-0 left-0 right-0 flex items-center justify-between px-8"
+            className="absolute top-0 left-0 right-0 flex items-center justify-between gap-3 px-4 sm:px-8"
             style={{ height: 70, background: PAPER, borderBottom: `1px solid ${BORDER}`, zIndex: 60 }}
           >
-            <div className="flex flex-col gap-0.5">
-              <span style={{ fontFamily: DISPLAY_FONT, fontSize: 19, letterSpacing: "0.1em", textTransform: "uppercase", color: INK }}>
+            <div className="flex flex-col gap-0.5 min-w-0">
+              <span
+                className="truncate"
+                style={{ fontFamily: DISPLAY_FONT, fontSize: "clamp(14px, 4.2vw, 19px)", letterSpacing: "0.06em", textTransform: "uppercase", color: INK }}
+              >
                 The Idea Bed
               </span>
-              <div className="flex items-center gap-2" style={{ fontFamily: LABEL_FONT, fontSize: 11, letterSpacing: "0.1em", color: MUTED }}>
-                <Link to="/" className="hover:opacity-70 transition-opacity uppercase" style={{ letterSpacing: "0.14em" }}>
+              <div className="flex items-center gap-2 min-w-0" style={{ fontFamily: LABEL_FONT, fontSize: 11, letterSpacing: "0.1em", color: MUTED }}>
+                <Link to="/" className="hover:opacity-70 transition-opacity uppercase shrink-0" style={{ letterSpacing: "0.14em" }}>
                   ← surface
                 </Link>
-                <span>·</span>
-                <span>SITE SURVEY · IDEAS NOT PURSUED</span>
+                <span className="hidden sm:inline">·</span>
+                <span className="hidden sm:inline truncate">SITE SURVEY · IDEAS NOT PURSUED</span>
               </div>
             </div>
-            <div className="flex items-center gap-8">
+            <div className="flex items-center gap-3 sm:gap-8 shrink-0">
               <div className="flex flex-col items-end gap-0.5">
-                <span style={{ fontFamily: LABEL_FONT, fontSize: 11, letterSpacing: "0.14em", color: MUTED }}>STRATUM</span>
-                <span style={{ fontFamily: DISPLAY_FONT, fontSize: 16, letterSpacing: "0.04em", color: INK }}>
-                  {STRATA[era].label} <span style={{ fontSize: 13, color: MUTED }}>({STRATA[era].span})</span>
+                <span className="hidden sm:inline" style={{ fontFamily: LABEL_FONT, fontSize: 11, letterSpacing: "0.14em", color: MUTED }}>STRATUM</span>
+                <span style={{ fontFamily: DISPLAY_FONT, fontSize: "clamp(12px, 3.2vw, 16px)", letterSpacing: "0.04em", color: INK, whiteSpace: "nowrap" }}>
+                  {STRATA[era].label} <span className="hidden sm:inline" style={{ fontSize: 13, color: MUTED }}>({STRATA[era].span})</span>
                 </span>
               </div>
-              <div className="flex flex-col items-end gap-0.5">
+              <div className="hidden sm:flex flex-col items-end gap-0.5">
                 <span style={{ fontFamily: LABEL_FONT, fontSize: 11, letterSpacing: "0.14em", color: MUTED }}>RECOVERED</span>
                 <span style={{ fontFamily: LABEL_FONT, fontSize: 16, color: INK }}>
                   {found.size} / {TOTAL_IDEAS}
                 </span>
               </div>
+              <span className="sm:hidden" style={{ fontFamily: LABEL_FONT, fontSize: 13, color: INK, whiteSpace: "nowrap" }}>
+                {found.size}/{TOTAL_IDEAS}
+              </span>
             </div>
           </div>
 
