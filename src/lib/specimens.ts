@@ -1,4 +1,10 @@
-import { supabase } from "./supabase";
+import { supabase, supabaseConfigured } from "./supabase";
+
+function assertConfigured() {
+  if (!supabaseConfigured) {
+    throw new Error("Supabase isn't configured for this deployment.");
+  }
+}
 
 export interface SpecimenRow {
   id: string;
@@ -17,6 +23,7 @@ export interface SpecimenRow {
 export type SpecimenDraft = Omit<SpecimenRow, "id"> & { id?: string };
 
 export async function fetchSpecimens(): Promise<SpecimenRow[]> {
+  assertConfigured();
   const { data, error } = await supabase
     .from("specimens")
     .select("*")
@@ -26,17 +33,20 @@ export async function fetchSpecimens(): Promise<SpecimenRow[]> {
 }
 
 export async function saveSpecimen(row: SpecimenDraft): Promise<SpecimenRow> {
+  assertConfigured();
   const { data, error } = await supabase.from("specimens").upsert(row).select().single();
   if (error) throw error;
   return data as SpecimenRow;
 }
 
 export async function deleteSpecimen(id: string): Promise<void> {
+  assertConfigured();
   const { error } = await supabase.from("specimens").delete().eq("id", id);
   if (error) throw error;
 }
 
 export async function uploadPlateImage(file: File): Promise<string> {
+  assertConfigured();
   const ext = file.name.split(".").pop() || "jpg";
   const path = `${crypto.randomUUID()}.${ext}`;
   const { error } = await supabase.storage.from("specimen-plates").upload(path, file);
