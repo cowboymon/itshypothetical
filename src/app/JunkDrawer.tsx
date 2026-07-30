@@ -1,5 +1,5 @@
 import { Link } from "react-router";
-import { motion } from "motion/react";
+import { motion, useScroll, useTransform } from "motion/react";
 import { useEffect, useRef } from "react";
 import rough from "roughjs";
 
@@ -192,32 +192,42 @@ function IdeaCard({ idea, frameColor }: { idea: TrashedIdea; frameColor: string 
 
 export default function JunkDrawer() {
   const drawerRef = useRef<HTMLDivElement>(null);
+  const { scrollY } = useScroll();
+  const collapseDistance = 260;
+  const headerScale = useTransform(scrollY, [0, collapseDistance], [1, 0.82]);
+  const headerOpacity = useTransform(scrollY, [0, collapseDistance], [1, 0]);
 
   return (
     <main style={{ background: PAPER, backgroundImage: NOISE_BG }}>
       <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&family=Kalam:wght@400;700&display=swap" />
 
-      <div className="max-w-5xl mx-auto px-6 pt-32 pb-0">
-        <Link
-          to="/"
-          className="inline-flex items-center gap-1.5 text-sm hover:opacity-70 transition-opacity duration-200 group"
-          style={{ fontFamily: "Kalam, cursive", color: INK }}
+      {/* Header — collapses (scales + fades) as you scroll into the drawer, layout height stays fixed */}
+      <div className="overflow-hidden">
+        <motion.div
+          className="max-w-5xl mx-auto px-6 pt-32 pb-16"
+          style={{ scale: headerScale, opacity: headerOpacity, transformOrigin: "top center" }}
         >
-          <span className="transition-transform duration-200 group-hover:-translate-x-0.5 inline-block">←</span>
-          Back to the sensible website
-        </Link>
+          <Link
+            to="/"
+            className="inline-flex items-center gap-1.5 text-sm hover:opacity-70 transition-opacity duration-200 group"
+            style={{ fontFamily: "Kalam, cursive", color: INK }}
+          >
+            <span className="transition-transform duration-200 group-hover:-translate-x-0.5 inline-block">←</span>
+            Back to the sensible website
+          </Link>
 
-        <div className="mt-12 pb-16">
-          <p className="text-sm tracking-wide mb-4" style={{ fontFamily: "Kalam, cursive", color: "#8B9A5B" }}>
-            everything that didn't make it
-          </p>
-          <h1 className="text-6xl sm:text-8xl leading-[1.05]" style={{ fontFamily: "Caveat, cursive", fontWeight: 700, color: INK }}>
-            The <MarkerCircle color="#6FA8D8">junk drawer</MarkerCircle>.
-          </h1>
-          <p className="text-lg mt-6 max-w-xl leading-relaxed" style={{ fontFamily: "Kalam, cursive", color: "#6B6252" }}>
-            Ideas that got as far as a name and then didn't. Drag stuff around — it's a drawer, that's what it's for.
-          </p>
-        </div>
+          <div className="mt-12">
+            <p className="text-sm tracking-wide mb-4" style={{ fontFamily: "Kalam, cursive", color: "#8B9A5B" }}>
+              everything that didn't make it
+            </p>
+            <h1 className="text-6xl sm:text-8xl leading-[1.05]" style={{ fontFamily: "Caveat, cursive", fontWeight: 700, color: INK }}>
+              The <MarkerCircle color="#6FA8D8">junk drawer</MarkerCircle>.
+            </h1>
+            <p className="text-lg mt-6 max-w-xl leading-relaxed" style={{ fontFamily: "Kalam, cursive", color: "#6B6252" }}>
+              Ideas that got as far as a name and then didn't. Drag stuff around — it's a drawer, that's what it's for.
+            </p>
+          </div>
+        </motion.div>
       </div>
 
       {/* The drawer itself — full bleed, edge to edge */}
