@@ -327,10 +327,22 @@ function BackLink() {
 }
 
 function DetailRow({ label, value }: { label: string; value: string }) {
+  const isLink = /^https?:\/\//i.test(value);
   return (
     <div className="flex items-baseline justify-between py-3 border-b border-border last:border-0 gap-8">
       <span className="font-[General_Sans] font-medium text-xs text-muted-foreground uppercase tracking-[0.12em] shrink-0">{label}</span>
-      <span className="font-[General_Sans] text-sm text-foreground text-right">{value}</span>
+      {isLink ? (
+        <a
+          href={value}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="font-[General_Sans] text-sm text-foreground text-right hover:underline"
+        >
+          {value.replace(/^https?:\/\/(www\.)?/i, "").replace(/\/$/, "")}
+        </a>
+      ) : (
+        <span className="font-[General_Sans] text-sm text-foreground text-right">{value}</span>
+      )}
     </div>
   );
 }
